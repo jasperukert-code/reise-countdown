@@ -1049,7 +1049,18 @@ footer {
   transform: rotateY(180deg);
   background: var(--karte-2);
   border-color: var(--linie-satt);
+  overflow: hidden;
 }
+/* Restzeit, bis die Karte von selbst zuklappt */
+.kk.um .kk-hinten::after {
+  content: "";
+  position: absolute; left: 0; bottom: 0; height: 2px;
+  width: 100%;
+  background: var(--akzent);
+  opacity: .55;
+  animation: restzeit 8s linear forwards;
+}
+@keyframes restzeit { to { width: 0; } }
 .kk-hinten .es {
   font-family: var(--display);
   font-size: 1.02rem; font-weight: 700; line-height: 1.25;
@@ -3137,10 +3148,12 @@ const SPRACHGRUPPEN = [
   ]}
 ];
 const SAETZE = SPRACHGRUPPEN.flatMap(g => g.saetze);
+const UMKLAPP_MS = 8000;   // reicht zum Lesen und einmal Nachsprechen
 
 INHALTE[14] = {
   lead: flach(`${SAETZE.length} Karten, nach Situation sortiert. Tippen dreht sie um —
-               vorne steht, was du sagen willst, hinten wie es klingt.`),
+               vorne steht, was du sagen willst, hinten wie es klingt.
+               Nach acht Sekunden klappen sie von selbst zurück.`),
   render(w) {
     SPRACHGRUPPEN.forEach(gruppe => {
       w.appendChild(el("p", "sprach-gruppe", gruppe.titel));
@@ -3161,9 +3174,15 @@ INHALTE[14] = {
               <span class="wo">${s.wo}</span>
             </span>
           </span>`;
+        // Karten klappen von selbst zu, damit das Gitter nicht offen liegen bleibt
         k.addEventListener("click", () => {
-          k.classList.toggle("um");
-          if (k.classList.contains("um")) sprich(s.es);
+          const dreht = !k.classList.contains("um");
+          k.classList.toggle("um", dreht);
+          clearTimeout(k._zurueck);
+          if (dreht) {
+            sprich(s.es);
+            k._zurueck = setTimeout(() => k.classList.remove("um"), UMKLAPP_MS);
+          }
         });
         g.appendChild(k);
       });
