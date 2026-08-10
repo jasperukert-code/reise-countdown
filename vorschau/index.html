@@ -4198,7 +4198,8 @@ function vorspann() {
   messen();
   addEventListener("resize", messen);
 
-  const DAUER = 3200;
+  // Ritt endet bei 2400 ms, der Name steht ab 2550 — danach bleibt er kurz stehen
+  const DAUER = 3450;
   const staub = [];
   let raf = 0, fertig = false;
   const t0 = performance.now();
@@ -4241,16 +4242,18 @@ function vorspann() {
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(0, BODEN); ctx.lineTo(B, BODEN); ctx.stroke();
 
-    // Der Ritt: von links aus dem Bild heraus nach rechts
-    const ritt = weich((t - 350) / 1750);
+    // Der Ritt: von links aus dem Bild heraus nach rechts.
+    // Ein Galoppzyklus dauert 320 ms — also gut drei pro Sekunde, wie beim
+    // echten Pferd. Mit 90 ms wirkte es wie im Schnelldurchlauf.
+    const ritt = weich((t - 350) / 2050);
     const gx = -140 + ritt * (B + 300);
     const groesse = Math.max(0.75, Math.min(1.35, B / 620));
     if (t > 300 && ritt < 1) {
-      if (staub.length < 90 && t % 2 < 1.2) {
+      if (staub.length < 90 && t % 3 < 1.6) {
         staub.push({ x: gx - 34 * groesse, y: BODEN, l: 1,
-                     vx: -(0.6 + Math.random() * 1.6), vy: -(Math.random() * 0.9) });
+                     vx: -(0.5 + Math.random() * 1.3), vy: -(Math.random() * 0.8) });
       }
-      gauchoZeichnen(ctx, gx, BODEN, (t / 90) % 1, false, groesse);
+      gauchoZeichnen(ctx, gx, BODEN, (t / 320) % 1, false, groesse);
     }
 
     // Staubfahne
@@ -4263,7 +4266,7 @@ function vorspann() {
     }
 
     // Der Name bleibt zurück
-    const auf = weich((t - 1450) / 750);
+    const auf = weich((t - 1750) / 800);
     wort.style.opacity = auf;
     wort.style.transform = `scale(${1.35 - 0.35 * auf})`;
     wort.style.letterSpacing = (0.26 - 0.16 * auf) + "em";
