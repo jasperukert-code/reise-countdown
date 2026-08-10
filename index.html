@@ -2137,16 +2137,28 @@ function karteBauen() {
     }).observe(svg);
   }
 
+  /* Bildausschnitt, der alle genannten Orte umfasst — mit Rand,
+     Mindestgröße und dem Seitenverhältnis der Grundkarte. */
+  function boxFuerOrte(ids, padGrad, minGrad) {
+    const lons = ids.map(id => ORTE[id].lon), lats = ids.map(id => ORTE[id].lat);
+    const padX = padGrad * B / LON_SPAN, padY = padGrad * H / LAT_SPAN;
+    let bx = px(Math.min(...lons)) - padX;
+    let by = py(Math.max(...lats)) - padY;
+    let bw = px(Math.max(...lons)) - px(Math.min(...lons)) + 2 * padX;
+    let bh = py(Math.min(...lats)) - py(Math.max(...lats)) + 2 * padY;
+
+    const minW = (minGrad || 0) * B / LON_SPAN;
+    if (bw < minW) { bx -= (minW - bw) / 2; bw = minW; }
+
+    const soll = H / B;
+    if (bh / bw < soll) { const n = bw * soll; by -= (n - bh) / 2; bh = n; }
+    else { const n = bh / soll; bx -= (n - bw) / 2; bw = n; }
+    return [bx, by, bw, bh];
+  }
+
   function hinein(r) {
-    const lons = r.orte.map(id => ORTE[id].lon), lats = r.orte.map(id => ORTE[id].lat);
-    // Mindestausdehnung, damit einzelne Orte nicht ins Unendliche zoomen
-    const spanne = Math.max(2.6, (Math.max(...lons) - Math.min(...lons)) * 2.4,
-                                 (Math.max(...lats) - Math.min(...lats)) * 2.4);
-    const mLon = (Math.max(...lons) + Math.min(...lons)) / 2;
-    const mLat = (Math.max(...lats) + Math.min(...lats)) / 2;
-    const bw = spanne / LON_SPAN * B;
-    const bh = bw * (H / B);
-    boxAnimieren([px(mLon) - bw / 2, py(mLat) - bh / 2, bw, bh]);
+    if (fliegtGerade) return;
+    boxAnimieren(boxFuerOrte(r.orte, 0.6, 2.6));
 
     svg.classList.add("gezoomt");
     Object.values(regionGruppen).forEach(g => g.classList.add("weg"));
@@ -2190,31 +2202,133 @@ function karteBauen() {
 
   panel.querySelector("#kZurueck").addEventListener("click", hinaus);
 
-  /* --- Die Route abfliegen --------------------------------------- */
+  /* --- Die Route abfliegen ---------------------------------------
+     Die Kamera folgt dem Flugzeug: nah an Frankfurt starten, für den
+     Atlantikflug herauszoomen, über Amerika wieder hinein, zum Schluss
+     zurück nach Deutschland. Segmentzeiten und Kamerafahrten laufen auf
+     derselben Zeitachse, sind aber getrennt gesteuert. */
   let fliegtGerade = false;
+
+  /* Segment 0 und 9 überqueren den Atlantik, 1–2 führen quer durch
+     Lateinamerika, 3–8 sind Inlandsflüge in Argentinien, 10 ist der
+     letzte Hüpfer nach München. Jede Gruppe bekommt ihren Ausschnitt. */
+  const AM_VON = 1, AM_BIS = 2, AR_VON = 3, AR_BIS = 8;
+  const ZEIT = { start: 1.4, atlantikHin: 4.0, amerika: 4.2, argentinien: 7.4, atlantikZur: 3.4, heimat: 1.8 };
+  const T_HIN         = ZEIT.start;
+  const T_AMERIKA     = T_HIN + ZEIT.atlantikHin;
+  const T_ARGENTINIEN = T_AMERIKA + ZEIT.amerika;
+  const T_ZURUECK     = T_ARGENTINIEN + ZEIT.argentinien;
+  const T_HEIMAT      = T_ZURUECK + ZEIT.atlantikZur;
+  const T_ENDE        = T_HEIMAT + ZEIT.heimat;
+
+  // Eine Gruppe von Segmenten auf ihr Zeitfenster verteilen, nach Streckenlänge
+  function gruppe(plan, von, bis, tVon, dauer) {
+    const km = FLUG_KM.slice(von, bis + 1);
+    const summe = km.reduce((s, k) => s + k, 0) || 1;
+    let t = tVon;
+    km.forEach((k, i) => {
+      const d = dauer * k / summe;
+      plan.push({ seg: von + i, von: t, bis: t + d });
+      t += d;
+    });
+  }
+
+  function segmentPlan() {
+    const plan = [];
+    plan.push({ seg: 0, von: T_HIN, bis: T_AMERIKA });
+    gruppe(plan, AM_VON, AM_BIS, T_AMERIKA, ZEIT.amerika);
+    gruppe(plan, AR_VON, AR_BIS, T_ARGENTINIEN, ZEIT.argentinien);
+    plan.push({ seg: FLUEGE.length - 2, von: T_ZURUECK, bis: T_HEIMAT });
+    plan.push({ seg: FLUEGE.length - 1, von: T_HEIMAT, bis: T_ENDE });
+    return plan;
+  }
+
+  function kameraPlan() {
+    const dt = boxFuerOrte(["fra", "muc"], 2.5, 9);
+    const am = boxFuerOrte(["cdmx", "lim", "bue"], 6, 0);
+    const ar = boxFuerOrte(["bue", "bar", "cal", "sla", "igu"], 3, 0);
+    return [
+      { t: 0,                   box: dt },
+      { t: T_HIN,               box: dt },
+      { t: T_HIN + 1.5,         box: GRUND },
+      { t: T_AMERIKA - 0.2,     box: GRUND },
+      { t: T_AMERIKA + 1.3,     box: am },
+      { t: T_ARGENTINIEN - 0.4, box: am },
+      { t: T_ARGENTINIEN + 1.2, box: ar },
+      { t: T_ZURUECK - 0.9,     box: ar },
+      { t: T_ZURUECK + 0.8,     box: GRUND },
+      { t: T_HEIMAT - 0.5,      box: GRUND },
+      { t: T_HEIMAT + 1.0,      box: dt },
+      { t: T_ENDE + 1.2,        box: dt }
+    ];
+  }
+
+  function boxMischen(a, b, e) { return a.map((v, i) => v + (b[i] - v) * e); }
+
   panel.querySelector("#kFliegen").addEventListener("click", () => {
     if (fliegtGerade) return;
-    if (svg.classList.contains("gezoomt")) hinaus();
-    fliegtGerade = true;
     const knopf = panel.querySelector("#kFliegen");
-    knopf.disabled = true;
+
+    // Zoomzustand und laufende Kamerafahrten zurücksetzen
+    if (animation) cancelAnimationFrame(animation);
+    svg.classList.remove("gezoomt");
+    Object.values(regionGruppen).forEach(g => g.classList.remove("weg"));
+    Object.values(ortGruppen).forEach(g => g.classList.remove("sichtbar"));
+    $("#kTitel").textContent = "Die Strecke";
+    $("#kZurueck").hidden = true;
+    info.innerHTML = '<span class="ki-leer">Unterwegs …</span>';
 
     const laengen = flugPfade.map(p => { try { return p.getTotalLength(); } catch { return 0; } });
-    const gesamtL = laengen.reduce((s, l) => s + l, 0) || 1;
-    const dauer = reduziert ? 1 : 17000;
+    const plan = segmentPlan();
+    const kamera = kameraPlan();
+
+    if (reduziert) {
+      $("#kZaehler").textContent = Math.round(GESAMT_KM).toLocaleString("de-DE") + " km";
+      info.innerHTML = '<span class="ki-leer">Tipp eine Region an</span>';
+      return;
+    }
+
+    fliegtGerade = true;
+    knopf.disabled = true;
     flieger.removeAttribute("hidden");
+    let heimatSichtbar = null;
 
     const t0 = performance.now();
     const schritt = (jetzt) => {
       if (!document.contains(svg)) { fliegtGerade = false; return; }
-      const p = Math.min(1, (jetzt - t0) / dauer);
-      let rest = p * gesamtL, idx = 0;
-      while (idx < laengen.length - 1 && rest > laengen[idx]) { rest -= laengen[idx]; idx++; }
+      const t = (jetzt - t0) / 1000;
+
+      /* Kamera */
+      let a = kamera[0], b = kamera[kamera.length - 1];
+      for (let i = 0; i < kamera.length - 1; i++)
+        if (t >= kamera[i].t && t <= kamera[i + 1].t) { a = kamera[i]; b = kamera[i + 1]; break; }
+      if (t > kamera[kamera.length - 1].t) a = b = kamera[kamera.length - 1];
+      const spanne = Math.max(.001, b.t - a.t);
+      const q = Math.max(0, Math.min(1, (t - a.t) / spanne));
+      const e = q < .5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;
+      boxSetzen(boxMischen(a.box, b.box, e));
+
+      // In den Deutschland-Phasen die beiden Flughäfen benennen
+      const nah = t < T_HIN + 1.2 || t > T_HEIMAT + 0.4;
+      if (nah !== heimatSichtbar) {
+        heimatSichtbar = nah;
+        ["fra", "muc"].forEach(id => ortGruppen[id].classList.toggle("sichtbar", nah));
+        Object.values(regionGruppen).forEach(g => g.classList.toggle("weg", nah));
+      }
+
+      /* Flugzeug */
+      let seg = plan[0], anteil = 0;
+      if (t <= plan[0].von) { seg = plan[0]; anteil = 0; }
+      else {
+        seg = plan[plan.length - 1]; anteil = 1;
+        for (const s of plan)
+          if (t >= s.von && t <= s.bis) { seg = s; anteil = (t - s.von) / (s.bis - s.von); break; }
+      }
 
       try {
-        const pfad = flugPfade[idx];
-        const pos = pfad.getPointAtLength(rest);
-        const vor = pfad.getPointAtLength(Math.min(laengen[idx], rest + 2));
+        const pfad = flugPfade[seg.seg], L = laengen[seg.seg];
+        const pos = pfad.getPointAtLength(L * anteil);
+        const vor = pfad.getPointAtLength(Math.min(L, L * anteil + Math.max(1, L * 0.01)));
         // Das Emoji zeigt von Haus aus nach rechts oben, daher die 45 Grad Ausgleich
         const winkel = Math.atan2(vor.y - pos.y, vor.x - pos.x) * 180 / Math.PI + 45;
         flieger.setAttribute("transform",
@@ -2222,17 +2336,25 @@ function karteBauen() {
       } catch {}
 
       // Kilometer aus den echten Distanzen, nicht aus der Pfadlänge
-      const km = FLUG_KM.slice(0, idx).reduce((s, k) => s + k, 0) +
-                 (FLUG_KM[idx] || 0) * (rest / (laengen[idx] || 1));
+      const km = FLUG_KM.slice(0, seg.seg).reduce((s, k) => s + k, 0) + FLUG_KM[seg.seg] * anteil;
       $("#kZaehler").textContent = Math.round(km).toLocaleString("de-DE") + " km";
 
-      if (p < 1) requestAnimationFrame(schritt);
+      if (t < T_ENDE) requestAnimationFrame(schritt);
       else {
+        flieger.setAttribute("hidden", "");            // angekommen, also weg damit
         $("#kZaehler").textContent = Math.round(GESAMT_KM).toLocaleString("de-DE") + " km";
         knopf.disabled = false;
         knopf.textContent = "Nochmal abfliegen";
         fliegtGerade = false;
-        setTimeout(() => flieger.setAttribute("hidden", ""), 1400);
+        // Nach kurzem Verweilen in München zurück auf die Gesamtansicht
+        setTimeout(() => {
+          if (fliegtGerade || svg.classList.contains("gezoomt")) return;
+          ["fra", "muc"].forEach(id => ortGruppen[id].classList.remove("sichtbar"));
+          Object.values(regionGruppen).forEach(g => g.classList.remove("weg"));
+          heimatSichtbar = null;
+          boxAnimieren(GRUND, 900);
+          info.innerHTML = '<span class="ki-leer">Tipp eine Region an</span>';
+        }, 1600);
       }
     };
     requestAnimationFrame(schritt);
