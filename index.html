@@ -2407,13 +2407,6 @@ const FRAGEN = [
     e: "Rund zehn Millimeter im ganzen Jahr — in Deutschland sind es je nach Ecke 600 bis 900. Sonnig wird es trotzdem selten: Von Juni bis November hängt der Küstennebel <i>garúa</i> über der Stadt."
   },
   {
-    f: "Der Koffer ist zu voll. Was kostet bei Lufthansa ein zweites Gepäckstück auf dem Flug nach Mexiko-Stadt?",
-    o: ["35 Euro, so viel wie beim Billigflieger", "80 Euro",
-        "rund 250 Euro — und zwar pro Richtung", "gar nichts, zwei Stück sind inklusive"],
-    r: 2,
-    e: "Auf der weiten Langstrecke verlangt Lufthansa für das zusätzliche Gepäckstück rund 250 Euro je Strecke, am Schalter noch mehr. Hin und zurück wären das etwa 500 Euro. Dafür kauft man sich vor Ort einen Koffer, füllt ihn und geht vom Rest noch essen."
-  },
-  {
     f: "In San Antonio de Areco dreht sich alles um Gauchos. Was ist ein <i>facón</i>?",
     o: ["ein breites Messer, das hinten im Gürtel steckt", "ein Kurzer vor dem Abendessen",
         "der Sattel aus Schaffell", "der Vorarbeiter einer Estancia"],
@@ -2445,12 +2438,21 @@ const FRAGEN = [
         "Winterende — in Patagonien unter null, in Iguazú 25 Grad", "Regenzeit, aber durchgehend warm"],
     r: 2,
     e: "Südhalbkugel, also Winter. In Bariloche und El Calafate liegt Schnee, in Tilcara klettert es tagsüber auf 20 Grad und fällt nachts fast auf null — und Iguazú ist subtropisch. Ihr braucht praktisch zwei Garderoben."
+  },
+  {
+    f: flach(`Die Reise ist um, der Koffer voller Erinnerungen — und beim Packen
+              für den Rückflug wird klar: Das ist Übergepäck. Was kostet bei
+              Lufthansa ein zusätzliches Gepäckstück?`),
+    o: ["35 Euro, so viel wie beim Billigflieger", "80 Euro",
+        "rund 250 Euro", "gar nichts, zwei Stück sind inklusive"],
+    r: 2,
+    e: "Auf der weiten Langstrecke verlangt Lufthansa für das zusätzliche Gepäckstück rund 250 Euro, am Schalter noch mehr. Günstiger wäre, die Schokolade aus Bariloche schon unterwegs aufzuessen — aber dafür ist es dann ja zu spät."
   }
 ];
 
 INHALTE[11] = {
-  lead: flach(`Zwölf Fragen zu den Orten, an denen du in den nächsten Wochen stehst —
-               und zu zwei Dingen, die vorher zu klären wären.`),
+  lead: flach(`Zwölf Fragen quer durch die Reise, in der Reihenfolge, in der ihr
+               unterwegs seid — vom Kofferpacken bis zum Rückflug.`),
   render(w) {
     let i = 0, punkte = 0, gesperrt = false;
 
@@ -2463,6 +2465,18 @@ INHALTE[11] = {
     const buehne = el("div");
     w.appendChild(buehne);
 
+    /* Die Optionen werden bei jedem Durchgang neu gemischt. Sonst steht
+       die richtige Antwort immer an derselben Stelle, und nach ein paar
+       Fragen rät man die Position statt der Sache. */
+    function gemischt(q) {
+      const a = q.o.map((text, k) => ({ text, richtig: k === q.r }));
+      for (let n = a.length - 1; n > 0; n--) {
+        const m = Math.floor(Math.random() * (n + 1));
+        [a[n], a[m]] = [a[m], a[n]];
+      }
+      return a;
+    }
+
     function frage() {
       const q = FRAGEN[i];
       $("#qNr").textContent = `Frage ${i + 1} von ${FRAGEN.length}`;
@@ -2471,31 +2485,35 @@ INHALTE[11] = {
 
       buehne.innerHTML = "";
       buehne.appendChild(el("h3", "q-frage", q.f));
+      const wahl = gemischt(q);
       const opts = el("div", "q-optionen");
-      q.o.forEach((text, k) => {
+      wahl.forEach((o, k) => {
         const b = el("button", "q-opt");
         b.type = "button";
-        b.innerHTML = `<span class="marke">${"ABCD"[k]}</span><span>${text}</span>`;
-        b.addEventListener("click", () => antwort(k, opts, q));
+        b.innerHTML = `<span class="marke">${"ABCD"[k]}</span><span>${o.text}</span>`;
+        b.addEventListener("click", () => antwort(k, opts, q, wahl));
         opts.appendChild(b);
       });
       buehne.appendChild(opts);
       gesperrt = false;
     }
 
-    function antwort(k, opts, q) {
+    function antwort(k, opts, q, wahl) {
       if (gesperrt) return;
       gesperrt = true;
       const knoepfe = [...opts.children];
       knoepfe.forEach(b => b.disabled = true);
-      knoepfe[q.r].classList.add("richtig");
-      if (k === q.r) { punkte++; konfetti(35, .5, .3); }
+
+      const richtigIdx = wahl.findIndex(o => o.richtig);
+      const getroffen = wahl[k].richtig;
+      knoepfe[richtigIdx].classList.add("richtig");
+      if (getroffen) { punkte++; konfetti(35, .5, .3); }
       else knoepfe[k].classList.add("falsch");
 
       $("#qStand").textContent = `${punkte} richtig`;
 
       const e = el("div", "q-erklaerung");
-      e.innerHTML = `<b>${k === q.r ? "Richtig." : "Knapp daneben."}</b> ${q.e}`;
+      e.innerHTML = `<b>${getroffen ? "Richtig." : "Knapp daneben."}</b> ${q.e}`;
       buehne.appendChild(e);
 
       const weiter = el("p");
