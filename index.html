@@ -3287,7 +3287,7 @@ const musik = (() => {
     uhr = setTimeout(planen, 30);
   }
 
-  return {
+  const api = {
     start() {
       if (!an || laeuft) return;
       try {
@@ -3325,6 +3325,22 @@ const musik = (() => {
       return an;
     }
   };
+
+  /* Der Bildaufbau ruht, sobald die Seite in den Hintergrund geht — die
+     Musik lief aber über einen eigenen Zeitgeber weiter und spielte
+     hinter einer weggewischten App munter fort. Sie pausiert jetzt mit. */
+  let pausiert = false;
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      pausiert = laeuft;
+      if (laeuft) api.stopp();
+    } else if (pausiert) {
+      pausiert = false;
+      api.start();
+    }
+  });
+
+  return api;
 })();
 
 /* ============================================================
