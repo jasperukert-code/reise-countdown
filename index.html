@@ -6,7 +6,20 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="dark light">
 <meta name="description" content="Sieben Türchen bis zur Reise nach Mexiko, Peru und Argentinien.">
-<title>Sieben Türchen bis Lateinamerika</title>
+<title>Vámonos — Sieben Türchen bis Lateinamerika</title>
+
+<!-- Auf dem Startbildschirm erscheint die Seite als „Vámonos“ -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<meta name="apple-mobile-web-app-title" content="Vámonos">
+<meta name="application-name" content="Vámonos">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#101A2E" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#EFEAD9" media="(prefers-color-scheme: light)">
 
 <style>
 /* Minimaler Reset */
@@ -143,6 +156,9 @@ button { font: inherit; }
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+  /* Am Startbildschirm läuft die Seite randlos — Statusleiste aussparen */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Kalkputz-Textur, sehr subtil */
@@ -1202,7 +1218,7 @@ footer {
 
   <div class="inner">
     <header>
-      <p class="eyebrow">Ein Türchen pro Tag · 10. – 16. August</p>
+      <p class="eyebrow">Vámonos · Ein Türchen pro Tag · 10. – 16. August</p>
       <h1>Sieben Türchen<br>bis <em>Lateinamerika</em></h1>
       <p class="untertitel" id="untertitel">Jeden Tag geht eines auf. Nicht früher — die Kacheln wissen, welcher Tag heute ist.</p>
 
