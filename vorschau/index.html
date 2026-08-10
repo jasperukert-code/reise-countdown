@@ -3241,8 +3241,12 @@ function galoppSpiel() {
   let B = 0, H = 0, BODEN = 0;
 
   const PX_PRO_METER = 25;
-  const SCHWERKRAFT = 0.72;
-  const ABSPRUNG = -11.4;
+  /* Flacher Bogen mit langer Flugzeit: Entscheidend fürs Spielgefühl ist
+     nicht die Sprunghöhe, sondern wie lange man oben bleibt. Bei kurzem,
+     steilem Sprung liegt das brauchbare Absprungfenster bei gut einer
+     Zehntelsekunde — das trifft niemand. So sind es rund vier Zehntel. */
+  const SCHWERKRAFT = 0.5;
+  const ABSPRUNG = -11;
 
   function messen() {
     const b = cv.parentElement.getBoundingClientRect();
@@ -3280,12 +3284,12 @@ function galoppSpiel() {
 
   /* --- Hindernisse ------------------------------------------------ */
   const ARTEN = [
-    { art: "zaun",   breite: 26, hoehe: 40 },
-    { art: "zaun",   breite: 38, hoehe: 32 },
-    { art: "fels",   breite: 30, hoehe: 24 },
-    { art: "fels",   breite: 44, hoehe: 20 },
-    { art: "kaktus", breite: 22, hoehe: 46 },
-    { art: "busch",  breite: 34, hoehe: 18 }
+    { art: "zaun",   breite: 24, hoehe: 32 },
+    { art: "zaun",   breite: 36, hoehe: 26 },
+    { art: "fels",   breite: 28, hoehe: 22 },
+    { art: "fels",   breite: 42, hoehe: 18 },
+    { art: "kaktus", breite: 20, hoehe: 34 },
+    { art: "busch",  breite: 32, hoehe: 16 }
   ];
 
   function hindernisSetzen() {
@@ -3471,7 +3475,7 @@ function galoppSpiel() {
       hindernisse = hindernisse.filter(o => o.x + o.breite > -60);
 
       // Treffer? Der Kasten ist enger als die Silhouette, sonst wird es unfair
-      const links = REITER_X - 24, rechts = REITER_X + 26;
+      const links = REITER_X - 15, rechts = REITER_X + 18;
       for (const o of hindernisse) {
         if (o.x < rechts && o.x + o.breite > links && hoehe < o.hoehe + 4) {
           return schluss();
