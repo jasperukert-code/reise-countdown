@@ -4171,6 +4171,9 @@ if (VORSCHAU) {
 function vorspann() {
   const heuteSchluessel = new Date().toISOString().slice(0, 10);
   if (reduziert || speicher.get("vorspannAm", "") === heuteSchluessel) return;
+  // Im Hintergrund geladen? Dann gar nicht erst anfangen — der Bildaufbau
+  // ruht dort, und der Vorspann bliebe über der Seite liegen.
+  if (document.hidden) return;
   speicher.set("vorspannAm", heuteSchluessel);
 
   const buehne = el("div", "vorspann");
@@ -4206,6 +4209,10 @@ function vorspann() {
     setTimeout(() => buehne.remove(), 420);
   }
   buehne.addEventListener("pointerdown", beenden);
+  /* Notbremse: Wandert die Seite mitten im Vorspann in den Hintergrund,
+     ruht der Bildaufbau und die Schleife käme nie ans Ende. Diese Uhr
+     läuft weiter und räumt in jedem Fall auf. */
+  setTimeout(beenden, DAUER + 1200);
 
   const weich = (x) => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
 
