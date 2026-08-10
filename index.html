@@ -196,6 +196,35 @@ h1 em {
 .route b { color: var(--schrift); font-weight: 600; }
 .route span[aria-hidden] { color: var(--akzent); }
 
+/* Sprungleiste, nur im Vorschaumodus */
+.vorschau-leiste {
+  display: flex; flex-wrap: wrap; gap: 7px;
+  align-items: center; justify-content: center;
+  margin: -12px auto 26px;
+  padding: 12px 14px;
+  max-width: 30rem;
+  border: 1px dashed var(--linie-satt);
+  border-radius: var(--r);
+  background: var(--verschlossen);
+}
+.vl-titel {
+  font-family: var(--mono); font-size: .6rem;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--schrift-2); margin-right: 4px;
+}
+.vl-knopf {
+  font-family: var(--mono); font-size: .78rem;
+  font-variant-numeric: tabular-nums;
+  min-width: 34px; padding: 6px 8px;
+  background: var(--karte);
+  color: var(--schrift);
+  border: 1px solid var(--linie);
+  border-radius: var(--r);
+  cursor: pointer;
+}
+.vl-knopf:hover { border-color: var(--akzent); color: var(--akzent); }
+.vl-knopf:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+
 /* Countdown-Uhr */
 .uhr {
   display: inline-flex; gap: 2px;
@@ -1071,7 +1100,7 @@ const speicher = {
 };
 
 const params = new URLSearchParams(location.search);
-const VORSCHAU = params.get("vorschau") === "1";
+const VORSCHAU = params.get("vorschau") === "1" || /\/vorschau\/?$/.test(location.pathname);
 
 const heuteMitternacht = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 const tagDatum = (tag) => new Date(JAHR, 7, tag, 0, 0, 0, 0);   // Monat 7 = August
@@ -2389,8 +2418,28 @@ setInterval(() => {
 feldBauen.marker = TUEREN.map(t => istFrei(t.tag) ? "1" : "0").join("");
 
 if (VORSCHAU) {
-  $("#untertitel").innerHTML = 'Vorschaumodus — alle Türchen sind offen. Ohne <code>?vorschau=1</code> gilt das Datum.';
+  $("#untertitel").innerHTML = "Vorschaumodus — alle sieben Türchen sind offen. Für Katharina gilt weiterhin das Datum.";
+
+  const leiste = el("div", "vorschau-leiste");
+  leiste.innerHTML = '<span class="vl-titel">Direkt öffnen</span>';
+  TUEREN.forEach(t => {
+    const b = el("button", "vl-knopf", String(t.tag));
+    b.type = "button";
+    b.title = t.titel;
+    b.setAttribute("aria-label", `Türchen ${t.tag}. August: ${t.titel}`);
+    b.addEventListener("click", () => oeffne(t.tag));
+    leiste.appendChild(b);
+  });
+  $("#untertitel").after(leiste);
 }
+
+// Direktsprung per Adresse, z. B. …/vorschau/#t13
+(() => {
+  const m = location.hash.match(/^#t(\d+)$/);
+  if (m && TUEREN.some(t => t.tag === +m[1]) && istFrei(+m[1])) {
+    setTimeout(() => oeffne(+m[1]), 60);
+  }
+})();
 
 // Beim ersten Besuch: kleiner Empfang
 if (!speicher.get("begruesst", false)) {
