@@ -266,6 +266,13 @@ h1 em {
 }
 .vl-knopf:hover { border-color: var(--akzent); color: var(--akzent); }
 .vl-knopf:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+.vl-aus {
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-size: .6rem;
+  color: var(--schrift-2);
+  border-style: dashed;
+}
 
 /* Countdown-Uhr */
 .uhr {
@@ -926,6 +933,14 @@ footer {
   text-align: center;
 }
 .los-inhalt .l-icon { line-height: 0; color: var(--akzent); }
+.los-inhalt .l-land {
+  font-family: var(--mono);
+  font-size: .58rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--jade);
+  margin-top: 2px;
+}
 .los-inhalt .l-titel {
   font-family: var(--display);
   font-size: 1.22rem;
@@ -1298,7 +1313,28 @@ const speicher = {
 };
 
 const params = new URLSearchParams(location.search);
-const VORSCHAU = params.get("vorschau") === "1" || /\/vorschau\/?$/.test(location.pathname);
+
+/* Der Vorschaumodus muss zwei Klippen überstehen, wenn die Seite zum
+   Startbildschirm gelegt wird:
+   1. Das Manifest gibt start_url vor und würde den Parameter schlucken —
+      deshalb wird der Manifest-Link bei aktiver Vorschau entfernt, dann
+      merkt sich das System die aufgerufene Adresse samt Parameter.
+   2. Auf iOS hat eine Homescreen-App einen eigenen Speicher, getrennt
+      von Safari. Greift Punkt 1 nicht, rettet das gemerkte Flag den
+      Modus zumindest überall dort, wo der Speicher geteilt wird.
+   Mit ?vorschau=0 lässt sich der Modus wieder abschalten. */
+(() => {
+  const p = params.get("vorschau");
+  if (p === "0") speicher.set("vorschaumodus", false);
+  else if (p === "1" || /\/vorschau\/?$/.test(location.pathname)) speicher.set("vorschaumodus", true);
+})();
+const VORSCHAU = speicher.get("vorschaumodus", false);
+
+if (VORSCHAU) {
+  document.querySelector('link[rel="manifest"]')?.remove();
+  const titel = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+  if (titel) titel.content = "Vámonos Test";
+}
 
 const heuteMitternacht = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 const tagDatum = (tag) => new Date(JAHR, 7, tag, 0, 0, 0, 0);   // Monat 7 = August
@@ -1478,7 +1514,7 @@ function symbol(k, groesse) {
 const TUEREN = [
   { tag: 10, sym: "route",  titel: "Die Route",       teaser: "Dreizehn Etappen, vom Vulkangipfel bis zum Gletscher." },
   { tag: 11, sym: "quiz",   titel: "Das Quiz",        teaser: "Zwölf Fragen. Die Hälfte glaubst du mir nicht." },
-  { tag: 12, sym: "los",    titel: "Drei Rubbellose", teaser: "Freirubbeln. Einlösbar unterwegs." },
+  { tag: 12, sym: "los",    titel: "Drei Rubbellose", teaser: "Eines pro Land. Freirubbeln, dann gilt es." },
   { tag: 13, sym: "koffer", titel: "Kofferchaos",     teaser: "Ein Spiel. Steigeisen ja, Weihnachtsbaum nein." },
   { tag: 14, sym: "reden",  titel: "Notfall-Spanisch",teaser: "Die Sätze, die wirklich zählen." },
   { tag: 15, sym: "liste",  titel: "Die letzte Liste",teaser: "Morgen Mittag geht der Flieger. Also heute packen." },
@@ -2592,24 +2628,28 @@ INHALTE[11] = {
 const LOS_SYM = {
   schlaf: `<path d="M20.4 14.6 A8.6 8.6 0 1 1 9.4 3.6 a6.8 6.8 0 0 0 11 11 z"/>
            <path d="M4.6 6.2 h3.2 l-3.2 3.4 h3.2" stroke-width="1.2" opacity=".6"/>`,
-  glas:   `<path d="M4.5 4.5 h15 l-7.5 8 z"/><path d="M12 12.5 v6"/><path d="M8 19 h8"/>
-           <circle cx="15.6" cy="7.3" r="1.35" fill="currentColor" stroke="none" opacity=".7"/>`,
-  veto:   `<path d="M4 6 h16 l-6.2 6.6 v6.1 l-3.6 2.1 v-8.2 z"/>
-           <path d="M15.5 15.5 l5 5 M20.5 15.5 l-5 5" stroke-width="1.7" stroke-linecap="round"/>`
+  essen:  `<path d="M8 21.5 V12"/>
+           <path d="M5.4 2.8 V8.4 a2.6 2.6 0 0 0 5.2 0 V2.8"/>
+           <path d="M16.4 21.5 V12.6"/>
+           <path d="M16.4 2.6 c3.4 2.2 3.4 8.4 0 10 z"/>`,
+  tango:  `<path d="M10.4 17.6 V5.4 L20 3.2 v12"/>
+           <ellipse cx="7.6" cy="18.2" rx="3" ry="2.3" transform="rotate(-18 7.6 18.2)"/>
+           <ellipse cx="17.2" cy="15.8" rx="3" ry="2.3" transform="rotate(-18 17.2 15.8)"/>
+           <path d="M10.4 8.4 L20 6.2" stroke-width="1.2" opacity=".6"/>`
 };
 
 const LOSE = [
-  { sym: "schlaf", titel: "Einmal ausschlafen",
+  { sym: "schlaf", titel: "Einmal ausschlafen", land: "Mexiko",
     text: "Ein Vormittag ohne Wecker und ohne „wir müssten mal los“. Du sagst wann — und der 25. August, nach zwei Tagen Iztaccíhuatl, wäre ein guter Kandidat." },
-  { sym: "glas",   titel: "Die rechte Spalte ist egal",
-    text: "Ein Essen, bei dem du nicht auf die Preise schaust. Einmal pro Land — in Lima, in Mexiko und in Buenos Aires." },
-  { sym: "veto",   titel: "Veto-Recht",
-    text: "Ein Programmpunkt, den du streichst. Ohne Begründung, ohne Diskussion und ohne späteres „aber wir hätten doch …“." }
+  { sym: "essen",  titel: "Ich lade dich ein", land: "Peru",
+    text: "Ein Abend in Lima, in einem Restaurant deiner Wahl. Du suchst aus, ohne auf die rechte Spalte zu schauen — Lima gilt als beste Küchenstadt Südamerikas, die Auswahl ist also nicht das Problem." },
+  { sym: "tango",  titel: "Eine Nacht Tango", land: "Argentinien",
+    text: "Eine Milonga in Buenos Aires, mit der Anfängerstunde davor. Ich verspreche nicht, dass ich es kann — nur, dass ich mitkomme und keine Ausrede suche." }
 ];
 
 INHALTE[12] = {
-  lead: flach(`Drei Lose. Freirubbeln mit dem Finger oder der Maus.
-               Was drunter steht, gilt.`),
+  lead: flach(`Drei Lose, eines pro Land. Freirubbeln mit dem Finger —
+               und was drunter steht, gilt.`),
   render(w) {
     const hinweis = el("p");
     hinweis.style.cssText = "font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--schrift-2)";
@@ -2626,6 +2666,7 @@ INHALTE[12] = {
         <div class="los-inhalt">
           <div class="l-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34"
             fill="none" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round">${LOS_SYM[l.sym]}</svg></div>
+          <div class="l-land">${l.land}</div>
           <div class="l-titel">${l.titel}</div>
           <div class="l-text">${l.text}</div>
         </div>`;
@@ -3283,6 +3324,14 @@ if (VORSCHAU) {
     b.addEventListener("click", () => oeffne(t.tag));
     leiste.appendChild(b);
   });
+  const aus = el("button", "vl-knopf vl-aus", "Vorschau aus");
+  aus.type = "button";
+  aus.title = "Zeigt die Seite so, wie Katharina sie sieht";
+  aus.addEventListener("click", () => {
+    speicher.set("vorschaumodus", false);
+    location.href = location.pathname.replace(/vorschau\/?$/, "") + "?vorschau=0";
+  });
+  leiste.appendChild(aus);
   $("#untertitel").after(leiste);
 }
 
