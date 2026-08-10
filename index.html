@@ -1083,66 +1083,6 @@ footer {
 .hoeren:hover { border-color: var(--akzent); color: var(--akzent); }
 
 /* ============================================================
-   TAG 6 — Packliste
-   ============================================================ */
-.pl-gruppe + .pl-gruppe { margin-top: 20px; }
-.pl-kopf {
-  font-family: var(--mono);
-  font-size: .64rem;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--akzent);
-  margin-bottom: 9px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--linie);
-}
-.pl-zeile {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 12px;
-  border: 1px solid transparent;
-  border-radius: var(--r);
-  cursor: pointer;
-  transition: background .16s;
-  width: 100%;
-  text-align: left;
-  background: none;
-  color: inherit;
-  font-family: inherit;
-  font-size: .94rem;
-}
-.pl-zeile:hover { background: var(--verschlossen); }
-.pl-zeile:focus-visible { outline: 2px solid var(--akzent); outline-offset: -1px; }
-.pl-box {
-  width: 19px; height: 19px; flex-shrink: 0;
-  border: 1.5px solid var(--linie-satt);
-  border-radius: 3px;
-  display: grid; place-items: center;
-  font-size: .74rem; color: transparent;
-  transition: background .18s, border-color .18s, color .18s;
-}
-.pl-zeile.ab .pl-box { background: var(--jade); border-color: var(--jade); color: #fff; }
-.pl-zeile.ab .pl-text { text-decoration: line-through; color: var(--schrift-2); }
-.pl-text { flex: 1; line-height: 1.35; }
-.pl-reaktion {
-  font-size: .76rem; color: var(--jade);
-  font-family: var(--mono); letter-spacing: .05em;
-  opacity: 0; transition: opacity .25s;
-  flex-shrink: 0;
-}
-.pl-zeile.ab .pl-reaktion { opacity: 1; }
-.pl-stand {
-  margin-top: 22px; padding: 16px;
-  border: 1px dashed var(--linie-satt);
-  border-radius: var(--r);
-  text-align: center;
-  font-family: var(--mono);
-  font-size: .8rem;
-  letter-spacing: .08em;
-  color: var(--schrift-2);
-}
-.pl-stand b { color: var(--akzent); font-size: 1.5rem; font-variant-numeric: tabular-nums; display: block; margin-bottom: 4px; }
-
-/* ============================================================
    TAG 7 — Boarding Pass
    ============================================================ */
 .bp {
@@ -1534,9 +1474,11 @@ const SYM = {
           <path d="M9.8 9.6 h11.7 v7.4 h-2.2 v2.9 l-3.1-2.9 h-6.4 z" fill="var(--karte)"/>
           <path d="M6 8 v-.9 M6 9.7 v.05" stroke-width="1.4" stroke-linecap="round"/>
           <path d="M17.4 13.4 v.05 M17.4 15.1 v.9" stroke-width="1.4" stroke-linecap="round"/>`,
-  liste: `<path d="M3.5 6.6 l1.7 1.7 L8.6 4.9"/><path d="M11.5 7 h9" stroke-width="1.2"/>
-          <path d="M3.5 12.3 l1.7 1.7 L8.6 10.6"/><path d="M11.5 12.7 h9" stroke-width="1.2"/>
-          <path d="M3.5 18 l1.7 1.7 L8.6 16.3" opacity=".45"/><path d="M11.5 18.4 h6" stroke-width="1.2" opacity=".45"/>`,
+  huf:   `<path d="M7.4 20.4 C4.6 17.6 3.6 14.4 3.9 11.2 4.3 6.6 7.6 3.4 12 3.4
+                   s7.7 3.2 8.1 7.8 c.3 3.2-.7 6.4-3.5 9.2"/>
+          <path d="M7.4 20.4 h3.1 M13.5 20.4 h3.1" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M8.4 12.2 a3.6 3.6 0 0 1 7.2 0 c0 2.2-.9 4.2-2.3 5.6 h-2.6
+                   c-1.4-1.4-2.3-3.4-2.3-5.6 z" opacity=".45"/>`,
   flug:  `<path d="M11.2 2.6 a.9 .9 0 0 1 1.6 0 l1.1 6.2 6.9 4 a1 1 0 0 1 .5.9 v1.2 l-7.6-2.1-.7 4.6 2.4 1.9 v1.3 l-3.4-1.1-3.4 1.1 v-1.3 l2.4-1.9-.7-4.6-7.6 2.1 v-1.2 a1 1 0 0 1 .5-.9 l6.9-4 z"/>`
 };
 
@@ -1557,7 +1499,7 @@ const TUEREN = [
   { tag: 12, sym: "los",    titel: "Drei Rubbellose", teaser: "Eines pro Land. Freirubbeln, dann gilt es." },
   { tag: 13, sym: "koffer", titel: "Kofferchaos",     teaser: "Ein Spiel. Steigeisen ja, Weihnachtsbaum nein." },
   { tag: 14, sym: "reden",  titel: "Notfall-Spanisch",teaser: "Die Sätze, die wirklich zählen — mit Lautschrift." },
-  { tag: 15, sym: "liste",  titel: "Die letzte Liste",teaser: "Morgen Mittag geht der Flieger. Also heute packen." },
+  { tag: 15, sym: "huf",    titel: "Galopp",          teaser: "Spring über alles, was kommt. Es wird schneller." },
   { tag: 16, sym: "flug",   titel: "Boarding",        teaser: "Das war's mit Warten." }
 ];
 
@@ -1624,7 +1566,7 @@ $("#schliessen").addEventListener("click", schliesse);
 addEventListener("keydown", (e) => { if (e.key === "Escape" && $("#overlay").classList.contains("auf")) schliesse(); });
 
 /* ============================================================
-   DIE ETAPPEN — Grundlage für Karte, Quiz und Packliste
+   DIE ETAPPEN — Grundlage für Karte und Quiz
    ============================================================ */
 const ORTE = {
   fra:  { name: "Frankfurt",             lon:   8.57, lat:  50.05 },
@@ -1685,7 +1627,7 @@ const ETAPPEN = [
     fakt: "Tor zum Perito Moreno, einem der wenigen Gletscher weltweit, der nicht schrumpft. Er schiebt sich bis zu zwei Meter am Tag vor, dann kracht vorne eine Eiswand ins Wasser. Der Ort heißt nach einer Beere — wer sie isst, kehrt angeblich nach Patagonien zurück.",
     dazu: [
       { o: "cal", wann: "12. Sep", was: "Gletscher-Trekking",
-        fakt: "Mit Steigeisen auf das Eis. Dafür stehen die wasserdichten Schuhe auf der Packliste." },
+        fakt: "Mit Steigeisen auf das Eis — dafür braucht es die wasserdichten Schuhe." },
       { o: "cal", wann: "13. Sep", was: "Bootstour",
         fakt: "Vom Wasser aus sieht man erst, wie hoch die Abbruchkante wirklich ist — rund sechzig Meter über der Oberfläche." }
     ]},
@@ -3247,104 +3189,363 @@ function sprich(text) {
 }
 
 /* ============================================================
-   TAG 15 — DIE LETZTE LISTE
+   TAG 15 — GALOPP
+   Endloser Ritt: Der Gaucho springt über alles, was kommt, und es
+   wird stetig schneller. Gezählt werden die zurückgelegten Meter.
    ============================================================ */
-const PACKEN = [
-  { g: "Ohne das geht gar nichts", punkte: [
-    ["Reisepass", "Sechs Monate gültig"],
-    ["Impfausweis", "Gelbfieber für Iguazú"],
-    ["Kreditkarte und Bargeld", "In Argentinien zählt Bargeld"],
-    ["Reiseadapter", "Typ A in Mexiko, Typ I in Argentinien"],
-    ["Offline-Karten geladen", "Vor dem Abflug, nicht danach"]
-  ]},
-  { g: "Für den Iztaccíhuatl — 5.230 Meter", punkte: [
-    ["Feste Bergschuhe", "Eingelaufen, nicht neu"],
-    ["Handschuhe und Mütze", "Am Gipfel unter null"],
-    ["Zwiebellook zum Ausziehen", "Aufstieg heiß, Gipfel eisig"],
-    ["Stirnlampe", "Ihr startet nachts"],
-    ["Kopfschmerztabletten", "Die Höhe kommt schneller als gedacht"]
-  ]},
-  { g: "Für Patagonien — Bariloche und der Gletscher", punkte: [
-    ["Richtig warme Jacke", "Nicht die Übergangsjacke"],
-    ["Thermounterwäsche", "El Calafate ist Winter"],
-    ["Wasserdichte Schuhe", "Auf dem Eis wird alles nass"],
-    ["Sonnenbrille", "Gletscher blendet mehr als Schnee"],
-    ["Lippenbalsam", "Kälte und Wind"]
-  ]},
-  { g: "Für den Norden und die Wasserfälle", punkte: [
-    ["Etwas Leichtes", "Iguazú hat 25 Grad"],
-    ["Regenjacke", "Am Teufelsschlund wirst du nass"],
-    ["Mückenschutz", "Subtropen"],
-    ["Sonnencreme, hoher Faktor", "Tilcara liegt auf 2.465 Metern"]
-  ]},
-  { g: "Was man vergisst", punkte: [
-    ["Powerbank", "Lange Tage, wenig Steckdosen"],
-    ["Ein Buch", "Frankfurt–Mexiko sind zwölf Stunden"],
-    ["Waschmittel für unterwegs", "Drei Wochen, ein Koffer"],
-    ["Platz für Rückmitbringsel", "Schokolade aus Bariloche, Talavera aus Puebla"]
-  ]}
-];
 
 INHALTE[15] = {
-  lead: flach(`Morgen um halb zwei geht der Flieger. Heute ist der Tag,
-               an dem man merkt, was noch fehlt.`),
+  lead: flach(`Morgen um halb zwei geht der Flieger. Bis dahin:
+               springen, was kommt. Es wird immer schneller — irgendwann
+               erwischt dich ein Hindernis, die Frage ist nur, nach wie vielen Metern.`),
   render(w) {
-    const alle = PACKEN.reduce((n, g) => n + g.punkte.length, 0);
-    let ab = 0;
+    const rekord = speicher.get("galoppBest", 0);
 
-    PACKEN.forEach((grp, gi) => {
-      const box = el("div", "pl-gruppe");
-      box.appendChild(el("p", "pl-kopf", grp.g));
-      grp.punkte.forEach(([text, note], pi) => {
-        const key = `pack:${gi}:${pi}`;
-        const an = speicher.get(key, false);
-        if (an) ab++;
-        const z = el("button", "pl-zeile" + (an ? " ab" : ""));
-        z.type = "button";
-        z.setAttribute("aria-pressed", an ? "true" : "false");
-        z.innerHTML = `
-          <span class="pl-box" aria-hidden="true">✓</span>
-          <span class="pl-text">${text}</span>
-          <span class="pl-reaktion">${note}</span>`;
-        z.addEventListener("click", () => {
-          const jetzt = !z.classList.contains("ab");
-          z.classList.toggle("ab", jetzt);
-          z.setAttribute("aria-pressed", jetzt ? "true" : "false");
-          speicher.set(key, jetzt);
-          ab += jetzt ? 1 : -1;
-          standAktualisieren();
-        });
-        box.appendChild(z);
-      });
-      w.appendChild(box);
-    });
+    const huelle = el("div", "spiel-huelle");
+    huelle.innerHTML = `
+      <div class="spiel-hud">
+        <span>Strecke <b id="gMeter">0 m</b></span>
+        <span>Tempo <b id="gTempo">–</b></span>
+        <span>Rekord <b id="gBest">${rekord} m</b></span>
+      </div>
+      <div style="position:relative">
+        <canvas id="galopp"></canvas>
+        <div class="spiel-overlay" id="gOverlay">
+          <h4>Bereit zum Aufsitzen?</h4>
+          <p>Tippen oder Leertaste lässt das Pferd springen.
+             Ein Sprung pro Hindernis — mehr geht nicht.</p>
+          <button class="btn" id="gStart">Los</button>
+        </div>
+      </div>`;
+    w.appendChild(huelle);
 
-    const stand = el("div", "pl-stand");
-    w.appendChild(stand);
+    const legende = el("div", "panel");
+    legende.innerHTML = `<p class="panel-titel">Worum es geht</p>
+      <p style="margin:0;font-size:.88rem;color:var(--schrift-2);line-height:1.6">
+        Zäune, Felsen und Kakteen kommen entgegen, und der Galopp wird mit jedem
+        Meter schneller. Gewinnen kann man nicht — es geht nur darum, wie weit du kommst.
+        Der weiteste Ritt bleibt gespeichert.
+      </p>`;
+    w.appendChild(legende);
 
-    const reset = el("p", "mitte");
-    reset.style.marginTop = "16px";
-    reset.innerHTML = '<button class="btn geist" id="plNeu">Liste leeren</button>';
-    w.appendChild(reset);
-    $("#plNeu").addEventListener("click", () => {
-      PACKEN.forEach((g, gi) => g.punkte.forEach((_, pi) => speicher.set(`pack:${gi}:${pi}`, false)));
-      w.innerHTML = ""; INHALTE[15].render(w);
-    });
-
-    function standAktualisieren() {
-      const prozent = Math.round(ab / alle * 100);
-      let text;
-      if (prozent === 100) text = "Fertig. Der Koffer kann zu.";
-      else if (prozent >= 75) text = "Fast. Der Rest passt noch rein.";
-      else if (prozent >= 40) text = "Guter Zwischenstand.";
-      else if (prozent > 0) text = "Angefangen ist die halbe Miete. Angeblich.";
-      else text = "Noch nichts. Es ist der letzte Abend.";
-      stand.innerHTML = `<b>${ab} / ${alle}</b>${text}`;
-      if (prozent === 100) konfetti(140);
-    }
-    standAktualisieren();
+    galoppSpiel();
   }
 };
+
+function galoppSpiel() {
+  const cv = $("#galopp"), ctx = cv.getContext("2d");
+  const ov = $("#gOverlay");
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  let B = 0, H = 0, BODEN = 0;
+
+  const PX_PRO_METER = 25;
+  const SCHWERKRAFT = 0.72;
+  const ABSPRUNG = -11.4;
+
+  function messen() {
+    const b = cv.parentElement.getBoundingClientRect();
+    if (b.width < 40) { requestAnimationFrame(messen); return; }
+    B = b.width;
+    H = Math.min(300, Math.max(210, B * 0.42));
+    BODEN = H - 34;
+    cv.width = B * dpr; cv.height = H * dpr;
+    cv.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  messen();
+  addEventListener("resize", messen);
+
+  const REITER_X = 78;
+  let hoehe = 0, steig = 0, amBoden = true;
+  let hindernisse = [], strecke = 0, tempo = 0, laeuft = false;
+  let schrittphase = 0, letzterStempel = 0, raf = 0;
+  let berge = [], naechstes = 0;
+
+  function tempoJetzt() { return 5.4 + strecke / 2600; }
+
+  function bergeSetzen() {
+    berge = [];
+    for (let i = 0; i < 14; i++) {
+      berge.push({ x: i * 130 + (i * 37 % 90), h: 26 + (i * 53 % 40) });
+    }
+  }
+
+  /* --- Hindernisse ------------------------------------------------ */
+  const ARTEN = [
+    { art: "zaun",   breite: 26, hoehe: 40 },
+    { art: "zaun",   breite: 38, hoehe: 32 },
+    { art: "fels",   breite: 30, hoehe: 24 },
+    { art: "fels",   breite: 44, hoehe: 20 },
+    { art: "kaktus", breite: 22, hoehe: 46 },
+    { art: "busch",  breite: 34, hoehe: 18 }
+  ];
+
+  function hindernisSetzen() {
+    const v = tempoJetzt();
+    // Sprungweite bei aktuellem Tempo, daraus ein fairer Mindestabstand
+    const sprungdauer = (2 * Math.abs(ABSPRUNG)) / SCHWERKRAFT;
+    const weite = v * sprungdauer;
+    const a = ARTEN[(Math.random() * ARTEN.length) | 0];
+    hindernisse.push({ x: B + 40, ...a });
+    naechstes = weite * (1.55 + Math.random() * 1.25);
+  }
+
+  function zeichneHindernis(o) {
+    const x = o.x, u = BODEN, h = o.hoehe, br = o.breite;
+    ctx.strokeStyle = "#E4AC38";
+    ctx.fillStyle = "#B8871F";
+    ctx.lineWidth = 2.4;
+    ctx.lineJoin = "round";
+
+    if (o.art === "zaun") {
+      ctx.beginPath();
+      ctx.moveTo(x, u); ctx.lineTo(x, u - h);
+      ctx.moveTo(x + br, u); ctx.lineTo(x + br, u - h);
+      ctx.moveTo(x - 3, u - h * 0.75); ctx.lineTo(x + br + 3, u - h * 0.75);
+      ctx.moveTo(x - 3, u - h * 0.35); ctx.lineTo(x + br + 3, u - h * 0.35);
+      ctx.stroke();
+    } else if (o.art === "fels") {
+      ctx.beginPath();
+      ctx.moveTo(x, u);
+      ctx.lineTo(x + br * 0.18, u - h * 0.7);
+      ctx.lineTo(x + br * 0.5, u - h);
+      ctx.lineTo(x + br * 0.82, u - h * 0.62);
+      ctx.lineTo(x + br, u);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+    } else if (o.art === "kaktus") {
+      const m = x + br / 2;
+      ctx.beginPath();
+      ctx.moveTo(m, u); ctx.lineTo(m, u - h);
+      ctx.moveTo(m, u - h * 0.6); ctx.lineTo(m - br * 0.6, u - h * 0.6);
+      ctx.lineTo(m - br * 0.6, u - h * 0.82);
+      ctx.moveTo(m, u - h * 0.45); ctx.lineTo(m + br * 0.55, u - h * 0.45);
+      ctx.lineTo(m + br * 0.55, u - h * 0.7);
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      ctx.lineWidth = 2.4;
+    } else {
+      ctx.beginPath();
+      for (let i = 0; i <= 5; i++) {
+        const bx = x + (br / 5) * i;
+        ctx.moveTo(bx, u);
+        ctx.lineTo(bx + (i - 2.5) * 2.6, u - h * (0.55 + (i % 3) * 0.22));
+      }
+      ctx.stroke();
+    }
+  }
+
+  /* --- Gaucho zu Pferd, dieselbe Silhouette wie im App-Symbol ----- */
+  function zeichneReiter(y, phase, springt) {
+    ctx.save();
+    ctx.translate(REITER_X, BODEN - y);
+    ctx.fillStyle = "#F0C463";
+    ctx.strokeStyle = "#F0C463";
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // Beine zuerst, damit der Rumpf darüber liegt
+    const beine = springt
+      ? [[16, 8, -16], [10, 6, -22], [-16, -8, -14], [-22, -10, -18]]
+      : null;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    if (springt) {
+      beine.forEach(([ax, dx, dy]) => {
+        ctx.moveTo(ax, -34);
+        ctx.lineTo(ax + dx, -34 + dy + 20);
+      });
+    } else {
+      [[16, 0], [10, .5], [-16, .5], [-22, 0]].forEach(([ax, vers]) => {
+        const p = (phase + vers) % 1;
+        const schwung = Math.sin(p * Math.PI * 2) * 11;
+        const heben = Math.max(0, Math.sin(p * Math.PI * 2)) * 7;
+        ctx.moveTo(ax, -34);
+        ctx.lineTo(ax + schwung, -heben);
+      });
+    }
+    ctx.stroke();
+
+    // Rumpf, Kruppe, Brust
+    ctx.beginPath();
+    ctx.ellipse(-2, -44, 25, 11, 0, 0, 7); ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(-20, -46, 11, 11, 0, 0, 7); ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(16, -45, 10, 11, 0, 0, 7); ctx.fill();
+
+    // Hals und Kopf
+    ctx.beginPath();
+    ctx.moveTo(12, -52); ctx.lineTo(22, -64); ctx.lineTo(30, -72);
+    ctx.lineTo(35, -73); ctx.lineTo(37, -66); ctx.lineTo(30, -60);
+    ctx.lineTo(24, -50); ctx.lineTo(16, -40);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(31, -73); ctx.lineTo(39, -77); ctx.lineTo(46, -70);
+    ctx.lineTo(50, -62); ctx.lineTo(45, -60); ctx.lineTo(37, -65);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();                                   // Ohr
+    ctx.moveTo(33, -74); ctx.lineTo(35, -81); ctx.lineTo(39, -74);
+    ctx.closePath(); ctx.fill();
+
+    // Schweif, im Galopp wehend
+    const weh = springt ? 6 : Math.sin(phase * Math.PI * 2) * 4;
+    ctx.beginPath();
+    ctx.moveTo(-28, -50);
+    ctx.lineTo(-42, -46 + weh); ctx.lineTo(-52, -34 + weh);
+    ctx.lineTo(-46, -32 + weh); ctx.lineTo(-36, -42); ctx.lineTo(-28, -45);
+    ctx.closePath(); ctx.fill();
+
+    // Reiter
+    ctx.beginPath();                                   // Bein
+    ctx.moveTo(-6, -50); ctx.lineTo(-2, -50); ctx.lineTo(-4, -32); ctx.lineTo(-9, -33);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();                                   // Rumpf, im Sprung geduckt
+    const neig = springt ? 5 : 0;
+    ctx.moveTo(-8, -52); ctx.lineTo(2, -52);
+    ctx.lineTo(6 + neig, -72); ctx.lineTo(-4 + neig, -75);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();                                   // Arm zu den Zügeln
+    ctx.moveTo(0 + neig, -70); ctx.lineTo(5 + neig, -71);
+    ctx.lineTo(22, -62); ctx.lineTo(20, -57);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();                                   // Kopf
+    ctx.arc(1 + neig, -79, 5, 0, 7); ctx.fill();
+    ctx.beginPath();                                   // Hut
+    ctx.ellipse(1 + neig, -84, 11, 2.4, 0, 0, 7); ctx.fill();
+    ctx.fillRect(-3 + neig, -90, 8, 6);
+
+    ctx.restore();
+  }
+
+  /* --- Schleife --------------------------------------------------- */
+  function schleife(jetzt) {
+    if (jetzt == null) jetzt = performance.now();
+    let dt = (jetzt - letzterStempel) / 16.667;
+    if (!letzterStempel || !(dt > 0) || dt > 4) dt = 1;
+    letzterStempel = jetzt;
+
+    ctx.clearRect(0, 0, B, H);
+
+    // Hügel im Hintergrund, langsamer als der Vordergrund
+    ctx.fillStyle = "rgba(228,172,56,.10)";
+    berge.forEach(m => {
+      if (laeuft) m.x -= tempo * 0.22 * dt;
+      if (m.x < -140) m.x += 14 * 130;
+      ctx.beginPath();
+      ctx.moveTo(m.x - 70, BODEN);
+      ctx.lineTo(m.x, BODEN - m.h);
+      ctx.lineTo(m.x + 70, BODEN);
+      ctx.closePath(); ctx.fill();
+    });
+
+    // Boden
+    ctx.strokeStyle = "rgba(228,172,56,.55)";
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, BODEN); ctx.lineTo(B, BODEN); ctx.stroke();
+
+    if (laeuft) {
+      tempo = tempoJetzt();
+      strecke += tempo * dt;
+      schrittphase = (schrittphase + dt * (0.035 + tempo * 0.004)) % 1;
+
+      // Sprung
+      if (!amBoden) {
+        hoehe -= steig * dt;
+        steig += SCHWERKRAFT * dt;
+        if (hoehe <= 0) { hoehe = 0; steig = 0; amBoden = true; }
+      }
+
+      // Hindernisse nachschieben
+      naechstes -= tempo * dt;
+      if (naechstes <= 0) hindernisSetzen();
+      hindernisse.forEach(o => { o.x -= tempo * dt; });
+      hindernisse = hindernisse.filter(o => o.x + o.breite > -60);
+
+      // Treffer? Der Kasten ist enger als die Silhouette, sonst wird es unfair
+      const links = REITER_X - 24, rechts = REITER_X + 26;
+      for (const o of hindernisse) {
+        if (o.x < rechts && o.x + o.breite > links && hoehe < o.hoehe + 4) {
+          return schluss();
+        }
+      }
+
+      $("#gMeter").textContent = Math.floor(strecke / PX_PRO_METER) + " m";
+      $("#gTempo").textContent = Math.round(tempo * 60 / PX_PRO_METER * 3.6) + " km/h";
+    }
+
+    hindernisse.forEach(zeichneHindernis);
+    zeichneReiter(hoehe, schrittphase, !amBoden);
+
+    raf = requestAnimationFrame(schleife);
+  }
+
+  function springen() {
+    if (!laeuft || !amBoden) return;
+    amBoden = false;
+    steig = ABSPRUNG;
+  }
+
+  function start() {
+    hindernisse = []; strecke = 0; hoehe = 0; steig = 0; amBoden = true;
+    letzterStempel = 0; schrittphase = 0;
+    tempo = tempoJetzt();
+    naechstes = B * 0.75;
+    bergeSetzen();
+    laeuft = true;
+    ov.classList.add("weg");
+    cancelAnimationFrame(raf);
+    schleife();
+  }
+
+  function schluss() {
+    laeuft = false;
+    cancelAnimationFrame(raf);
+    const meter = Math.floor(strecke / PX_PRO_METER);
+    const best = speicher.get("galoppBest", 0);
+    const neu = meter > best;
+    if (neu) { speicher.set("galoppBest", meter); konfetti(130); }
+    $("#gBest").textContent = Math.max(best, meter) + " m";
+    ov.classList.remove("weg");
+    ov.innerHTML = `
+      <h4>${neu ? "Weiter als je zuvor" : "Abgeworfen"}</h4>
+      <p style="font-family:var(--mono);font-size:2rem;color:var(--oro);font-weight:600">${meter} m</p>
+      <p>${meter >= 1200 ? "Das reicht für die Estancia. Die stellen dich ein."
+         : meter >= 600 ? "Ordentlich geritten. Der Gaucho nickt anerkennend."
+         : meter >= 250 ? "Solide. Beim nächsten Mal etwas später abspringen."
+         : "Der Zaun kam schneller als gedacht."}</p>
+      <button class="btn" id="gStart">Nochmal</button>`;
+    $("#gStart").addEventListener("click", start);
+    $("#gStart").focus();
+  }
+
+  $("#gStart").addEventListener("click", start);
+
+  // Steuerung: tippen, klicken, Leertaste
+  cv.addEventListener("pointerdown", (e) => { e.preventDefault(); springen(); });
+  const taste = (e) => {
+    if (e.code === "Space" || e.code === "ArrowUp") {
+      if (!$("#overlay").classList.contains("auf")) return;
+      e.preventDefault();
+      if (laeuft) springen(); else { const s = $("#gStart"); if (s) s.click(); }
+    }
+  };
+  addEventListener("keydown", taste);
+
+  // Aufräumen, sobald das Türchen geschlossen wird
+  const beobachter = new MutationObserver(() => {
+    if (!$("#overlay").classList.contains("auf")) {
+      laeuft = false;
+      cancelAnimationFrame(raf);
+      removeEventListener("keydown", taste);
+      beobachter.disconnect();
+    }
+  });
+  beobachter.observe($("#overlay"), { attributes: true, attributeFilter: ["class"] });
+
+  bergeSetzen();
+  schleife();
+}
 
 /* ============================================================
    TAG 16 — BOARDING
