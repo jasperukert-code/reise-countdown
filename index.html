@@ -3246,15 +3246,27 @@ function galoppSpiel() {
   const SCHWERKRAFT = 0.5;
   const ABSPRUNG = -11;
 
+  /* Gezeichnet wird in einer festen Spielwelt, die beim Anzeigen
+     verkleinert wird. Auf schmalen Displays sitzt der Reiter dadurch
+     nicht mehr klobig im Bild — und man sieht weiter voraus, was das
+     Springen dort überhaupt erst fair macht. */
+  let M = 1;
+
   function messen() {
     const b = cv.parentElement.getBoundingClientRect();
     if (b.width < 40) { requestAnimationFrame(messen); return; }
-    B = b.width;
-    H = Math.min(300, Math.max(210, B * 0.42));
-    BODEN = H - 34;
-    cv.width = B * dpr; cv.height = H * dpr;
-    cv.style.height = H + "px";
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const breiteCss = b.width;
+    const hoeheCss = Math.min(300, Math.max(200, breiteCss * 0.40));
+    M = Math.max(0.58, Math.min(0.92, breiteCss / 700));
+
+    B = breiteCss / M;                 // Weltbreite
+    H = hoeheCss / M;                  // Welthöhe
+    BODEN = H - 30;
+
+    cv.width = breiteCss * dpr;
+    cv.height = hoeheCss * dpr;
+    cv.style.height = hoeheCss + "px";
+    ctx.setTransform(dpr * M, 0, 0, dpr * M, 0, 0);
   }
   messen();
   addEventListener("resize", messen);
