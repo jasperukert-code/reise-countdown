@@ -4202,8 +4202,8 @@ function vorspann() {
 
   function messen() {
     B = innerWidth; H = innerHeight;
-    // Horizont knapp oberhalb der Bildmitte — darunter bleibt Platz für den Namen
-    BODEN = Math.round(H * 0.45);
+    // Horizont knapp oberhalb der Bildmitte
+    BODEN = Math.round(H * 0.475);
     cv.width = B * dpr; cv.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
@@ -4220,7 +4220,7 @@ function vorspann() {
   const T_RAND   = 4250;
   const T_HALT   = 4380;
   const T_MITTE  = 5200;
-  const T_ZOOM   = 5550, T_ZOOM_DAUER = 1300;
+  const T_ZOOM   = 5550, T_ZOOM_DAUER = 1550;
   const DAUER    = T_ZOOM + T_ZOOM_DAUER;
   const staub = [];
 
@@ -4372,7 +4372,6 @@ function vorspann() {
        das Bild füllt — man fliegt hindurch auf die Seite dahinter. */
     if (t >= T_ZOOM) {
       const z = Math.min(1, (t - T_ZOOM) / T_ZOOM_DAUER);
-      const skala = 1 + Math.pow(z, 2.4) * 95;
       buehne.style.background = "transparent";
 
       ctx.clearRect(0, 0, B, H);
@@ -4382,10 +4381,22 @@ function vorspann() {
       const stil = getComputedStyle(wort);
       // passt: dieselbe Verkleinerung wie eben noch beim Schriftzug
       const basis = parseFloat(stil.fontSize) * passt;
+
+      /* Gleichmäßiger Flug: Die Skalierung wächst exponentiell, das
+         entspricht konstanter Annäherung — pro Zeitabschnitt derselbe
+         Faktor. Eine Potenzkurve raste stattdessen am Ende davon.
+         Die ersten Prozent laufen quadratisch an, damit es nicht ruckt.
+         Das Ziel richtet sich danach, wie weit das Loch im o noch
+         aufziehen muss, statt fest bei hundertfach zu liegen. */
+      const anlauf = z < 0.22 ? (z / 0.22) * (z / 0.22) * 0.22 : z;
+      const ziel = Math.max(34, Math.min(90, (B / (basis * 0.26)) * 1.2));
+      const skala = Math.exp(Math.log(ziel) * anlauf);
+
       ctx.save();
       ctx.globalCompositeOperation = "destination-out";
       ctx.font = `italic 700 ${basis * skala}px ${stil.fontFamily}`;
-      try { ctx.letterSpacing = stil.letterSpacing; } catch {}
+      // Bei großen Graden fällt der Laufabstand nicht mehr auf, kostet aber
+      if (skala < 12) { try { ctx.letterSpacing = stil.letterSpacing; } catch {} }
       ctx.textAlign = "left";
       ctx.textBaseline = "middle";
       // Das erste o mittig halten: Abstand bis zu seiner Mitte messen
