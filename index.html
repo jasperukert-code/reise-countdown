@@ -1082,6 +1082,19 @@ footer {
 }
 .hoeren:hover { border-color: var(--akzent); color: var(--akzent); }
 
+/* Musikschalter unter dem Spiel */
+.ton-zeile {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap;
+  padding-top: 14px;
+  border-top: 1px solid var(--linie);
+  font-size: .82rem;
+  color: var(--schrift-2);
+  line-height: 1.5;
+}
+.ton-zeile span { flex: 1 1 200px; }
+.ton-knopf { white-space: nowrap; padding: 8px 14px; font-size: .68rem; }
+
 /* ============================================================
    TAG 7 — Boarding Pass
    ============================================================ */
@@ -3189,6 +3202,132 @@ function sprich(text) {
 }
 
 /* ============================================================
+   MUSIK — eine Chacarera, im Browser erzeugt
+
+   Keine Aufnahme, sondern Ton für Ton gerechnet: Der 6/8-Puls aus dem
+   argentinischen Landesinneren, gespielt von Bombo, Bass und einer
+   gezupften Melodie in a-Moll. Das Tempo lässt sich mitziehen, damit
+   die Musik mit dem Pferd schneller wird.
+   ============================================================ */
+const musik = (() => {
+  const ACHTEL_GRUND = 0.115;          // Sekunden pro Achtel bei Grundtempo
+  const TAKTLAENGE = 24;               // vier Takte à sechs Achtel
+
+  // [Achtel-Position, Halbtöne über A, Länge in Achteln]
+  const MELODIE = [
+    [0, 7, 2], [2, 5, 1], [3, 3, 2], [5, 5, 1],
+    [6, 0, 2], [8, 3, 1], [9, 5, 2], [11, 3, 1],
+    [12, 5, 2], [14, 7, 1], [15, 8, 2], [17, 7, 1],
+    [18, 7, 2], [20, 11, 1], [21, 7, 3]
+  ];
+  const BASS  = [[0,-12],[3,-12],[6,-12],[9,-5],[12,-7],[15,-7],[18,-5],[21,-5]];
+  const BOMBO = [0, 3, 6, 9, 12, 15, 18, 21];
+  const KLICK = [2, 5, 8, 11, 14, 17, 20, 23];
+
+  let ac = null, summe = null, laeuft = false;
+  let naechster = 0, schritt = 0, uhr = null, faktor = 1;
+  let an = speicher.get("musikAn", true);
+
+  const hz = (halb) => 220 * Math.pow(2, halb / 12);
+
+  function huelle(ziel, start, hoch, halt, weg, spitze) {
+    ziel.gain.setValueAtTime(0.0001, start);
+    ziel.gain.exponentialRampToValueAtTime(spitze, start + hoch);
+    ziel.gain.exponentialRampToValueAtTime(spitze * 0.35, start + hoch + halt);
+    ziel.gain.exponentialRampToValueAtTime(0.0001, start + hoch + halt + weg);
+  }
+
+  function zupfen(start, frequenz, dauer, spitze, art) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = art;
+    o.frequency.setValueAtTime(frequenz, start);
+    huelle(g, start, 0.008, dauer * 0.3, dauer * 0.8, spitze);
+    o.connect(g); g.connect(summe);
+    o.start(start); o.stop(start + dauer + 0.3);
+  }
+
+  function trommel(start) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(132, start);
+    o.frequency.exponentialRampToValueAtTime(46, start + 0.09);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(0.5, start + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
+    o.connect(g); g.connect(summe);
+    o.start(start); o.stop(start + 0.3);
+  }
+
+  function stock(start) {                    // Schlag auf den Trommelrand
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = "square";
+    o.frequency.setValueAtTime(1400, start);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(0.045, start + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 0.05);
+    o.connect(g); g.connect(summe);
+    o.start(start); o.stop(start + 0.08);
+  }
+
+  function planen() {
+    const achtel = ACHTEL_GRUND / faktor;
+    while (naechster < ac.currentTime + 0.15) {
+      const pos = schritt % TAKTLAENGE;
+      if (BOMBO.includes(pos)) trommel(naechster);
+      if (KLICK.includes(pos)) stock(naechster);
+      BASS.forEach(([p, h]) => {
+        if (p === pos) zupfen(naechster, hz(h), achtel * 2.4, 0.16, "triangle");
+      });
+      MELODIE.forEach(([p, h, l]) => {
+        if (p === pos) zupfen(naechster, hz(h + 12), achtel * l * 0.95, 0.075, "triangle");
+      });
+      naechster += achtel;
+      schritt++;
+    }
+    uhr = setTimeout(planen, 30);
+  }
+
+  return {
+    start() {
+      if (!an || laeuft) return;
+      try {
+        if (!ac) {
+          ac = new (window.AudioContext || window.webkitAudioContext)();
+          summe = ac.createGain();
+          summe.gain.value = 0.5;
+          summe.connect(ac.destination);
+        }
+        if (ac.state === "suspended") ac.resume();
+        laeuft = true;
+        schritt = 0;
+        naechster = ac.currentTime + 0.08;
+        planen();
+      } catch { laeuft = false; }
+    },
+    stopp() {
+      laeuft = false;
+      clearTimeout(uhr);
+      if (summe && ac) {
+        try {
+          summe.gain.cancelScheduledValues(ac.currentTime);
+          summe.gain.setValueAtTime(summe.gain.value, ac.currentTime);
+          summe.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.35);
+          setTimeout(() => { if (!laeuft && summe) summe.gain.value = 0.5; }, 500);
+        } catch {}
+      }
+    },
+    tempo(f) { faktor = Math.max(1, Math.min(1.5, f)); },
+    an() { return an; },
+    umschalten() {
+      an = !an;
+      speicher.set("musikAn", an);
+      if (!an) this.stopp();
+      return an;
+    }
+  };
+})();
+
+/* ============================================================
    TAG 15 — GALOPP
    Endloser Ritt: Der Gaucho springt über alles, was kommt, und es
    wird stetig schneller. Gezählt werden die zurückgelegten Meter.
@@ -3221,12 +3360,27 @@ INHALTE[15] = {
 
     const legende = el("div", "panel");
     legende.innerHTML = `<p class="panel-titel">Worum es geht</p>
-      <p style="margin:0;font-size:.88rem;color:var(--schrift-2);line-height:1.6">
+      <p style="margin:0 0 14px;font-size:.88rem;color:var(--schrift-2);line-height:1.6">
         Zäune, Felsen und Kakteen kommen entgegen, und der Galopp wird mit jedem
         Meter schneller. Gewinnen kann man nicht — es geht nur darum, wie weit du kommst.
         Der weiteste Ritt bleibt gespeichert.
-      </p>`;
+      </p>
+      <div class="ton-zeile">
+        <span>Dazu läuft eine Chacarera — der Sechsachteltakt der Gauchos.
+              Sie zieht mit dem Tempo an.</span>
+        <button class="btn geist ton-knopf" id="gTon" type="button"
+                aria-pressed="${musik.an()}">${musik.an() ? "Musik aus" : "Musik an"}</button>
+      </div>`;
     w.appendChild(legende);
+
+    $("#gTon").addEventListener("click", () => {
+      const jetztAn = musik.umschalten();
+      const k = $("#gTon");
+      k.textContent = jetztAn ? "Musik aus" : "Musik an";
+      k.setAttribute("aria-pressed", String(jetztAn));
+      // Läuft gerade ein Ritt, greift die Änderung sofort
+      if (jetztAn && $("#gOverlay").classList.contains("weg")) musik.start();
+    });
 
     galoppSpiel();
   }
@@ -3498,6 +3652,7 @@ function galoppSpiel() {
 
       $("#gMeter").textContent = Math.floor(strecke / PX_PRO_METER) + " m";
       $("#gTempo").textContent = Math.round(tempo * 60 / PX_PRO_METER * 3.6) + " km/h";
+      musik.tempo(1 + strecke / 55000);      // die Chacarera zieht mit an
     }
 
     hindernisse.forEach(zeichneHindernis);
@@ -3520,6 +3675,8 @@ function galoppSpiel() {
     bergeSetzen();
     laeuft = true;
     ov.classList.add("weg");
+    musik.tempo(1);
+    musik.start();
     cancelAnimationFrame(raf);
     schleife();
   }
@@ -3527,6 +3684,7 @@ function galoppSpiel() {
   function schluss() {
     laeuft = false;
     cancelAnimationFrame(raf);
+    musik.stopp();
     const meter = Math.floor(strecke / PX_PRO_METER);
     const best = speicher.get("galoppBest", 0);
     const neu = meter > best;
@@ -3563,6 +3721,7 @@ function galoppSpiel() {
     if (!$("#overlay").classList.contains("auf")) {
       laeuft = false;
       cancelAnimationFrame(raf);
+      musik.stopp();
       removeEventListener("keydown", taste);
       beobachter.disconnect();
     }
