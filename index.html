@@ -2781,23 +2781,32 @@ function rubbeln(cv, box, idx) {
    TAG 13 — KOFFERCHAOS
    ============================================================ */
 const DINGE = [
+  // Was für diese Reise wirklich in den Koffer gehört
   { z: "🥾", gut: true,  w: "Bergschuhe" },
   { z: "🧥", gut: true,  w: "Winterjacke" },
   { z: "🧤", gut: true,  w: "Handschuhe" },
+  { z: "🧣", gut: true,  w: "Schal" },
   { z: "🕶️", gut: true,  w: "Sonnenbrille" },
   { z: "🔦", gut: true,  w: "Stirnlampe" },
   { z: "🧴", gut: true,  w: "Sonnencreme" },
+  { z: "💊", gut: true,  w: "Kopfschmerztabletten" },
   { z: "📸", gut: true,  w: "Kamera" },
   { z: "🔌", gut: true,  w: "Adapter" },
   { z: "🧦", gut: true,  w: "Warme Socken" },
   { z: "📖", gut: true,  w: "Buch" },
+  // Was ganz sicher nicht mitkommt
   { z: "🎄", gut: false, w: "Weihnachtsbaum" },
   { z: "🪑", gut: false, w: "Küchenstuhl" },
   { z: "🐢", gut: false, w: "Schildkröte" },
   { z: "🧯", gut: false, w: "Feuerlöscher" },
-  { z: "🎺", gut: false, w: "Tuba" },
+  { z: "🎺", gut: false, w: "Trompete" },
   { z: "🛷", gut: false, w: "Rodelschlitten" },
-  { z: "🌵", gut: false, w: "Zimmerkaktus" }
+  { z: "🌵", gut: false, w: "Zimmerkaktus" },
+  { z: "🍳", gut: false, w: "Bratpfanne" },
+  { z: "🖨️", gut: false, w: "Drucker" },
+  { z: "🛁", gut: false, w: "Badewanne" },
+  // Selten, dafür fünfzig Punkte
+  { z: "🎫", gut: true, bonus: true, w: "Boarding Pass" }
 ];
 
 INHALTE[13] = {
@@ -2828,8 +2837,10 @@ INHALTE[13] = {
       <p style="margin:0;font-size:.88rem;color:var(--schrift-2);line-height:1.6">
         Richtiges gefangen: <b style="color:var(--jade)">+10</b>.
         Falsches gefangen: <b style="color:var(--carmin-hell)">ein Leben weg</b>.
-        Richtiges verpasst: auch ein Leben weg. Nach drei Fehlern ist Schluss.
-        Es wird mit der Zeit schneller.
+        Richtiges verpasst: auch ein Leben weg. Nach drei Fehlern ist Schluss,
+        und es wird mit der Zeit schneller.
+        Wenn etwas mit <b style="color:var(--akzent)">goldenem Ring</b> fällt, ist es
+        der Boarding Pass — der bringt <b style="color:var(--akzent)">+50</b>.
       </p>`;
     w.appendChild(legende);
 
@@ -2864,8 +2875,13 @@ function kofferSpiel() {
   let links = false, rechts = false;
   let blitze = [];
 
+  // Der Boarding Pass ist der seltene Hauptgewinn, sonst gleichverteilt
+  const ALLTAG = DINGE.filter(d => !d.bonus);
+  const BONUS  = DINGE.filter(d => d.bonus);
+
   function spawn() {
-    const d = DINGE[(Math.random() * DINGE.length) | 0];
+    const topf = (BONUS.length && Math.random() < 0.07) ? BONUS : ALLTAG;
+    const d = topf[(Math.random() * topf.length) | 0];
     objekte.push({
       x: 34 + Math.random() * (B - 68),
       y: -30,
@@ -2929,8 +2945,11 @@ function kofferSpiel() {
         const gefangen = o.y > kY - 6 && o.y < kY + koffer.h &&
                          Math.abs(o.x - koffer.x) < koffer.b / 2 + 8;
         if (gefangen) {
-          if (o.d.gut) { punkte += 10; blitz(o.x, kY, "+10", "#2E9E8F"); }
-          else { leben--; blitz(o.x, kY, o.d.w + "?!", "#D95560"); }
+          if (o.d.gut) {
+            const wert = o.d.bonus ? 50 : 10;
+            punkte += wert;
+            blitz(o.x, kY, "+" + wert, o.d.bonus ? "#E4AC38" : "#2E9E8F");
+          } else { leben--; blitz(o.x, kY, o.d.w + "?!", "#D95560"); }
           return false;
         }
         if (o.y > H + 20) {
@@ -2948,7 +2967,16 @@ function kofferSpiel() {
     ctx.font = "26px system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    for (const o of objekte) ctx.fillText(o.d.z, o.x, o.y);
+    for (const o of objekte) {
+      if (o.d.bonus) {                       // Goldring, damit der Hauptgewinn auffällt
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, 21, 0, 7);
+        ctx.strokeStyle = "#E4AC38";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+      }
+      ctx.fillText(o.d.z, o.x, o.y);
+    }
 
     zeichneKoffer();
 
