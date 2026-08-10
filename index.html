@@ -1334,12 +1334,13 @@ const params = new URLSearchParams(location.search);
 })();
 const VORSCHAU = speicher.get("vorschaumodus", false);
 
-if (VORSCHAU) {
-  /* Auf das Manifest im Vorschau-Ordner umbiegen: dessen start_url zeigt
-     dorthin zurück, wo der Modus wieder gesetzt wird. Ohne das würde eine
-     abgelegte Vorschau-App auf der normalen Startseite landen. */
-  const m = document.querySelector('link[rel="manifest"]');
-  if (m) m.href = "vorschau/manifest.webmanifest";
+const IN_VORSCHAU_ORDNER = /\/vorschau\//.test(location.pathname);
+
+if (VORSCHAU && !IN_VORSCHAU_ORDNER) {
+  /* Wer die Vorschau von der Hauptseite aus ablegt, soll die Kopie unter
+     /vorschau/ bekommen — die ist eigenständig und startet dort. Hier hilft
+     nur ein Hinweis, denn iOS liest das Manifest aus dem urspruenglichen
+     HTML und ignoriert diese Änderung beim Ablegen. */
   const titel = document.querySelector('meta[name="apple-mobile-web-app-title"]');
   if (titel) titel.content = "Vámonos Test";
   const anwendung = document.querySelector('meta[name="application-name"]');

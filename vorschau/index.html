@@ -1,3 +1,5 @@
+<!-- Erzeugt von build-vorschau.py — nicht von Hand aendern.
+     Quelle ist index.html; nach jeder Aenderung dort neu erzeugen. -->
 <!doctype html>
 <html lang="de">
 <head>
@@ -5,41 +7,3397 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="dark light">
-<title>Vámonos Test</title>
+<meta name="description" content="Sieben Türchen bis zur Reise nach Mexiko, Peru und Argentinien.">
+<title>Vámonos Test — Sieben Türchen bis Lateinamerika</title>
 
-<!-- Eigenes Manifest mit start_url auf genau diese Seite. Wird die
-     Vorschau zum Startbildschirm gelegt, startet die App also hier —
-     setzt das Merkmal im App-eigenen Speicher und leitet dann weiter.
-     Mit dem Manifest der Hauptseite ginge der Vorschaumodus verloren,
-     weil dessen start_url ohne Parameter startet. -->
+<!-- Auf dem Startbildschirm erscheint die Seite als „Vámonos“ -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="../icon-192.png">
+<link rel="icon" type="image/svg+xml" href="../icon.svg">
 <meta name="apple-mobile-web-app-title" content="Vámonos Test">
 <meta name="application-name" content="Vámonos Test">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#101A2E">
-<link rel="canonical" href="../?vorschau=1">
+<meta name="theme-color" content="#101A2E" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#EFEAD9" media="(prefers-color-scheme: light)">
 
 <style>
-  body {
-    margin: 0; min-height: 100vh;
-    display: grid; place-items: center;
-    background: #101A2E; color: #A9B4C9;
-    font-family: ui-monospace, "Cascadia Mono", monospace;
-    font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
-    text-align: center; padding: 24px;
+/* Minimaler Reset */
+html, body { margin: 0; padding: 0; background: var(--grund); }
+img, svg { max-width: 100%; }
+button { font: inherit; }
+
+/* ============================================================
+   TOKENS — Fileteado Porteño trifft Talavera
+   ============================================================ */
+:root {
+  /* Grundfarben */
+  --noche:      #101A2E;   /* tiefes Nachtblau */
+  --noche-2:    #16233C;   /* angehobenes Nachtblau */
+  --papel:      #EFEAD9;   /* Kalkpapier */
+  --papel-2:    #E4DDC8;   /* Kalkpapier, gealtert */
+
+  /* Akzente */
+  --oro:        #E4AC38;   /* Gold / Ocker */
+  --oro-tief:   #B07F1E;
+  --carmin:     #B8353F;   /* Karminrot */
+  --carmin-hell:#D95560;
+  --jade:       #2E9E8F;   /* Jade */
+  --cobalto:    #3A5FBF;   /* Kobaltblau */
+
+  /* Semantische Tokens — hier hängt alles dran */
+  --grund:      var(--noche);
+  --grund-2:    var(--noche-2);
+  --schrift:    #F2EDE0;
+  --schrift-2:  #A9B4C9;   /* Neutral mit Blaustich, nicht grau */
+  --linie:      rgba(228, 172, 56, .26);
+  --linie-satt: rgba(228, 172, 56, .55);
+  --akzent:     var(--oro);
+  --auf-akzent: var(--noche);   /* Schrift auf Akzentflächen */
+  --akzent-2:   var(--carmin-hell);
+  --schatten:   0 18px 44px rgba(0,0,0,.44);
+  --karte:      #18253E;
+  --karte-2:    #1E2E4C;
+  --verschlossen: rgba(255,255,255,.045);
+
+  /* Kartenflächen */
+  --wasser:       #0C1526;
+  --wasser-linie: #2C4E7A;
+  --land:         #23334F;
+  --kueste-linie: #4A6285;
+  --relief:       #2E415F;
+  --relief-hoch:  #6E7F98;
+
+  /* Typo */
+  --display: "Bodoni MT", "Didot", "Playfair Display", "Hoefler Text", Georgia, serif;
+  --body: "Avenir Next", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "SF Mono", ui-monospace, "Cascadia Mono", "Roboto Mono", "DejaVu Sans Mono", monospace;
+
+  --w: min(1120px, 92vw);
+  --r: 4px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --grund:    var(--papel);
+    --grund-2:  var(--papel-2);
+    --schrift:  #1B1F2E;
+    --schrift-2:#5C6070;
+    --linie:    rgba(27,31,46,.16);
+    --linie-satt: rgba(184,53,63,.5);
+    --akzent:   var(--carmin);
+    --auf-akzent: #FFF7EA;
+    --akzent-2: var(--oro-tief);
+    --schatten: 0 14px 34px rgba(27,31,46,.16);
+    --karte:    #FBF7EC;
+    --karte-2:  #F4EFDF;
+    --verschlossen: rgba(27,31,46,.05);
+    --wasser:       #CFDDE8;
+    --wasser-linie: #6E93B4;
+    --land:         #F1EADA;
+    --kueste-linie: #9AA6A0;
+    --relief:       #E2D9C2;
+    --relief-hoch:  #A99C7E;
   }
-  a { color: #E4AC38; }
+}
+
+:root[data-theme="light"] {
+  --grund:    var(--papel);
+  --grund-2:  var(--papel-2);
+  --schrift:  #1B1F2E;
+  --schrift-2:#5C6070;
+  --linie:    rgba(27,31,46,.16);
+  --linie-satt: rgba(184,53,63,.5);
+  --akzent:   var(--carmin);
+  --auf-akzent: #FFF7EA;
+  --akzent-2: var(--oro-tief);
+  --schatten: 0 14px 34px rgba(27,31,46,.16);
+  --karte:    #FBF7EC;
+  --karte-2:  #F4EFDF;
+  --verschlossen: rgba(27,31,46,.05);
+  --wasser:       #CFDDE8;
+  --wasser-linie: #6E93B4;
+  --land:         #F1EADA;
+  --kueste-linie: #9AA6A0;
+  --relief:       #E2D9C2;
+  --relief-hoch:  #A99C7E;
+}
+
+:root[data-theme="dark"] {
+  --grund:    var(--noche);
+  --grund-2:  var(--noche-2);
+  --schrift:  #F2EDE0;
+  --schrift-2:#A9B4C9;
+  --linie:    rgba(228,172,56,.26);
+  --linie-satt: rgba(228,172,56,.55);
+  --akzent:   var(--oro);
+  --auf-akzent: var(--noche);
+  --akzent-2: var(--carmin-hell);
+  --schatten: 0 18px 44px rgba(0,0,0,.44);
+  --karte:    #18253E;
+  --karte-2:  #1E2E4C;
+  --verschlossen: rgba(255,255,255,.045);
+  --wasser:       #0C1526;
+  --wasser-linie: #2C4E7A;
+  --land:         #23334F;
+  --kueste-linie: #4A6285;
+  --relief:       #2E415F;
+  --relief-hoch:  #6E7F98;
+}
+
+* { box-sizing: border-box; }
+
+.wrap {
+  background: var(--grund);
+  color: var(--schrift);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  /* Am Startbildschirm läuft die Seite randlos — Statusleiste aussparen */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Kalkputz-Textur, sehr subtil */
+.wrap::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  opacity: .5;
+  background-image:
+    radial-gradient(circle at 15% 12%, rgba(58,95,191,.16), transparent 42%),
+    radial-gradient(circle at 85% 78%, rgba(184,53,63,.14), transparent 46%);
+  z-index: 0;
+}
+
+.inner { width: var(--w); margin: 0 auto; position: relative; z-index: 1; }
+
+/* ============================================================
+   PAPEL PICADO — Wimpelkette
+   ============================================================ */
+.picado { display: flex; width: 100%; height: 46px; overflow: hidden; }
+.picado svg { display: block; width: 100%; height: 46px; }
+.flag { transform-origin: top center; animation: schwingen 4.6s ease-in-out infinite; }
+@keyframes schwingen {
+  0%, 100% { transform: rotate(-1.4deg); }
+  50%      { transform: rotate(1.4deg); }
+}
+
+/* ============================================================
+   KOPF
+   ============================================================ */
+header { padding: 30px 0 12px; text-align: center; }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--akzent);
+  margin: 0 0 14px;
+}
+
+h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2.1rem, 7.4vw, 4.1rem);
+  line-height: 1.02;
+  letter-spacing: -.012em;
+  margin: 0 0 6px;
+  text-wrap: balance;
+  color: var(--schrift);
+}
+h1 em {
+  font-style: italic;
+  color: var(--akzent);
+  text-shadow: 2px 3px 0 rgba(184,53,63,.32);
+}
+
+.untertitel {
+  color: var(--schrift-2);
+  font-size: .96rem;
+  margin: 0 auto 26px;
+  max-width: 46ch;
+  text-wrap: balance;
+}
+
+/* Route */
+.route {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; flex-wrap: wrap;
+  margin: 0 0 30px;
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+}
+.route b { color: var(--schrift); font-weight: 600; }
+.route span[aria-hidden] { color: var(--akzent); }
+
+/* Sprungleiste, nur im Vorschaumodus */
+.vorschau-leiste {
+  display: flex; flex-wrap: wrap; gap: 7px;
+  align-items: center; justify-content: center;
+  margin: -12px auto 26px;
+  padding: 12px 14px;
+  max-width: 30rem;
+  border: 1px dashed var(--linie-satt);
+  border-radius: var(--r);
+  background: var(--verschlossen);
+}
+.vl-titel {
+  font-family: var(--mono); font-size: .6rem;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--schrift-2); margin-right: 4px;
+}
+.vl-knopf {
+  font-family: var(--mono); font-size: .78rem;
+  font-variant-numeric: tabular-nums;
+  min-width: 34px; padding: 6px 8px;
+  background: var(--karte);
+  color: var(--schrift);
+  border: 1px solid var(--linie);
+  border-radius: var(--r);
+  cursor: pointer;
+}
+.vl-knopf:hover { border-color: var(--akzent); color: var(--akzent); }
+.vl-knopf:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+.vl-aus {
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-size: .6rem;
+  color: var(--schrift-2);
+  border-style: dashed;
+}
+
+/* Countdown-Uhr */
+.uhr {
+  display: inline-flex; gap: 2px;
+  border: 1px solid var(--linie-satt);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--grund-2);
+  box-shadow: var(--schatten);
+  margin-bottom: 8px;
+}
+.uhr div {
+  padding: 12px 16px 10px;
+  min-width: 74px;
+  background: var(--karte);
+}
+.uhr .z {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(1.45rem, 5vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--akzent);
+  display: block;
+}
+.uhr .l {
+  font-size: .58rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+  margin-top: 6px;
+  display: block;
+}
+.uhr-hinweis {
+  font-size: .74rem;
+  color: var(--schrift-2);
+  margin: 4px 0 34px;
+  font-family: var(--mono);
+  letter-spacing: .08em;
+}
+
+/* ============================================================
+   KACHELFELD
+   ============================================================ */
+.feld {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding-bottom: 40px;
+}
+@media (min-width: 760px) {
+  .feld { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .t1 { grid-column: span 2; grid-row: span 2; }
+  .t4 { grid-column: span 2; }
+  .t7 { grid-column: span 2; }
+}
+@media (max-width: 759px) {
+  .t1, .t4, .t7 { grid-column: span 2; }
+}
+
+.tuer {
+  position: relative;
+  border: 1px solid var(--linie);
+  border-radius: var(--r);
+  background: var(--karte);
+  color: inherit;
+  font-family: inherit;
+  padding: 18px 16px 16px;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform .22s cubic-bezier(.2,.8,.3,1), border-color .22s, box-shadow .22s;
+}
+.t1 { min-height: 200px; }
+
+/* Talavera-Eckornament */
+.tuer::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--linie);
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: .55;
+}
+
+.tuer:hover:not(.zu),
+.tuer:focus-visible:not(.zu) {
+  transform: translateY(-3px);
+  border-color: var(--linie-satt);
+  box-shadow: var(--schatten);
+}
+.tuer:focus-visible {
+  outline: 2px solid var(--akzent);
+  outline-offset: 3px;
+}
+
+.tuer .datum {
+  font-family: var(--mono);
+  font-size: .64rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+}
+.tuer .icon { display: block; line-height: 0; color: var(--akzent); }
+.tuer .icon svg { display: block; }
+.tuer .titel {
+  font-family: var(--display);
+  font-size: 1.14rem;
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -.005em;
+  text-wrap: balance;
+}
+.t1 .titel { font-size: clamp(1.3rem, 3.6vw, 1.75rem); }
+.tuer .teaser {
+  font-size: .8rem;
+  color: var(--schrift-2);
+  line-height: 1.45;
+}
+
+/* Zustände */
+.tuer.zu {
+  background: var(--verschlossen);
+  cursor: not-allowed;
+  border-style: dashed;
+}
+.tuer.zu .icon,
+.tuer.zu .titel,
+.tuer.zu .teaser { filter: blur(4px); opacity: .3; user-select: none; }
+.tuer.zu .schloss {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: .66rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+}
+.tuer.zu .schloss .s-icon { filter: none; opacity: .55; line-height: 0; color: var(--akzent); }
+.tuer:not(.zu) .schloss { display: none; }
+
+.tuer.heute {
+  border-color: var(--akzent);
+  border-style: solid;
+  background: var(--karte-2);
+}
+.tuer.heute::before {
+  content: "Heute";
+  position: absolute;
+  top: 0; right: 0;
+  background: var(--akzent);
+  color: var(--auf-akzent);
+  font-family: var(--mono);
+  font-size: .58rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  padding: 4px 9px 3px;
+  border-bottom-left-radius: var(--r);
+  z-index: 2;
+  font-weight: 600;
+}
+.tuer.heute:not(.gesehen) .icon { animation: wippen 2.4s ease-in-out infinite; }
+@keyframes wippen {
+  0%, 88%, 100% { transform: rotate(0) scale(1); }
+  92%  { transform: rotate(-9deg) scale(1.1); }
+  96%  { transform: rotate(9deg) scale(1.1); }
+}
+
+.tuer.gesehen .haken {
+  position: absolute; bottom: 10px; right: 12px;
+  font-size: .7rem; color: var(--jade);
+  font-family: var(--mono);
+  letter-spacing: .1em;
+}
+
+footer {
+  border-top: 1px solid var(--linie);
+  padding: 24px 0 60px;
+  text-align: center;
+  font-size: .78rem;
+  color: var(--schrift-2);
+  font-family: var(--mono);
+  letter-spacing: .08em;
+}
+
+/* ============================================================
+   OVERLAY
+   ============================================================ */
+.overlay {
+  position: fixed; inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--grund) 96%, black);
+  display: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.overlay.auf { display: block; animation: einblenden .3s ease; }
+@keyframes einblenden { from { opacity: 0; } to { opacity: 1; } }
+
+/* Das Overlay liegt außerhalb von .wrap, muss die Statusleiste also
+   selbst aussparen — im Standalone-Modus klebte das Schließkreuz sonst
+   am oberen Bildschirmrand. */
+.overlay-inner {
+  width: min(720px, 92vw);
+  margin: 0 auto;
+  padding: calc(30px + env(safe-area-inset-top, 0px)) 0 90px;
+  position: relative;
+  z-index: 1;
+}
+
+.schliessen {
+  position: sticky;
+  top: calc(26px + env(safe-area-inset-top, 0px));
+  float: right;
+  z-index: 5;
+  background: var(--karte);
+  border: 1px solid var(--linie-satt);
+  color: var(--schrift);
+  border-radius: 50%;
+  width: 40px; height: 40px;
+  font-size: 1.15rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background .2s, transform .2s;
+}
+.schliessen:hover { background: var(--akzent); color: var(--auf-akzent); transform: rotate(90deg); }
+.schliessen:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+
+.o-kopf { padding-top: 22px; margin-bottom: 26px; clear: both; }
+.o-datum {
+  font-family: var(--mono);
+  font-size: .66rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--akzent);
+  margin-bottom: 10px;
+}
+.o-titel {
+  font-family: var(--display);
+  font-size: clamp(1.8rem, 6vw, 2.9rem);
+  font-weight: 700;
+  line-height: 1.06;
+  margin: 0 0 12px;
+  text-wrap: balance;
+}
+.o-lead {
+  color: var(--schrift-2);
+  font-size: 1rem;
+  max-width: 58ch;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.o-inhalt > * + * { margin-top: 18px; }
+.o-inhalt p { max-width: 64ch; text-wrap: pretty; }
+
+/* Karte / Panel */
+.panel {
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  border-radius: var(--r);
+  padding: 20px 18px;
+}
+.panel-titel {
+  font-family: var(--mono);
+  font-size: .66rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--akzent);
+  margin: 0 0 14px;
+}
+
+/* Buttons */
+.btn {
+  font-family: var(--mono);
+  font-size: .74rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  background: var(--akzent);
+  color: var(--auf-akzent);
+  border: 1px solid var(--akzent);
+  border-radius: var(--r);
+  padding: 11px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: filter .2s, transform .12s;
+}
+.btn:hover { filter: brightness(1.12); }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid var(--akzent-2); outline-offset: 3px; }
+.btn.geist {
+  background: transparent;
+  color: var(--schrift);
+  border-color: var(--linie-satt);
+}
+.btn.geist:hover { background: var(--verschlossen); }
+.btn[disabled] { opacity: .4; cursor: not-allowed; }
+
+/* Notiz / persönliche Nachricht */
+.notiz {
+  background: linear-gradient(180deg, var(--karte-2), var(--karte));
+  border: 1px solid var(--linie-satt);
+  border-left: 3px solid var(--carmin-hell);
+  border-radius: var(--r);
+  padding: 20px 20px 18px;
+  font-family: var(--display);
+  font-size: 1.1rem;
+  line-height: 1.55;
+  font-style: italic;
+}
+.notiz .sig {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: .68rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--akzent);
+}
+
+/* ============================================================
+   TAG 1 — Karte
+   ============================================================ */
+.karte-svg { width: 100%; height: auto; display: block; border-radius: var(--r); }
+.route-linie {
+  fill: none;
+  stroke: var(--akzent);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 7 9;
+  stroke-dashoffset: 1200;
+  animation: zeichnen 3.4s ease-out forwards;
+}
+@keyframes zeichnen { to { stroke-dashoffset: 0; } }
+.stadt-punkt { fill: var(--carmin-hell); opacity: 0; animation: aufpoppen .5s ease-out forwards; }
+.stadt-ring { fill: none; stroke: var(--carmin-hell); stroke-width: 1.6; opacity: 0; animation: pulsring 2.6s ease-out infinite; }
+@keyframes aufpoppen { from { opacity: 0; r: 0; } to { opacity: 1; } }
+@keyframes pulsring {
+  0% { opacity: .8; transform: scale(.4); }
+  70%, 100% { opacity: 0; transform: scale(1.8); }
+}
+/* Marker liegen in gegenskalierten Gruppen — hier gelten feste Größen */
+.stadt-label {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  fill: var(--schrift);
+  paint-order: stroke;
+  stroke: var(--karte);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+  opacity: 0;
+  animation: einfaden .6s ease-out forwards;
+}
+
+/* Kartenflächen: Wasser dunkel und kühl, Land heller und wärmer —
+   damit auf einen Blick klar ist, was Küste ist und was Ozean. */
+.karte-svg .ozean { fill: var(--wasser); }
+.karte-svg .kueste { fill: var(--land); stroke: var(--kueste-linie); }
+.karte-svg .gebirge {
+  fill: var(--relief);
+  stroke: none;
+}
+.karte-svg .gewaesser {
+  fill: var(--wasser);
+  stroke: var(--kueste-linie);
+  stroke-width: calc(.7px * var(--k, 1));
+}
+.karte-svg .fluss {
+  fill: none;
+  stroke: var(--wasser-linie);
+  stroke-width: calc(1.4px * var(--k, 1));
+}
+.karte-svg .gipfel {
+  fill: var(--relief-hoch);
+  stroke: var(--land);
+  stroke-width: .5px;
+  transform: scale(1.5);
+}
+.gipfel-schicht { opacity: 0; transition: opacity .35s; pointer-events: none; }
+.karte-svg.gezoomt .gipfel-schicht { opacity: 1; }
+
+/* Beim Zoom skaliert die viewBox — Punkte, Linien und Schrift werden
+   über --k gegengerechnet, damit sie optisch gleich groß bleiben. */
+.karte-svg .kueste { stroke-width: calc(1px * var(--k, 1)); }
+.karte-svg .breitengrad {
+  stroke: var(--linie);
+  stroke-width: calc(.8px * var(--k, 1));
+  stroke-dasharray: calc(3px * var(--k, 1)) calc(7px * var(--k, 1));
+  opacity: .7;
+}
+.karte-svg .route-linie { stroke-width: calc(2.4px * var(--k, 1)); }
+.karte-svg .fahrt-linie {
+  fill: none;
+  stroke: var(--jade);
+  stroke-width: calc(1.6px * var(--k, 1));
+  stroke-dasharray: calc(2px * var(--k, 1)) calc(4px * var(--k, 1));
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity .4s;
+}
+.karte-svg.gezoomt .fahrt-linie { opacity: .85; }
+.karte-svg.gezoomt .route-linie { opacity: .18; }
+
+/* Maßstabsleiste erscheint erst im Zoom */
+.massstab { opacity: 0; transition: opacity .35s; pointer-events: none; }
+.karte-svg.gezoomt .massstab { opacity: 1; }
+.massstab text {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  fill: var(--schrift-2);
+}
+
+/* Regionspunkte blenden beim Zoom aus, Einzelorte ein */
+.station { transition: opacity .3s; }
+.station.weg { opacity: 0; pointer-events: none; }
+
+.detailort { opacity: 0; pointer-events: none; transition: opacity .35s; }
+.detailort.sichtbar { opacity: 1; }
+.detail-punkt {
+  fill: var(--carmin-hell);
+  stroke: var(--karte);
+  stroke-width: 1.5px;
+}
+.detail-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  fill: var(--schrift);
+  paint-order: stroke;
+  stroke: var(--karte);
+  stroke-width: 3.2px;
+  stroke-linejoin: round;
+}
+
+/* Flugzeug für die Abflug-Animation */
+.flieger-marke .flieger-form {
+  fill: var(--akzent);
+  stroke: var(--karte);
+  stroke-width: 1px;
+}
+
+/* Zurück-Knopf und Kilometerzähler */
+.k-zurueck {
+  float: right;
+  font-family: var(--mono);
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  background: none;
+  border: 1px solid var(--linie-satt);
+  border-radius: var(--r);
+  color: var(--akzent);
+  padding: 3px 9px;
+  cursor: pointer;
+  margin-top: -3px;
+}
+.k-zurueck:hover { background: var(--verschlossen); }
+.k-zurueck:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+
+.k-steuerung {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--linie);
+}
+.k-zaehler {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--akzent);
+  letter-spacing: .04em;
+}
+
+/* Zeile mit Höhe und Temperatur unter jeder Etappe */
+.et-lage {
+  margin: 6px 0 0;
+  font-family: var(--mono);
+  font-size: .64rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--jade);
+}
+
+/* Ausflüge, eingerückt unter der Basisetappe */
+.et-dazu {
+  margin: 12px 0 0 14px;
+  padding: 10px 0 0 14px;
+  border-left: 2px solid var(--linie);
+}
+.ed-kopf { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 9px; margin-bottom: 4px; }
+.ed-kopf b { font-family: var(--display); font-size: 1rem; }
+.ed-wann {
+  font-family: var(--mono); font-size: .62rem;
+  color: var(--akzent); font-variant-numeric: tabular-nums;
+}
+.ed-was {
+  font-family: var(--mono); font-size: .56rem;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--schrift-2); margin-left: auto;
+}
+.et-dazu p { margin: 0; font-size: .84rem; line-height: 1.5; color: var(--schrift-2); }
+@keyframes einfaden { to { opacity: 1; } }
+.flieger { offset-path: var(--pfad); animation: fliegen 3.4s ease-out forwards; font-size: 15px; }
+
+/* Antippbare Stationen */
+.station { cursor: pointer; }
+.station:focus { outline: none; }
+.station:focus-visible .stadt-punkt,
+.station:hover .stadt-punkt { fill: var(--oro); r: 7; }
+.station.aktiv .stadt-punkt { fill: var(--oro); r: 7; }
+.station:focus-visible text { text-decoration: underline; }
+.stadt-punkt { transition: fill .18s, r .18s; }
+
+/* Infofeld unter der Karte */
+.karten-info {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--linie);
+  min-height: 84px;
+}
+.ki-leer {
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+}
+.ki-eintrag + .ki-eintrag { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--linie); }
+.ki-kopf {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px;
+  margin-bottom: 6px;
+}
+.ki-kopf b { font-family: var(--display); font-size: 1.2rem; }
+.ki-nr, .ki-daten {
+  font-family: var(--mono); font-size: .6rem;
+  letter-spacing: .16em; text-transform: uppercase;
+}
+.ki-nr { color: var(--akzent); }
+.ki-daten { color: var(--jade); margin-left: auto; white-space: nowrap; }
+.karten-info p { margin: 0; font-size: .88rem; line-height: 1.55; color: var(--schrift-2); }
+
+/* Etappenliste */
+.etappe { padding: 14px 0; border-top: 1px solid var(--linie); }
+.et-kopf { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 5px; }
+.et-nr {
+  font-family: var(--mono); font-size: .68rem;
+  color: var(--akzent); font-variant-numeric: tabular-nums;
+}
+.et-ort { font-family: var(--display); font-size: 1.15rem; font-weight: 700; }
+.et-daten {
+  font-family: var(--mono); font-size: .6rem;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--jade); margin-left: auto; white-space: nowrap;
+}
+.et-fakt { margin: 0; font-size: .88rem; color: var(--schrift-2); line-height: 1.55; }
+
+/* ============================================================
+   TAG 2 — Quiz
+   ============================================================ */
+.q-fortschritt {
+  font-family: var(--mono);
+  font-size: .66rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+  margin-bottom: 8px;
+  display: flex; justify-content: space-between;
+}
+.q-balken { height: 3px; background: var(--verschlossen); border-radius: 2px; overflow: hidden; margin-bottom: 22px; }
+.q-balken i { display: block; height: 100%; background: var(--akzent); transition: width .4s cubic-bezier(.2,.8,.3,1); }
+.q-frage {
+  font-family: var(--display);
+  font-size: clamp(1.25rem, 4.4vw, 1.7rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 20px;
+  text-wrap: balance;
+}
+.q-optionen { display: flex; flex-direction: column; gap: 9px; }
+.q-opt {
+  text-align: left;
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  border-radius: var(--r);
+  color: var(--schrift);
+  font-family: var(--body);
+  font-size: .93rem;
+  line-height: 1.4;
+  padding: 13px 15px;
+  cursor: pointer;
+  display: flex; gap: 12px; align-items: flex-start;
+  transition: border-color .18s, background .18s, transform .12s;
+}
+.q-opt:hover:not(:disabled) { border-color: var(--linie-satt); transform: translateX(3px); }
+.q-opt:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+.q-opt .marke {
+  font-family: var(--mono);
+  font-size: .72rem;
+  color: var(--akzent);
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.q-opt.richtig { border-color: var(--jade); background: color-mix(in srgb, var(--jade) 14%, var(--karte)); }
+.q-opt.falsch  { border-color: var(--carmin-hell); background: color-mix(in srgb, var(--carmin-hell) 12%, var(--karte)); }
+.q-opt:disabled { cursor: default; }
+.q-erklaerung {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--verschlossen);
+  border-left: 2px solid var(--akzent);
+  border-radius: 0 var(--r) var(--r) 0;
+  font-size: .89rem;
+  line-height: 1.55;
+  color: var(--schrift-2);
+}
+.q-erklaerung b { color: var(--schrift); font-weight: 600; }
+.q-ergebnis { text-align: center; padding: 22px 0; }
+.q-punkte {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(3rem, 13vw, 5rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--akzent);
+}
+.q-punkte small { font-size: .3em; color: var(--schrift-2); }
+
+/* ============================================================
+   TAG 3 — Rubbellose
+   ============================================================ */
+.lose { display: grid; gap: 14px; }
+/* Der Inhalt bestimmt die Höhe, die Rubbelschicht legt sich darüber —
+   sonst wird ein längerer Text unter der Kante abgeschnitten. */
+.los {
+  position: relative;
+  border: 1px solid var(--linie-satt);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--karte);
+}
+.los-inhalt {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 7px;
+  padding: 20px 18px;
+  min-height: 128px;
+  text-align: center;
+}
+.los-inhalt .l-icon { line-height: 0; color: var(--akzent); }
+.los-inhalt .l-land {
+  font-family: var(--mono);
+  font-size: .58rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--jade);
+  margin-top: 2px;
+}
+.los-inhalt .l-titel {
+  font-family: var(--display);
+  font-size: 1.22rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.los-inhalt .l-text { font-size: .84rem; color: var(--schrift-2); max-width: 40ch; line-height: 1.45; }
+.los canvas {
+  position: absolute; inset: 0;
+  display: block; width: 100%; height: 100%;
+  cursor: crosshair; touch-action: none;
+}
+.los.frei canvas { display: none; }
+.los.frei { animation: gewonnen .5s ease; }
+@keyframes gewonnen {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.035); }
+}
+
+/* ============================================================
+   TAG 4 — Kofferspiel
+   ============================================================ */
+.spiel-huelle { position: relative; border-radius: var(--r); overflow: hidden; border: 1px solid var(--linie-satt); background: var(--grund-2); }
+#kofferSpiel { display: block; width: 100%; touch-action: none; }
+.spiel-hud {
+  display: flex; gap: 18px; justify-content: space-between;
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--linie);
+  background: var(--karte);
+}
+.spiel-hud b { color: var(--akzent); font-variant-numeric: tabular-nums; }
+.spiel-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; padding: 24px; text-align: center;
+  background: color-mix(in srgb, var(--grund) 88%, transparent);
+  backdrop-filter: blur(3px);
+}
+.spiel-overlay h4 {
+  font-family: var(--display);
+  font-size: 1.6rem; font-weight: 700; margin: 0;
+  text-wrap: balance;
+}
+.spiel-overlay p { font-size: .87rem; color: var(--schrift-2); max-width: 40ch; margin: 0; }
+.spiel-overlay.weg { display: none; }
+
+/* ============================================================
+   TAG 5 — Sprachkarten
+   ============================================================ */
+.karten-gitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 11px; }
+.kk { perspective: 900px; background: none; border: 0; padding: 0; cursor: pointer; height: 132px; font-family: inherit; }
+.kk:focus-visible { outline: 2px solid var(--akzent); outline-offset: 3px; border-radius: var(--r); }
+.kk-inner {
+  display: block;
+  position: relative; width: 100%; height: 100%;
+  transition: transform .55s cubic-bezier(.3,.9,.3,1.1);
+  transform-style: preserve-3d;
+}
+.kk.um .kk-inner { transform: rotateY(180deg); }
+.kk-seite {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  border: 1px solid var(--linie);
+  border-radius: var(--r);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px; padding: 12px; text-align: center;
+  background: var(--karte);
+}
+.kk-vorn .de { font-size: .93rem; line-height: 1.3; text-wrap: balance; }
+.kk-vorn .hinweis {
+  font-family: var(--mono); font-size: .55rem;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--schrift-2);
+}
+.kk-hinten {
+  transform: rotateY(180deg);
+  background: var(--karte-2);
+  border-color: var(--linie-satt);
+}
+.kk-hinten .es {
+  font-family: var(--display);
+  font-size: 1.02rem; font-weight: 700; line-height: 1.25;
+  color: var(--akzent); text-wrap: balance;
+}
+.kk-hinten .lautschrift { font-family: var(--mono); font-size: .64rem; color: var(--schrift-2); letter-spacing: .04em; }
+.kk-hinten .wo { font-family: var(--mono); font-size: .54rem; letter-spacing: .14em; text-transform: uppercase; color: var(--jade); }
+.hoeren {
+  margin-top: 4px;
+  background: var(--verschlossen);
+  border: 1px solid var(--linie);
+  border-radius: 20px;
+  font-size: .62rem;
+  font-family: var(--mono);
+  letter-spacing: .1em;
+  color: var(--schrift-2);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+.hoeren:hover { border-color: var(--akzent); color: var(--akzent); }
+
+/* ============================================================
+   TAG 6 — Packliste
+   ============================================================ */
+.pl-gruppe + .pl-gruppe { margin-top: 20px; }
+.pl-kopf {
+  font-family: var(--mono);
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--akzent);
+  margin-bottom: 9px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--linie);
+}
+.pl-zeile {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: background .16s;
+  width: 100%;
+  text-align: left;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: .94rem;
+}
+.pl-zeile:hover { background: var(--verschlossen); }
+.pl-zeile:focus-visible { outline: 2px solid var(--akzent); outline-offset: -1px; }
+.pl-box {
+  width: 19px; height: 19px; flex-shrink: 0;
+  border: 1.5px solid var(--linie-satt);
+  border-radius: 3px;
+  display: grid; place-items: center;
+  font-size: .74rem; color: transparent;
+  transition: background .18s, border-color .18s, color .18s;
+}
+.pl-zeile.ab .pl-box { background: var(--jade); border-color: var(--jade); color: #fff; }
+.pl-zeile.ab .pl-text { text-decoration: line-through; color: var(--schrift-2); }
+.pl-text { flex: 1; line-height: 1.35; }
+.pl-reaktion {
+  font-size: .76rem; color: var(--jade);
+  font-family: var(--mono); letter-spacing: .05em;
+  opacity: 0; transition: opacity .25s;
+  flex-shrink: 0;
+}
+.pl-zeile.ab .pl-reaktion { opacity: 1; }
+.pl-stand {
+  margin-top: 22px; padding: 16px;
+  border: 1px dashed var(--linie-satt);
+  border-radius: var(--r);
+  text-align: center;
+  font-family: var(--mono);
+  font-size: .8rem;
+  letter-spacing: .08em;
+  color: var(--schrift-2);
+}
+.pl-stand b { color: var(--akzent); font-size: 1.5rem; font-variant-numeric: tabular-nums; display: block; margin-bottom: 4px; }
+
+/* ============================================================
+   TAG 7 — Boarding Pass
+   ============================================================ */
+.bp {
+  background: var(--karte);
+  border: 1px solid var(--linie-satt);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--schatten);
+  animation: reinschieben .8s cubic-bezier(.2,.9,.3,1) both;
+}
+@keyframes reinschieben {
+  from { opacity: 0; transform: translateY(28px) rotate(-1.2deg); }
+  to   { opacity: 1; transform: none; }
+}
+.bp-kopf {
+  background: var(--akzent);
+  color: var(--auf-akzent);
+  padding: 12px 18px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--mono);
+  font-size: .66rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.bp-koerper { padding: 22px 18px; }
+.bp-strecke {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 24px;
+}
+.bp-ort .code {
+  font-family: var(--display);
+  font-size: clamp(1.9rem, 8vw, 3rem);
+  font-weight: 700; line-height: 1;
+}
+.bp-ort .stadt {
+  font-family: var(--mono); font-size: .6rem;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--schrift-2); margin-top: 5px;
+}
+.bp-pfeil { flex: 1; position: relative; height: 1px; background: var(--linie-satt); }
+.bp-pfeil span {
+  position: absolute; top: 50%; left: 0;
+  transform: translate(-50%, -50%) rotate(90deg);
+  line-height: 0;
+  color: var(--akzent);
+  animation: entlang 3.6s ease-in-out infinite;
+}
+@keyframes entlang {
+  0%   { left: 0;    opacity: 0; }
+  14%  { opacity: 1; }
+  86%  { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+.bp-gitter {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 18px 12px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--linie-satt);
+}
+.bp-feld .k {
+  font-family: var(--mono); font-size: .55rem;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--schrift-2); margin-bottom: 4px;
+}
+.bp-feld .v {
+  font-family: var(--mono); font-size: .92rem;
+  font-weight: 600; font-variant-numeric: tabular-nums;
+  color: var(--schrift);
+}
+.bp-fuss {
+  border-top: 1px dashed var(--linie-satt);
+  padding: 14px 18px;
+  display: flex; gap: 3px; align-items: flex-end;
+  height: 62px;
+  background: var(--karte-2);
+}
+.bp-fuss i { display: block; background: var(--schrift); width: 2px; height: 100%; opacity: .82; }
+
+/* Konfetti-Canvas */
+#konfetti {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 200;
+}
+
+/* Countdown im Finale */
+.final-uhr {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  margin: 26px 0;
+}
+.final-uhr div {
+  background: var(--karte); border: 1px solid var(--linie-satt);
+  border-radius: var(--r); padding: 14px 18px; min-width: 84px; text-align: center;
+}
+.final-uhr .z {
+  font-family: var(--mono); font-variant-numeric: tabular-nums;
+  font-size: 1.9rem; font-weight: 600; color: var(--akzent); line-height: 1;
+}
+.final-uhr .l {
+  font-family: var(--mono); font-size: .55rem;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--schrift-2); margin-top: 6px;
+}
+
+.mitte { text-align: center; }
+.knopfreihe { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .route-linie { stroke-dashoffset: 0; }
+}
 </style>
 </head>
 <body>
-<p>Vorschau wird geöffnet …<br><br><a href="../?vorschau=1">Weiter</a></p>
+
+<div class="wrap">
+
+  <div class="picado" aria-hidden="true">
+    <svg viewBox="0 0 1200 46" preserveAspectRatio="none" id="picadoSvg"></svg>
+  </div>
+
+  <div class="inner">
+    <header>
+      <p class="eyebrow">Vámonos · Ein Türchen pro Tag · 10. – 16. August</p>
+      <h1>Sieben Türchen<br>bis <em>Lateinamerika</em></h1>
+      <p class="untertitel" id="untertitel">Jeden Tag geht eines auf. Nicht früher — die Kacheln wissen, welcher Tag heute ist.</p>
+
+      <p class="route">
+        <b>Ciudad de México</b> <span aria-hidden="true">◆</span>
+        <b>Lima</b> <span aria-hidden="true">◆</span>
+        <b>Argentinien</b>
+      </p>
+
+      <div class="uhr" id="uhr" role="timer" aria-live="off">
+        <div><span class="z" id="uT">–</span><span class="l">Tage</span></div>
+        <div><span class="z" id="uH">–</span><span class="l">Stunden</span></div>
+        <div><span class="z" id="uM">–</span><span class="l">Minuten</span></div>
+        <div><span class="z" id="uS">–</span><span class="l">Sekunden</span></div>
+      </div>
+      <p class="uhr-hinweis" id="uhrHinweis">bis es losgeht</p>
+    </header>
+
+    <main class="feld" id="feld"></main>
+
+    <footer>
+      <p id="fussnote">Gebaut mit zu viel Vorfreude.</p>
+    </footer>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="oTitel">
+  <div class="overlay-inner">
+    <button class="schliessen" id="schliessen" aria-label="Türchen schließen">✕</button>
+    <div class="o-kopf">
+      <p class="o-datum" id="oDatum"></p>
+      <h2 class="o-titel" id="oTitel"></h2>
+      <p class="o-lead" id="oLead"></p>
+    </div>
+    <div class="o-inhalt" id="oInhalt"></div>
+  </div>
+</div>
+
+<canvas id="konfetti" aria-hidden="true"></canvas>
+
 <script>
-  try { localStorage.setItem("cd7:vorschaumodus", "true"); } catch (e) {}
-  location.replace("../?vorschau=1");
+(() => {
+"use strict";
+
+/* ============================================================
+   KONFIGURATION — hier wird personalisiert
+   ============================================================ */
+const CFG = {
+  name:      "Katharina",              // Name der Partnerin
+  anrede:    "",                       // Kosename, falls gewünscht
+  absender:  "",                       // Wer unterschreibt
+  abflug:    "2026-08-16T13:30:00",    // Abflugzeit (lokal)
+  flugnr:    "LH 498",
+  vonCode:   "FRA",
+  vonStadt:  "Frankfurt",
+};
+
+const SIG = CFG.absender ? "— " + CFG.absender : "";
+
+/* ============================================================
+   BASIS
+   ============================================================ */
+const JAHR = 2026;
+const ABFLUG = new Date(CFG.abflug);
+const $  = (s, r = document) => r.querySelector(s);
+const el = (t, c, h) => { const n = document.createElement(t); if (c) n.className = c; if (h != null) n.innerHTML = h; return n; };
+const flach = (m) => m.trim().replace(/\s*\n\s*/g, " ");
+
+const speicher = {
+  get(k, f) { try { const v = localStorage.getItem("cd7:" + k); return v === null ? f : JSON.parse(v); } catch { return f; } },
+  set(k, v) { try { localStorage.setItem("cd7:" + k, JSON.stringify(v)); } catch {} }
+};
+
+const params = new URLSearchParams(location.search);
+
+/* Der Vorschaumodus muss zwei Klippen überstehen, wenn die Seite zum
+   Startbildschirm gelegt wird:
+   1. Das Manifest gibt start_url vor und würde den Parameter schlucken —
+      deshalb wird der Manifest-Link bei aktiver Vorschau entfernt, dann
+      merkt sich das System die aufgerufene Adresse samt Parameter.
+   2. Auf iOS hat eine Homescreen-App einen eigenen Speicher, getrennt
+      von Safari. Greift Punkt 1 nicht, rettet das gemerkte Flag den
+      Modus zumindest überall dort, wo der Speicher geteilt wird.
+   Mit ?vorschau=0 lässt sich der Modus wieder abschalten. */
+(() => {
+  const p = params.get("vorschau");
+  if (p === "0") speicher.set("vorschaumodus", false);
+  else if (p === "1" || /\/vorschau\/?$/.test(location.pathname)) speicher.set("vorschaumodus", true);
+})();
+const VORSCHAU = true;   // in dieser Kopie fest eingeschaltet
+
+const IN_VORSCHAU_ORDNER = /\/vorschau\//.test(location.pathname);
+
+if (VORSCHAU && !IN_VORSCHAU_ORDNER) {
+  /* Wer die Vorschau von der Hauptseite aus ablegt, soll die Kopie unter
+     /vorschau/ bekommen — die ist eigenständig und startet dort. Hier hilft
+     nur ein Hinweis, denn iOS liest das Manifest aus dem urspruenglichen
+     HTML und ignoriert diese Änderung beim Ablegen. */
+  const titel = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+  if (titel) titel.content = "Vámonos Test";
+  const anwendung = document.querySelector('meta[name="application-name"]');
+  if (anwendung) anwendung.content = "Vámonos Test";
+}
+
+const heuteMitternacht = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+const tagDatum = (tag) => new Date(JAHR, 7, tag, 0, 0, 0, 0);   // Monat 7 = August
+const istFrei  = (tag) => VORSCHAU || heuteMitternacht() >= tagDatum(tag);
+const istHeute = (tag) => heuteMitternacht().getTime() === tagDatum(tag).getTime();
+
+const WOCHENTAG = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+const langesDatum = (tag) => WOCHENTAG[tagDatum(tag).getDay()] + ", " + tag + ". August " + JAHR;
+
+/* Texte, die eine Frist nennen, müssen mitwandern — ein Türchen bleibt
+   ja offen und wird womöglich Tage später noch einmal gelesen. */
+const tageBisAbflug = () => {
+  const ab = new Date(ABFLUG); ab.setHours(0, 0, 0, 0);
+  return Math.max(0, Math.round((ab - heuteMitternacht()) / 86400000));
+};
+const ZAHLWORT = ["null","ein","zwei","drei","vier","fünf","sechs","sieben","acht","neun","zehn"];
+const inTagen = () => {
+  const n = tageBisAbflug();
+  if (n === 0) return "heute";
+  if (n === 1) return "morgen";
+  if (n === 2) return "übermorgen";
+  return "in " + (ZAHLWORT[n] || n) + " Tagen";
+};
+const gross = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+const reduziert = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ============================================================
+   PAPEL PICADO
+   ============================================================ */
+(function picado() {
+  const svg = $("#picadoSvg");
+  const farben = ["var(--carmin)", "var(--oro)", "var(--jade)", "var(--cobalto)", "var(--carmin-hell)"];
+  const breite = 60, anzahl = 20;
+  const raute = (cx, cy, r) => `M${cx} ${cy - r} L${cx + r} ${cy} L${cx} ${cy + r} L${cx - r} ${cy} Z`;
+
+  // Zwei alternierende Scherenschnitt-Muster, wie bei echten Papel-Picado-Bögen
+  function muster(x, m) {
+    const c = x + breite / 2;
+    if (m === 0) {
+      return `
+        <path d="${raute(c, 17, 7.5)}" fill="var(--grund)"/>
+        <path d="${raute(c - 15, 14, 3.2)}" fill="var(--grund)"/>
+        <path d="${raute(c + 15, 14, 3.2)}" fill="var(--grund)"/>
+        <path d="${raute(c, 30, 3.4)}" fill="var(--grund)"/>
+        <path d="M${x + 6} 26 a5 5 0 0 0 10 0 z" fill="var(--grund)"/>
+        <path d="M${x + breite - 16} 26 a5 5 0 0 0 10 0 z" fill="var(--grund)"/>`;
+    }
+    let r = "";
+    for (let k = -2; k <= 2; k++) r += `<path d="${raute(c + k * 10, 13, 3)}" fill="var(--grund)"/>`;
+    return r + `
+      <path d="M${c - 12} 24 a12 6.5 0 0 0 24 0 z" fill="var(--grund)"/>
+      <path d="M${x} 8 a4.5 4.5 0 0 0 9 0 z" fill="var(--grund)"/>
+      <path d="M${x + breite - 9} 8 a4.5 4.5 0 0 0 9 0 z" fill="var(--grund)"/>`;
+  }
+
+  let s = '<line x1="0" y1="3" x2="1200" y2="3" stroke="var(--linie-satt)" stroke-width="1.4"/>';
+  for (let i = 0; i < anzahl; i++) {
+    const x = i * breite;
+    const f = farben[i % farben.length];
+    const d = `M${x} 3 L${x + breite} 3 L${x + breite} 26 L${x + breite / 2} 40 L${x} 26 Z`;
+    s += `<g class="flag" style="animation-delay:${(i * 0.13).toFixed(2)}s;transform-origin:${x + breite / 2}px 3px">
+      <path d="${d}" fill="${f}" opacity=".88"/>
+      ${muster(x, i % 2)}
+    </g>`;
+  }
+  svg.innerHTML = s;
+})();
+
+/* ============================================================
+   KONFETTI
+   ============================================================ */
+const konfetti = (() => {
+  const c = $("#konfetti"), x = c.getContext("2d");
+  let teile = [], laeuft = false;
+  const farben = ["#E4AC38", "#B8353F", "#2E9E8F", "#3A5FBF", "#D95560", "#EFEAD9"];
+
+  function groesse() { c.width = innerWidth; c.height = innerHeight; }
+  addEventListener("resize", groesse); groesse();
+
+  function schritt() {
+    x.clearRect(0, 0, c.width, c.height);
+    teile = teile.filter(p => p.y < c.height + 40);
+    for (const p of teile) {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.13; p.dreh += p.vd;
+      x.save();
+      x.translate(p.x, p.y);
+      x.rotate(p.dreh);
+      x.fillStyle = p.f;
+      x.globalAlpha = Math.max(0, 1 - p.y / (c.height + 40));
+      x.fillRect(-p.b / 2, -p.h / 2, p.b, p.h);
+      x.restore();
+    }
+    if (teile.length) requestAnimationFrame(schritt);
+    else { laeuft = false; x.clearRect(0, 0, c.width, c.height); }
+  }
+
+  return function feuern(n = 110, ux = 0.5, uy = 0.35) {
+    if (reduziert) return;
+    groesse();
+    for (let i = 0; i < n; i++) {
+      teile.push({
+        x: c.width * ux + (Math.random() - .5) * 140,
+        y: c.height * uy + (Math.random() - .5) * 60,
+        vx: (Math.random() - .5) * 9,
+        vy: Math.random() * -11 - 3,
+        b: 5 + Math.random() * 7,
+        h: 3 + Math.random() * 5,
+        dreh: Math.random() * 6.28,
+        vd: (Math.random() - .5) * .3,
+        f: farben[(Math.random() * farben.length) | 0]
+      });
+    }
+    if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
+  };
+})();
+
+/* ============================================================
+   KOPF-COUNTDOWN
+   ============================================================ */
+function tickKopf() {
+  const rest = ABFLUG - new Date();
+  const p = (n) => String(Math.max(0, n)).padStart(2, "0");
+  if (rest <= 0) {
+    $("#uT").textContent = "00"; $("#uH").textContent = "00";
+    $("#uM").textContent = "00"; $("#uS").textContent = "00";
+    $("#uhrHinweis").textContent = "¡Buen viaje!";
+    return;
+  }
+  const s = Math.floor(rest / 1000);
+  $("#uT").textContent = p(Math.floor(s / 86400));
+  $("#uH").textContent = p(Math.floor(s / 3600) % 24);
+  $("#uM").textContent = p(Math.floor(s / 60) % 60);
+  $("#uS").textContent = p(s % 60);
+}
+tickKopf();
+setInterval(tickKopf, 1000);
+
+/* ============================================================
+   DIE SIEBEN TÜRCHEN
+   ============================================================ */
+/* Strichsymbole, 24×24, im Goldton der Seite — statt bunter Emoji */
+const SYM = {
+  route: `<path d="M3.5 19.5 Q9 19 10.5 12.5 T20.5 5" stroke-dasharray="2.4 2.6"/>
+          <circle cx="3.5" cy="19.5" r="2"/><circle cx="11.6" cy="12.1" r="1.5" opacity=".7"/>
+          <circle cx="20.5" cy="5" r="2"/>`,
+  quiz:  `<path d="M3.5 5.5 h17 v10.5 h-9.5 l-4 3.5 v-3.5 h-3.5 z"/>
+          <path d="M9.4 9.2 a2.6 2.6 0 0 1 4.6 1.7 c0 1.5-2 1.6-2 3" stroke-linecap="round"/>
+          <circle cx="12" cy="13.6" r=".85" fill="currentColor" stroke="none"/>`,
+  los:   `<path d="M3 7 h18 v3 a2 2 0 0 0 0 4 v3 h-18 v-3 a2 2 0 0 0 0-4 z"/>
+          <path d="M15 7.6 v9" stroke-dasharray="1.6 2"/>
+          <path d="M6 11 h6 M6 13.6 h4" stroke-width="1.2" opacity=".6"/>`,
+  koffer:`<rect x="3.5" y="8" width="17" height="11.5" rx="2"/>
+          <path d="M9 8 V6.2 a1.4 1.4 0 0 1 1.4-1.4 h3.2 A1.4 1.4 0 0 1 15 6.2 V8"/>
+          <path d="M8.6 8.6 v10.3 M15.4 8.6 v10.3" stroke-width="1.2" opacity=".55"/>`,
+  reden: `<path d="M2.5 4.8 h11.5 v7.4 h-6.2 l-3.1 2.9 v-2.9 h-2.2 z"/>
+          <path d="M9.8 9.6 h11.7 v7.4 h-2.2 v2.9 l-3.1-2.9 h-6.4 z" fill="var(--karte)"/>
+          <path d="M6 8 v-.9 M6 9.7 v.05" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M17.4 13.4 v.05 M17.4 15.1 v.9" stroke-width="1.4" stroke-linecap="round"/>`,
+  liste: `<path d="M3.5 6.6 l1.7 1.7 L8.6 4.9"/><path d="M11.5 7 h9" stroke-width="1.2"/>
+          <path d="M3.5 12.3 l1.7 1.7 L8.6 10.6"/><path d="M11.5 12.7 h9" stroke-width="1.2"/>
+          <path d="M3.5 18 l1.7 1.7 L8.6 16.3" opacity=".45"/><path d="M11.5 18.4 h6" stroke-width="1.2" opacity=".45"/>`,
+  flug:  `<path d="M11.2 2.6 a.9 .9 0 0 1 1.6 0 l1.1 6.2 6.9 4 a1 1 0 0 1 .5.9 v1.2 l-7.6-2.1-.7 4.6 2.4 1.9 v1.3 l-3.4-1.1-3.4 1.1 v-1.3 l2.4-1.9-.7-4.6-7.6 2.1 v-1.2 a1 1 0 0 1 .5-.9 l6.9-4 z"/>`
+};
+
+const SCHLOSS = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+  stroke-width="1.55" stroke-linejoin="round" aria-hidden="true">
+  <rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/>
+  <path d="M8 10.5 V7.8 a4 4 0 0 1 8 0 v2.7"/>
+  <circle cx="12" cy="15.2" r="1.25" fill="currentColor" stroke="none"/></svg>`;
+
+function symbol(k, groesse) {
+  return `<svg viewBox="0 0 24 24" width="${groesse}" height="${groesse}" fill="none"
+    stroke="currentColor" stroke-width="1.55" stroke-linejoin="round" aria-hidden="true">${SYM[k]}</svg>`;
+}
+
+const TUEREN = [
+  { tag: 10, sym: "route",  titel: "Die Route",       teaser: "Dreizehn Etappen, vom Vulkangipfel bis zum Gletscher." },
+  { tag: 11, sym: "quiz",   titel: "Das Quiz",        teaser: "Zwölf Fragen. Die Hälfte glaubst du mir nicht." },
+  { tag: 12, sym: "los",    titel: "Drei Rubbellose", teaser: "Eines pro Land. Freirubbeln, dann gilt es." },
+  { tag: 13, sym: "koffer", titel: "Kofferchaos",     teaser: "Ein Spiel. Steigeisen ja, Weihnachtsbaum nein." },
+  { tag: 14, sym: "reden",  titel: "Notfall-Spanisch",teaser: "Die Sätze, die wirklich zählen." },
+  { tag: 15, sym: "liste",  titel: "Die letzte Liste",teaser: "Morgen Mittag geht der Flieger. Also heute packen." },
+  { tag: 16, sym: "flug",   titel: "Boarding",        teaser: "Das war's mit Warten." }
+];
+
+function feldBauen() {
+  const f = $("#feld");
+  f.innerHTML = "";
+  TUEREN.forEach((t, i) => {
+    const frei = istFrei(t.tag);
+    const gesehen = speicher.get("gesehen:" + t.tag, false);
+    const b = el("button", "tuer t" + (i + 1) + (frei ? "" : " zu") + (istHeute(t.tag) ? " heute" : "") + (gesehen ? " gesehen" : ""));
+    b.type = "button";
+    b.disabled = !frei;
+    b.setAttribute("aria-label", frei
+      ? `Türchen ${t.tag}. August öffnen: ${t.titel}`
+      : `Türchen ${t.tag}. August — öffnet sich am ${t.tag}. August`);
+    b.innerHTML = `
+      <span class="datum">${t.tag}. August</span>
+      <span class="icon" aria-hidden="true">${symbol(t.sym, i === 0 ? 46 : 32)}</span>
+      <span>
+        <span class="titel">${t.titel}</span><br>
+        <span class="teaser">${t.teaser}</span>
+      </span>
+      <span class="schloss"><span class="s-icon" aria-hidden="true">${SCHLOSS}</span><span>ab ${t.tag}.8.</span></span>
+      ${gesehen ? '<span class="haken">✓</span>' : ""}`;
+    if (frei) b.addEventListener("click", () => oeffne(t.tag));
+    f.appendChild(b);
+  });
+}
+
+/* ============================================================
+   OVERLAY-STEUERUNG
+   ============================================================ */
+let letzterFokus = null;
+
+function oeffne(tag) {
+  const t = TUEREN.find(x => x.tag === tag);
+  letzterFokus = document.activeElement;
+  $("#oDatum").textContent = langesDatum(tag) + (istHeute(tag) ? " · heute" : "");
+  $("#oTitel").textContent = t.titel;
+  $("#oInhalt").innerHTML = "";
+  const bau = INHALTE[tag];
+  $("#oLead").textContent = bau.lead;
+  // Erst sichtbar machen, dann rendern — sonst messen Canvas-Inhalte eine Breite von 0
+  $("#overlay").classList.add("auf");
+  document.body.style.overflow = "hidden";
+  $("#overlay").scrollTop = 0;
+  bau.render($("#oInhalt"));
+  $("#schliessen").focus();
+  if (!speicher.get("gesehen:" + tag, false)) {
+    speicher.set("gesehen:" + tag, true);
+    setTimeout(() => konfetti(70), 250);
+  }
+}
+
+function schliesse() {
+  $("#overlay").classList.remove("auf");
+  document.body.style.overflow = "";
+  $("#oInhalt").innerHTML = "";
+  feldBauen();
+  if (letzterFokus && document.contains(letzterFokus)) letzterFokus.focus();
+}
+
+$("#schliessen").addEventListener("click", schliesse);
+addEventListener("keydown", (e) => { if (e.key === "Escape" && $("#overlay").classList.contains("auf")) schliesse(); });
+
+/* ============================================================
+   DIE ETAPPEN — Grundlage für Karte, Quiz und Packliste
+   ============================================================ */
+const ORTE = {
+  fra:  { name: "Frankfurt",             lon:   8.57, lat:  50.05 },
+  muc:  { name: "München",               lon:  11.79, lat:  48.35 },
+  cdmx: { name: "Mexiko-Stadt",          lon: -99.13, lat:  19.43 },
+  teo:  { name: "Teotihuacán",           lon: -98.84, lat:  19.69 },
+  izta: { name: "Iztaccíhuatl",          lon: -98.64, lat:  19.18 },
+  pue:  { name: "Puebla",                lon: -98.21, lat:  19.04 },
+  lim:  { name: "Lima",                  lon: -77.03, lat: -12.05 },
+  bue:  { name: "Buenos Aires",          lon: -58.38, lat: -34.60 },
+  sar:  { name: "San Antonio de Areco",  lon: -59.47, lat: -34.25 },
+  vla:  { name: "La Villa",              lon: -71.65, lat: -40.76 },
+  bar:  { name: "Bariloche",             lon: -71.31, lat: -41.13 },
+  cal:  { name: "El Calafate",           lon: -72.28, lat: -50.34 },
+  sla:  { name: "Salta",                 lon: -65.41, lat: -24.79 },
+  til:  { name: "Tilcara",               lon: -65.39, lat: -23.58 },
+  est:  { name: "Estancia El Bordo",     lon: -65.06, lat: -24.62 },
+  igu:  { name: "Puerto Iguazú",         lon: -54.57, lat: -25.60 }
+};
+
+/* Der Reiseplan in zeitlicher Reihenfolge. `dazu` sind Ausflüge von dieser Basis aus. */
+const ETAPPEN = [
+  { o: "fra", land: "de", von: "16. Aug", art: "start", hoehe: "112 m", temp: "18–26 °C",
+    fakt: "13:30 ab Frankfurt, LH 498. Zwölf Stunden Flug — und weil ihr sieben Zeitzonen nach Westen fliegt, landet ihr um 17:30 Ortszeit am selben Nachmittag." },
+
+  { o: "cdmx", land: "mx", von: "16. Aug", bis: "27. Aug", naechte: 11, hoehe: "2.240 m", temp: "12–23 °C",
+    fakt: "Elf Nächte am Stück — genug, um anzukommen statt abzuhaken. Die Stadt ist auf einen trockengelegten See gebaut und sinkt bis heute, stellenweise 50 Zentimeter im Jahr. Im August ist Regenzeit: Vormittags klar, nachmittags schüttet es.",
+    dazu: [
+      { o: "teo",  wann: "21. Aug", was: "Tagesausflug",
+        fakt: "Niemand weiß, wer diese Stadt gebaut hat. Als die Azteken sie fanden, lag sie schon Jahrhunderte verlassen da — sie gaben ihr den Namen „Ort, an dem die Götter geboren wurden“. Die Sonnenpyramide ist 65 Meter hoch." },
+      { o: "izta", wann: "23.–24. Aug", was: "Gipfelbesteigung, zwei Tage",
+        fakt: "5.230 Meter, der dritthöchste Berg Mexikos. Sein Name heißt auf Nahuatl „weiße Frau“, weil der Bergrücken wie eine Liegende aussieht — Kopf, Brust, Knie heißen die Abschnitte bis heute. Nebenan raucht der Popocatépetl." }
+    ]},
+
+  { o: "pue", land: "mx", von: "27. Aug", bis: "29. Aug", naechte: 2, hoehe: "2.135 m", temp: "11–24 °C",
+    fakt: "Heimat der Talavera-Keramik, deren Blau-Weiß hier an den Fassaden klebt — dasselbe Muster, das diese Seite im Hintergrund trägt. Und ihr seid im richtigen Fenster: Chiles en Nogada gibt es nur von Juli bis September." },
+
+  { o: "cdmx", land: "mx", von: "29. Aug", bis: "31. Aug", naechte: 2, hoehe: "2.240 m", temp: "12–23 °C",
+    fakt: "Zurück in die Stadt, auf dem Weg noch reiten. Zwei Nächte, um Mexiko zu Ende zu sehen." },
+
+  { o: "lim", land: "pe", von: "31. Aug", bis: "3. Sep", naechte: 3, hoehe: "150 m", temp: "15–19 °C",
+    fakt: "Eine der trockensten Hauptstädte der Welt — rund zehn Millimeter Regen im Jahr. Trotzdem selten sonnig: Von Juni bis November liegt der Küstennebel <i>garúa</i> über der Stadt." },
+
+  { o: "bue", land: "ar", von: "3. Sep", bis: "6. Sep", naechte: 3, hoehe: "25 m", temp: "8–16 °C",
+    fakt: "Mehr Buchläden pro Kopf als jede andere Stadt der Welt. Der schönste, El Ateneo, steckt in einem umgebauten Theater von 1919 — die Logen sind Leseplätze geblieben.",
+    dazu: [
+      { o: "sar", wann: "5. Sep", was: "Tagesausflug mit dem Auto",
+        fakt: "Die Gaucho-Stadt schlechthin, gut hundert Kilometer nordwestlich. Kopfsteinpflaster, Silberschmieden und Estancias — hier wird das Landleben gepflegt, das Buenos Aires längst abgelegt hat." }
+    ]},
+
+  { o: "vla", land: "ar", von: "6. Sep", bis: "8. Sep", naechte: 2, hoehe: "800 m", temp: "−2–7 °C",
+    fakt: "Der ruhige Nachbar von Bariloche, zwischen Seen und Araukarienwäldern. Anfang September liegt hier noch Schnee." },
+
+  { o: "bar", land: "ar", von: "8. Sep", bis: "11. Sep", naechte: 3, hoehe: "893 m", temp: "−2–7 °C",
+    fakt: "Die Schweiz Argentiniens, inklusive Holzchalets und einer absurden Dichte an Schokoladenläden. Noch Skisaison — am Cerro Catedral liegt Schnee bis in den Oktober." },
+
+  { o: "cal", land: "ar", von: "11. Sep", bis: "14. Sep", naechte: 3, hoehe: "200 m", temp: "−3–5 °C",
+    fakt: "Tor zum Perito Moreno, einem der wenigen Gletscher weltweit, der nicht schrumpft. Er schiebt sich bis zu zwei Meter am Tag vor, dann kracht vorne eine Eiswand ins Wasser. Der Ort heißt nach einer Beere — wer sie isst, kehrt angeblich nach Patagonien zurück.",
+    dazu: [
+      { o: "cal", wann: "12. Sep", was: "Gletscher-Trekking",
+        fakt: "Mit Steigeisen auf das Eis. Dafür stehen die wasserdichten Schuhe auf der Packliste." },
+      { o: "cal", wann: "13. Sep", was: "Bootstour",
+        fakt: "Vom Wasser aus sieht man erst, wie hoch die Abbruchkante wirklich ist — rund sechzig Meter über der Oberfläche." }
+    ]},
+
+  { o: "sla", land: "ar", von: "14. Sep", bis: "15. Sep", naechte: 1, hoehe: "1.187 m", temp: "5–23 °C",
+    fakt: "„Salta la linda“ — die Schöne. Koloniale Altstadt im Nordwesten. Von Patagonien aus dauert der Weg sieben Stunden, weil es keinen Direktflug gibt: erst zurück nach Buenos Aires, dann quer nach Norden. Eine Nacht, dann weiter mit dem Auto." },
+
+  { o: "til", land: "ar", von: "15. Sep", bis: "18. Sep", naechte: 3, hoehe: "2.465 m", temp: "2–22 °C",
+    fakt: "Mitten in der Quebrada de Humahuaca. Über dem Dorf liegt das Pucará, eine präkolumbische Festung. Tagsüber über 20 Grad, nachts nahe null — das macht die Höhe." },
+
+  { o: "est", land: "ar", von: "18. Sep", bis: "20. Sep", naechte: 2, hoehe: "900 m", temp: "6–25 °C",
+    fakt: "Zwei Tage Estancia, mit Reiten und Kochen. Kein Programm, kein Weiterfahren — der ruhigste Punkt der ganzen Reise." },
+
+  { o: "igu", land: "ar", von: "20. Sep", bis: "23. Sep", naechte: 3, hoehe: "180 m", temp: "14–25 °C",
+    fakt: "275 einzelne Wasserfälle, darunter der Teufelsschlund. Eleanor Roosevelt soll beim Anblick nur „Poor Niagara“ gesagt haben. Subtropisch — die einzige Etappe, auf der es richtig warm wird." },
+
+  { o: "bue", land: "ar", von: "23. Sep", bis: "30. Sep", naechte: 7, hoehe: "25 m", temp: "10–19 °C",
+    fakt: "Sieben Nächte zum Schluss, zurück am Anfang. Inzwischen ist Frühling — und ihr habt Zeit für alles, was beim ersten Mal nicht geklappt hat." },
+
+  { o: "muc", land: "de", von: "30. Sep", art: "ziel", hoehe: "519 m", temp: "9–18 °C",
+    fakt: "16:35 ab Buenos Aires, über Frankfurt zurück und am nächsten Tag in München. 46 Tage, drei Länder, gut 36.000 Kilometer allein in der Luft — und diesmal geht die Zeitverschiebung in die unangenehme Richtung." }
+];
+
+const LAENDER = {
+  de: { name: "Deutschland", zeit: "MESZ",    farbe: "var(--cobalto)" },
+  mx: { name: "Mexiko",      zeit: "−8 Std.", farbe: "var(--carmin-hell)" },
+  pe: { name: "Peru",        zeit: "−7 Std.", farbe: "var(--jade)" },
+  ar: { name: "Argentinien", zeit: "−5 Std.", farbe: "var(--oro)" }
+};
+
+/* Regionen für den Zoom. Jede fasst die Orte zusammen, die auf Übersichtshöhe verschmelzen. */
+const REGIONEN = [
+  { id: "eu",  kurz: "DEUTSCHLAND",  titel: "Start und Ziel",      orte: ["fra", "muc"],                anker: "end",   dx: -13, dy: 4 },
+  { id: "mx",  kurz: "MEXIKO",       titel: "Mexiko",              orte: ["cdmx", "teo", "izta", "pue"], anker: "end",  dx: -13, dy: 4 },
+  { id: "pe",  kurz: "LIMA",         titel: "Lima",                orte: ["lim"],                       anker: "end",   dx: -13, dy: 4 },
+  { id: "sal", kurz: "SALTA",        titel: "Der Nordwesten",      orte: ["sla", "til", "est"],         anker: "end",   dx: -13, dy: 4 },
+  { id: "igu", kurz: "IGUAZÚ",       titel: "Puerto Iguazú",       orte: ["igu"],                       anker: "start", dx: 13,  dy: 4 },
+  { id: "ba",  kurz: "BUENOS AIRES", titel: "Buenos Aires",        orte: ["bue", "sar"],                anker: "end",   dx: -13, dy: 4 },
+  { id: "bar", kurz: "BARILOCHE",    titel: "Bariloche & La Villa", orte: ["vla", "bar"],               anker: "end",   dx: -13, dy: 4 },
+  { id: "cal", kurz: "EL CALAFATE",  titel: "El Calafate",         orte: ["cal"],                       anker: "end",   dx: -13, dy: 4 }
+];
+
+/* Die Flüge in Reihenfolge — das ist die Linie, die das Flugzeug abfliegt.
+   El Calafate–Salta und der Rückweg gehen über Zwischenstopps, weil es
+   auf beiden Strecken keine Direktverbindung gibt. */
+const FLUEGE = [
+  ["fra", "cdmx"], ["cdmx", "lim"], ["lim", "bue"], ["bue", "bar"], ["bar", "cal"],
+  ["cal", "bue"], ["bue", "sla"], ["sla", "igu"], ["igu", "bue"], ["bue", "fra"], ["fra", "muc"]
+];
+
+/* Landwege, nur im Zoom sichtbar */
+const FAHRTEN = [
+  ["cdmx", "teo"], ["cdmx", "izta"], ["cdmx", "pue"],
+  ["bue", "sar"], ["vla", "bar"], ["sla", "til"], ["til", "est"]
+];
+
+/* Entfernung auf der Kugel, für den Kilometerzähler */
+const R_ERDE = 6371;
+const bogen = (g) => g * Math.PI / 180;
+function distanzKm(a, b) {
+  const dLat = bogen(b.lat - a.lat), dLon = bogen(b.lon - a.lon);
+  const h = Math.sin(dLat / 2) ** 2 +
+            Math.cos(bogen(a.lat)) * Math.cos(bogen(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R_ERDE * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+const FLUG_KM = FLUEGE.map(([a, b]) => distanzKm(ORTE[a], ORTE[b]));
+const GESAMT_KM = FLUG_KM.reduce((s, k) => s + k, 0);
+
+/* ============================================================
+   TAG 10 — DIE ROUTE
+   ============================================================ */
+const INHALTE = {};
+
+INHALTE[10] = {
+  lead: flach(`46 Tage, drei Länder, vom Vulkangipfel bis zum Gletscher.
+               Tipp eine Region an, dann zoomt die Karte hinein.`),
+  render(w) {
+    const n = el("div", "notiz");
+    n.innerHTML = `${gross(inTagen())} geht es endlich los.<br>
+      Bis dahin wartet hier jeden Tag eine Überraschung — immer nur eine,
+      immer erst, wenn der Tag da ist.
+      ${SIG ? `<span class="sig">${SIG}</span>` : ""}`;
+    w.appendChild(n);
+
+    w.appendChild(karteBauen());
+
+    // Der Reiseplan, nach Ländern gruppiert
+    for (const [kuerzel, land] of Object.entries(LAENDER)) {
+      const etappen = ETAPPEN.filter(e => e.land === kuerzel);
+      if (!etappen.length) continue;
+      const box = el("div", "panel");
+      box.innerHTML = `<p class="panel-titel">
+        <span style="color:${land.farbe}">■</span> ${land.name}
+        <span style="float:right;color:var(--schrift-2);letter-spacing:.1em">${land.zeit}</span></p>`;
+      etappen.forEach(e => box.appendChild(etappeZeile(e)));
+      w.appendChild(box);
+    }
+  }
+};
+
+function zeitraum(e) {
+  if (!e.bis) return e.von;
+  return e.von + " – " + e.bis;
+}
+
+function etappeZeile(e) {
+  const z = el("div", "etappe");
+  const naechte = e.naechte
+    ? `${e.naechte} ${e.naechte === 1 ? "Nacht" : "Nächte"}`
+    : (e.art === "start" ? "Abflug" : e.art === "ziel" ? "Ankunft" : "");
+  z.innerHTML = `
+    <div class="et-kopf">
+      <span class="et-nr">${zeitraum(e)}</span>
+      <b class="et-ort">${ORTE[e.o].name}</b>
+      <span class="et-daten">${naechte}</span>
+    </div>
+    <p class="et-fakt">${e.fakt}</p>
+    <p class="et-lage">${e.hoehe} über dem Meer · ${e.temp}</p>`;
+  (e.dazu || []).forEach(d => {
+    const u = el("div", "et-dazu");
+    u.innerHTML = `<div class="ed-kopf"><span class="ed-wann">${d.wann}</span>
+      <b>${ORTE[d.o].name}</b><span class="ed-was">${d.was}</span></div>
+      <p>${d.fakt}</p>`;
+    z.appendChild(u);
+  });
+  return z;
+}
+
+/* ============================================================
+   DIE KARTE — Übersicht mit Zoom in jede Region
+   ============================================================ */
+function karteBauen() {
+  const NS = "http://www.w3.org/2000/svg";
+
+  // Basisausschnitt: Europa bis Feuerland. Die Projektion bleibt fest,
+  // gezoomt wird ausschließlich über die viewBox.
+  const B = 620, H = 560;
+  const LON0 = -122, LON_SPAN = 142, LAT0 = 56, LAT_SPAN = 116;
+  const px = (lon) => (lon - LON0) / LON_SPAN * B;
+  const py = (lat) => (LAT0 - lat) / LAT_SPAN * H;
+  const GRUND = [0, 0, B, H];
+
+  const panel = el("div", "panel");
+  panel.innerHTML = `<p class="panel-titel">
+      <span id="kTitel">Die Strecke</span>
+      <button class="k-zurueck" id="kZurueck" hidden>← Ganze Route</button>
+    </p>`;
+
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", GRUND.join(" "));
+  svg.setAttribute("class", "karte-svg");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "Karte der Reiseroute von Frankfurt über Mexiko und Peru nach Argentinien");
+  svg.style.setProperty("--k", "1");
+  panel.appendChild(svg);
+
+  const info = el("div", "karten-info");
+  info.innerHTML = '<span class="ki-leer">Tipp eine Region an</span>';
+  panel.appendChild(info);
+
+  const steuerung = el("div", "k-steuerung");
+  steuerung.innerHTML = `
+    <button class="btn geist" id="kFliegen">Route abfliegen</button>
+    <span class="k-zaehler" id="kZaehler">0 km</span>`;
+  panel.appendChild(steuerung);
+
+  /* --- Ozean als Grundfläche ------------------------------------- */
+  const meer = document.createElementNS(NS, "rect");
+  meer.setAttribute("x", -B); meer.setAttribute("y", -H);
+  meer.setAttribute("width", B * 3); meer.setAttribute("height", H * 3);
+  meer.setAttribute("class", "ozean");
+  svg.appendChild(meer);
+
+  /* Marker werden über transform gegenskaliert statt über die Schriftgröße:
+     bei starkem Zoom fiele font-size sonst unter ein Pixel und verschwände. */
+  const marker = [];
+  function markerSetzen(g, x, y, k) {
+    g.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${k})`);
+  }
+
+  /* Hilfsfunktion: Längen-/Breitengrad-Paare zu einem Pfad */
+  const zuPfad = (paare, offen) => {
+    let d = "";
+    for (let i = 0; i < paare.length; i += 2)
+      d += (i ? "L" : "M") + px(paare[i]).toFixed(1) + " " + py(paare[i + 1]).toFixed(1) + " ";
+    return d + (offen ? "" : "Z");
+  };
+
+  function flaeche(paare, klasse, offen) {
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", zuPfad(paare, offen));
+    p.setAttribute("class", klasse);
+    p.setAttribute("stroke-linejoin", "round");
+    p.setAttribute("stroke-linecap", "round");
+    svg.appendChild(p);
+    return p;
+  }
+
+  /* --- Landmassen ------------------------------------------------ */
+  const kuesten = [
+    // Nordamerika, am oberen Rand angeschnitten
+    [-124,56, -110,56, -95,56, -80,56, -68,52, -60,47, -66,45, -70,43, -74,40, -75.5,37,
+     -76,35, -78,33.5, -81,31, -80.5,27, -80,25, -82,26, -83,29, -85,30, -88,30, -90,29,
+     -94,29.5, -97,26, -97.5,25.9, -99,27, -101,29.5, -103,29, -106,31.8, -111,31, -117,33,
+     -120,34.5, -122,37, -124,40, -124,44, -125,48, -124,56],
+    // Mexiko mit Yucatán und Baja
+    [-117,33, -114,32, -111,31, -108,31.5, -106,31.8, -103,29, -101,29.5, -99,27, -97.5,25.9,
+     -97,22, -95.5,18.7, -94.5,18.2, -92,18.6, -90.5,19.6, -90,21, -88,21.6, -86.8,21.4,
+     -86.7,20.2, -87.5,19, -88.3,18.5, -89,17.9, -90.5,16, -92,15, -94,16, -96,15.7,
+     -98,16.3, -99.5,16.7, -101.5,17.6, -103.5,18.5, -105.2,20.2, -105.7,22, -106.5,23.5,
+     -108,25, -109.5,27, -112,29, -114,31, -117,33],
+    // Baja California
+    [-117,32.5, -114.5,31.5, -113,29.5, -112,27.5, -110.5,24.5, -109.5,23, -110.5,24,
+     -112,25.5, -114,27.5, -115,29.5, -116.5,31.5, -117,32.5],
+    // Mittelamerika
+    [-92,15.5, -89,16, -88.2,15.9, -87,13, -84,10.8, -82.5,9.7, -80,9.2, -78.5,9.4, -77.5,8.6,
+     -78,7.5, -80,8, -81.5,8.5, -83,9.5, -85,11, -87,12.5, -89,14, -92,14.5],
+    // Südamerika, mit ausgeformtem Río de la Plata
+    [-77.5,8.6, -76,9.5, -75,10.5, -73,11.5, -71,12, -68,11.2, -66,10.6, -63,10.8, -62,10.7,
+     -60,8.5, -58,6.8, -55,5.8, -52,5, -51,3, -50,0, -47.5,-1, -44,-2.5, -41,-3, -38,-5,
+     -35.5,-6.5, -35,-8, -36,-10, -37,-11, -38.5,-12.8, -39,-15, -39.5,-18, -41,-22,
+     -43,-23, -45,-24, -46.5,-24.5, -48,-25.5, -50,-28, -52,-32, -53.5,-33.5, -55,-34.5,
+     -56.3,-34.9, -57.8,-34.5, -58.5,-34.0, -58.7,-34.5, -57.3,-35.3, -57.0,-36.4,
+     -56.7,-36.9, -57.5,-38.2, -60,-38.9, -62,-39, -62.5,-41, -64,-42.3, -65,-42.5, -65,-45,
+     -67.5,-46, -67,-49, -68,-50.5, -69,-52, -68,-54.8, -67,-55.5, -70,-55, -71,-53.5,
+     -74,-52.5, -75,-50, -73.5,-47, -75,-45, -74,-43.5, -73.5,-42, -73.5,-40, -73,-38,
+     -72.5,-36, -71.5,-33, -71,-30, -70.5,-28, -70.5,-25, -70.4,-23, -70,-21, -70.3,-19,
+     -71,-18, -73,-16.5, -74,-15.5, -76,-14, -76.3,-13.5, -77.2,-12.3, -77.1,-11.7,
+     -78.3,-10, -79,-8, -81,-6, -80.5,-4, -80,-2.5, -79.5,-1, -78.5,1, -77.5,4, -77.5,8.6],
+    // Europa
+    [-9.5,43, -9,39, -7,37, -6,36, -2,36.5, 0,39, 3,42, 4,43.5, 7,43.5, 9,44, 12,44,
+     14,42, 16,41.5, 18,40, 16,38.5, 15,38, 13,45.5, 14,45, 17,46, 19,48, 20,50, 21,54,
+     19,56, 14,56, 12,54.5, 10,54.5, 8,54, 6,53.5, 4,52, 4,51, 2,51, 0,50, -2,49, -4.5,48.5,
+     -2,47, -1,46, -1.5,44, -9.5,43],
+    // Britische Inseln
+    [-5,50, -3,50.7, -1,50.7, 1,51, 1.7,52.8, -0.5,54, -1.5,55.5, -2,57.5, -3.5,58.6,
+     -5,58.5, -5.5,57, -4.5,55.5, -5,53.5, -4,52.5, -5,51.5, -5,50],
+    // Irland
+    [-10,51.5, -8,51.6, -6,52.2, -6,54.2, -7,55.3, -9.5,54.3, -10,53, -10,51.5],
+    // Nordwestafrika, angeschnitten
+    [-17,21, -16.5,24, -15,27.7, -13,28.5, -10,31, -8,33, -6,35.2, -2,35.5, 2,36.8,
+     8,37, 10,37.2, 11,33.5, 15,32, 20,32, 20,20, 10,20, 0,20, -8,21, -17,21]
+  ];
+  kuesten.forEach(k => flaeche(k, "kueste"));
+
+  /* --- Gebirge, damit die Karte Relief bekommt -------------------- */
+  const gebirge = [
+    // Anden — schmales Band entlang der Westküste
+    [-72,-16, -69,-18, -67.5,-21, -67,-24, -67.5,-27, -68.5,-30, -69.5,-33, -70.5,-36,
+     -71.3,-39, -71.8,-42, -72.3,-45, -72.8,-48, -73.2,-51, -73.8,-52.5,
+     -74.6,-52, -74,-48.5, -73.6,-45, -73.2,-42, -72.7,-39, -71.8,-36, -71,-33, -70.3,-30,
+     -69.5,-27, -69,-24, -69.5,-21, -71,-18, -73,-16],
+    // Sierra Madre Occidental
+    [-108,29, -106,25, -105,22, -104.5,20.5, -103,20, -104,22, -105,25, -106.5,29, -108,29],
+    // Transmexikanischer Vulkangürtel — hier liegt der Iztaccíhuatl
+    [-103,19.6, -100,19.4, -98,19.2, -97,19.5, -98.5,19.8, -100.5,19.9, -103,20.1, -103,19.6],
+    // Alpen
+    [6,46, 9,46.5, 12,47, 14,47.3, 13,46.5, 10,45.8, 7,45.5, 6,46]
+  ];
+  gebirge.forEach(g => flaeche(g, "gebirge"));
+
+  /* --- Gewässer, die erst im Zoom Sinn ergeben -------------------- */
+  const gewaesser = [
+    // Nahuel Huapi bei Bariloche
+    [-71.9,-40.78, -71.6,-40.8, -71.35,-40.9, -71.1,-40.95, -71.05,-41.05, -71.4,-41.05,
+     -71.65,-40.97, -71.88,-40.9, -71.95,-40.83],
+    // Lago Correntoso / Villa La Angostura
+    [-71.72,-40.68, -71.6,-40.7, -71.55,-40.75, -71.65,-40.76, -71.75,-40.72],
+    // Lago Argentino bei El Calafate
+    [-73.4,-50.12, -72.9,-50.05, -72.5,-50.15, -72.1,-50.28, -71.95,-50.35, -72.2,-50.45,
+     -72.7,-50.5, -73.2,-50.42, -73.45,-50.28],
+    // Lago Viedma, nördlich davon
+    [-73.2,-49.5, -72.6,-49.45, -72.2,-49.55, -72.5,-49.68, -73.0,-49.65],
+    // Titicacasee, als Orientierung im Norden
+    [-69.8,-15.2, -69.2,-15.6, -68.7,-16.2, -69.2,-16.5, -69.9,-16.0]
+  ];
+  gewaesser.forEach(g => flaeche(g, "gewaesser"));
+
+  // Flüsse als Linien
+  const fluesse = [
+    // Paraná bei Iguazú, dann südwärts
+    [-54.62,-24.0, -54.6,-25.0, -54.58,-25.58, -54.75,-26.4, -55.5,-27.4, -56.5,-27.5,
+     -58,-27.3, -58.6,-29.5, -59.5,-31.5, -60.3,-33.2, -58.5,-34.2],
+    // Iguazú-Fluss von Osten zu den Fällen
+    [-53.2,-25.55, -54.0,-25.6, -54.35,-25.68, -54.58,-25.58],
+    // Uruguay
+    [-56.0,-27.4, -57.6,-30.2, -58.2,-32.5, -58.4,-34.0],
+    // Amazonas, grob
+    [-73,-4.5, -68,-3.8, -60,-3.2, -55,-2.2, -50,-1]
+  ];
+  fluesse.forEach(f => flaeche(f, "fluss", true));
+
+  /* --- Gipfel, die auf der Reise vorkommen ----------------------- */
+  const GIPFEL = [
+    { lon: -98.64, lat: 19.18, n: "Iztaccíhuatl" },
+    { lon: -98.62, lat: 19.02, n: "Popocatépetl" },
+    { lon: -71.88, lat: -41.16, n: "Tronador" },
+    { lon: -71.44, lat: -41.17, n: "Catedral" },
+    { lon: -73.04, lat: -49.27, n: "Fitz Roy" },
+    { lon: -65.20, lat: -23.15, n: "Hornocal" }
+  ];
+  const gipfelGruppe = document.createElementNS(NS, "g");
+  gipfelGruppe.setAttribute("class", "gipfel-schicht");
+  GIPFEL.forEach(g => {
+    const x = px(g.lon), y = py(g.lat);
+    const halter = document.createElementNS(NS, "g");
+    const s = document.createElementNS(NS, "path");
+    s.setAttribute("d", "M0 0 L-5 4.5 L5 4.5 Z M0 0 L-2 1.8 L-1 2.4 L0 1.9 L1 2.4 L2 1.8 Z");
+    s.setAttribute("class", "gipfel");
+    halter.appendChild(s);
+    gipfelGruppe.appendChild(halter);
+    marker.push({ g: halter, x, y });
+    markerSetzen(halter, x, y, 1);
+  });
+  svg.appendChild(gipfelGruppe);
+
+  // Äquator und Wendekreise
+  [0, 23.44, -23.44].forEach(lat => {
+    const l = document.createElementNS(NS, "line");
+    l.setAttribute("x1", -B); l.setAttribute("x2", B * 2);
+    l.setAttribute("y1", py(lat)); l.setAttribute("y2", py(lat));
+    l.setAttribute("class", "breitengrad");
+    svg.appendChild(l);
+  });
+
+  /* --- Wege ------------------------------------------------------ */
+  function bogenPfad(a, z, staerke) {
+    const A = { x: px(a.lon), y: py(a.lat) }, Z = { x: px(z.lon), y: py(z.lat) };
+    const mx = (A.x + Z.x) / 2, my = (A.y + Z.y) / 2;
+    const dx = Z.x - A.x, dy = Z.y - A.y;
+    const l = Math.hypot(dx, dy) || 1;
+    const bauch = Math.min(52, l * staerke);
+    return `M${A.x.toFixed(1)} ${A.y.toFixed(1)} Q${(mx - dy / l * bauch).toFixed(1)} ${(my + dx / l * bauch).toFixed(1)} ${Z.x.toFixed(1)} ${Z.y.toFixed(1)}`;
+  }
+
+  // Landwege zuerst, damit die Flüge darüber liegen
+  FAHRTEN.forEach(([a, b]) => {
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", bogenPfad(ORTE[a], ORTE[b], 0.08));
+    p.setAttribute("class", "fahrt-linie");
+    svg.appendChild(p);
+  });
+
+  const flugPfade = FLUEGE.map(([a, b], i) => {
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", bogenPfad(ORTE[a], ORTE[b], 0.15));
+    p.setAttribute("class", "route-linie");
+    svg.appendChild(p);
+    requestAnimationFrame(() => {
+      try {
+        const L = p.getTotalLength();
+        p.style.strokeDasharray = "6 8";
+        p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }],
+          { duration: reduziert ? 1 : 520, delay: reduziert ? 0 : i * 210, fill: "forwards", easing: "ease-out" });
+      } catch {}
+    });
+    return p;
+  });
+
+  /* --- Einzelorte, nur im Zoom sichtbar -------------------------- */
+  const ortGruppen = {};
+  for (const [id, o] of Object.entries(ORTE)) {
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "detailort");
+    const x = px(o.lon), y = py(o.lat);
+
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", 0); c.setAttribute("cy", 0); c.setAttribute("r", 3.6);
+    c.setAttribute("class", "detail-punkt");
+    g.appendChild(c);
+
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", 0); t.setAttribute("y", -10);
+    t.setAttribute("text-anchor", "middle");
+    t.setAttribute("class", "detail-label");
+    t.textContent = o.name;
+    g.appendChild(t);
+
+    svg.appendChild(g);
+    ortGruppen[id] = g;
+    marker.push({ g, x, y });
+    markerSetzen(g, x, y, 1);
+  }
+
+  /* --- Regionen als antippbare Punkte ---------------------------- */
+  const regionGruppen = {};
+  const regionLabels = [];
+  REGIONEN.forEach((r, i) => {
+    const mittel = r.orte.reduce((a, id) => ({
+      lon: a.lon + ORTE[id].lon / r.orte.length,
+      lat: a.lat + ORTE[id].lat / r.orte.length
+    }), { lon: 0, lat: 0 });
+    const x = px(mittel.lon), y = py(mittel.lat);
+
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "station");
+    g.setAttribute("tabindex", "0");
+    g.setAttribute("role", "button");
+    g.setAttribute("aria-label", r.titel + " — hineinzoomen");
+
+    const treffer = document.createElementNS(NS, "circle");
+    treffer.setAttribute("cx", 0); treffer.setAttribute("cy", 0); treffer.setAttribute("r", 18);
+    treffer.setAttribute("fill", "transparent");
+    g.appendChild(treffer);
+
+    const ring = document.createElementNS(NS, "circle");
+    ring.setAttribute("cx", 0); ring.setAttribute("cy", 0); ring.setAttribute("r", 9);
+    ring.setAttribute("class", "stadt-ring");
+    ring.style.animationDelay = (i * 0.28) + "s";
+    g.appendChild(ring);
+
+    const pkt = document.createElementNS(NS, "circle");
+    pkt.setAttribute("cx", 0); pkt.setAttribute("cy", 0);
+    pkt.setAttribute("r", r.orte.length > 1 ? 5.4 : 4.2);
+    pkt.setAttribute("class", "stadt-punkt");
+    pkt.style.animationDelay = (i * 0.28) + "s";
+    g.appendChild(pkt);
+
+    const txt = document.createElementNS(NS, "text");
+    txt.setAttribute("x", r.dx); txt.setAttribute("y", r.dy);
+    txt.setAttribute("text-anchor", r.anker);
+    txt.setAttribute("class", "stadt-label");
+    txt.style.animationDelay = (i * 0.28 + 0.2) + "s";
+    txt.textContent = r.kurz + (r.orte.length > 1 ? "  ·" + r.orte.length : "");
+    g.appendChild(txt);
+
+    g.addEventListener("click", () => hinein(r));
+    g.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); hinein(r); }
+    });
+    svg.appendChild(g);
+    regionGruppen[r.id] = g;
+    marker.push({ g, x, y });
+    markerSetzen(g, x, y, 1);
+    regionLabels.push({ txt, x, dx: Math.abs(r.dx), anker: r.anker });
+  });
+
+  /* Ortsnamen kippen auf die freie Seite, wenn sie sonst aus dem
+     Kartenrand laufen — das hängt von der Anzeigebreite ab. */
+  function labelsAusrichten(box, k) {
+    const links = box[0], rechts = box[0] + box[2];
+    regionLabels.forEach(L => {
+      L.txt.setAttribute("text-anchor", L.anker);
+      L.txt.setAttribute("x", L.anker === "end" ? -L.dx : L.dx);
+      let bb;
+      try { bb = L.txt.getBBox(); } catch { return; }
+      const l = L.x + bb.x * k, r = l + bb.width * k;
+      if (l < links + 3) {
+        L.txt.setAttribute("text-anchor", "start");
+        L.txt.setAttribute("x", L.dx);
+      } else if (r > rechts - 3) {
+        L.txt.setAttribute("text-anchor", "end");
+        L.txt.setAttribute("x", -L.dx);
+      }
+    });
+  }
+
+  /* --- Maßstab, nur im Zoom ------------------------------------- */
+  const massstab = document.createElementNS(NS, "g");
+  massstab.setAttribute("class", "massstab");
+  const msLinie = document.createElementNS(NS, "path");
+  massstab.appendChild(msLinie);
+  const msText = document.createElementNS(NS, "text");
+  massstab.appendChild(msText);
+  svg.appendChild(massstab);
+
+  const STUFEN = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000];
+
+  function massstabSetzen(box, k) {
+    // Kilometer pro Längengrad hängen von der Breite ab
+    const mittelLat = LAT0 - (box[1] + box[3] / 2) / H * LAT_SPAN;
+    const kmProGrad = 111.32 * Math.cos(bogen(mittelLat));
+    const sichtbareKm = box[2] / B * LON_SPAN * kmProGrad;
+    const ziel = STUFEN.find(s => s >= sichtbareKm * 0.22) || 5000;
+    const laenge = ziel / sichtbareKm * box[2];
+
+    const x = box[0] + box[2] * 0.06;
+    const y = box[1] + box[3] * 0.93;
+    const zacke = 4 * k;
+    msLinie.setAttribute("d",
+      `M${x} ${y - zacke} V${y} H${x + laenge} V${y - zacke}`);
+    msLinie.setAttribute("fill", "none");
+    msLinie.setAttribute("stroke", "var(--schrift-2)");
+    msLinie.setAttribute("stroke-width", 1.4 * k);
+    msText.setAttribute("x", x);
+    msText.setAttribute("y", y - 7 * k);
+    msText.setAttribute("transform", `translate(${x} ${y - 7 * k}) scale(${k}) translate(${-x} ${-(y - 7 * k)})`);
+    msText.textContent = ziel >= 1000 ? (ziel / 1000) + ".000 km" : ziel + " km";
+  }
+
+  /* --- Flugzeug für die Abflug-Animation ------------------------- */
+  const flieger = document.createElementNS(NS, "g");
+  flieger.setAttribute("class", "flieger-marke");
+  flieger.setAttribute("hidden", "");
+  const fSym = document.createElementNS(NS, "text");
+  fSym.setAttribute("class", "flieger-form");
+  fSym.setAttribute("text-anchor", "middle");
+  fSym.setAttribute("dominant-baseline", "central");
+  fSym.textContent = "✈️";
+  flieger.appendChild(fSym);
+  svg.appendChild(flieger);
+
+  /* --- Zoomen ---------------------------------------------------- */
+  let aktuelleBox = GRUND.slice();
+  let animation = null;
+
+  function boxAnimieren(ziel, dauer = 620) {
+    if (animation) cancelAnimationFrame(animation);
+    const start = aktuelleBox.slice();
+    if (reduziert) { boxSetzen(ziel); return; }
+    const t0 = performance.now();
+    const lauf = (jetzt) => {
+      const p = Math.min(1, (jetzt - t0) / dauer);
+      const e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;   // easeInOutCubic
+      boxSetzen(start.map((v, i) => v + (ziel[i] - v) * e));
+      if (p < 1) animation = requestAnimationFrame(lauf);
+    };
+    animation = requestAnimationFrame(lauf);
+  }
+
+  /* Gegenskalierung: nicht nur gegen den Zoom, sondern auch gegen die
+     Anzeigebreite — sonst schrumpfen die Ortsnamen auf dem Handy auf
+     sechs Pixel. Unter 430 px wird nicht weiter hochskaliert, sonst
+     überlappen sich die Beschriftungen in der Übersicht. */
+  function faktor(box) {
+    const breite = svg.getBoundingClientRect().width;
+    return box[2] / Math.max(breite || B, 430);
+  }
+
+  function boxSetzen(box) {
+    aktuelleBox = box;
+    svg.setAttribute("viewBox", box.map(v => v.toFixed(2)).join(" "));
+    const k = faktor(box);
+    svg.style.setProperty("--k", k.toFixed(4));
+    marker.forEach(m => markerSetzen(m.g, m.x, m.y, k));
+    massstabSetzen(box, k);
+    labelsAusrichten(box, k);
+  }
+
+  // Bei Größenänderung neu ausrechnen
+  if (window.ResizeObserver) {
+    let letzteBreite = 0;
+    new ResizeObserver(() => {
+      const b = Math.round(svg.getBoundingClientRect().width);
+      if (b && b !== letzteBreite) { letzteBreite = b; boxSetzen(aktuelleBox); }
+    }).observe(svg);
+  }
+
+  /* Bildausschnitt, der alle genannten Orte umfasst — mit Rand,
+     Mindestgröße und dem Seitenverhältnis der Grundkarte. */
+  function boxFuerOrte(ids, padGrad, minGrad) {
+    const lons = ids.map(id => ORTE[id].lon), lats = ids.map(id => ORTE[id].lat);
+    const padX = padGrad * B / LON_SPAN, padY = padGrad * H / LAT_SPAN;
+    let bx = px(Math.min(...lons)) - padX;
+    let by = py(Math.max(...lats)) - padY;
+    let bw = px(Math.max(...lons)) - px(Math.min(...lons)) + 2 * padX;
+    let bh = py(Math.min(...lats)) - py(Math.max(...lats)) + 2 * padY;
+
+    const minW = (minGrad || 0) * B / LON_SPAN;
+    if (bw < minW) { bx -= (minW - bw) / 2; bw = minW; }
+
+    const soll = H / B;
+    if (bh / bw < soll) { const n = bw * soll; by -= (n - bh) / 2; bh = n; }
+    else { const n = bh / soll; bx -= (n - bw) / 2; bw = n; }
+    return [bx, by, bw, bh];
+  }
+
+  function hinein(r) {
+    if (fliegtGerade) return;
+    boxAnimieren(boxFuerOrte(r.orte, 0.6, 2.6));
+
+    svg.classList.add("gezoomt");
+    Object.values(regionGruppen).forEach(g => g.classList.add("weg"));
+    Object.entries(ortGruppen).forEach(([id, g]) =>
+      g.classList.toggle("sichtbar", r.orte.includes(id)));
+
+    $("#kTitel").textContent = r.titel;
+    $("#kZurueck").hidden = false;
+
+    // Übernachtungen und Ausflüge dieser Region, in zeitlicher Reihenfolge
+    const stuecke = [];
+    ETAPPEN.forEach(e => {
+      if (r.orte.includes(e.o)) stuecke.push({
+        wann: zeitraum(e), ort: ORTE[e.o].name, fakt: e.fakt,
+        rechts: e.naechte ? e.naechte + (e.naechte === 1 ? " Nacht" : " Nächte") : ""
+      });
+      (e.dazu || []).forEach(d => {
+        if (r.orte.includes(d.o) && d.o !== e.o)
+          stuecke.push({ wann: d.wann, ort: ORTE[d.o].name, fakt: d.fakt, rechts: d.was });
+      });
+    });
+
+    info.innerHTML = stuecke.map(s => `
+      <div class="ki-eintrag">
+        <div class="ki-kopf"><span class="ki-nr">${s.wann}</span>
+        <b>${s.ort}</b>
+        <span class="ki-daten">${s.rechts}</span></div>
+        <p>${s.fakt}</p>
+      </div>`).join("") || '<span class="ki-leer">Keine Übernachtung hier</span>';
+  }
+
+  function hinaus() {
+    boxAnimieren(GRUND);
+    svg.classList.remove("gezoomt");
+    Object.values(regionGruppen).forEach(g => g.classList.remove("weg"));
+    Object.values(ortGruppen).forEach(g => g.classList.remove("sichtbar"));
+    $("#kTitel").textContent = "Die Strecke";
+    $("#kZurueck").hidden = true;
+    info.innerHTML = '<span class="ki-leer">Tipp eine Region an</span>';
+  }
+
+  panel.querySelector("#kZurueck").addEventListener("click", hinaus);
+
+  /* --- Die Route abfliegen ---------------------------------------
+     Die Kamera folgt dem Flugzeug: nah an Frankfurt starten, für den
+     Atlantikflug herauszoomen, über Amerika wieder hinein, zum Schluss
+     zurück nach Deutschland. Segmentzeiten und Kamerafahrten laufen auf
+     derselben Zeitachse, sind aber getrennt gesteuert. */
+  let fliegtGerade = false;
+
+  /* Segment 0 und 9 überqueren den Atlantik, 1–2 führen quer durch
+     Lateinamerika, 3–8 sind Inlandsflüge in Argentinien, 10 ist der
+     letzte Hüpfer nach München. Jede Gruppe bekommt ihren Ausschnitt. */
+  const AM_VON = 1, AM_BIS = 2, AR_VON = 3, AR_BIS = 8;
+  const ZEIT = { start: 1.4, atlantikHin: 4.0, amerika: 4.2, argentinien: 7.4, atlantikZur: 3.4, heimat: 1.8 };
+  const T_HIN         = ZEIT.start;
+  const T_AMERIKA     = T_HIN + ZEIT.atlantikHin;
+  const T_ARGENTINIEN = T_AMERIKA + ZEIT.amerika;
+  const T_ZURUECK     = T_ARGENTINIEN + ZEIT.argentinien;
+  const T_HEIMAT      = T_ZURUECK + ZEIT.atlantikZur;
+  const T_ENDE        = T_HEIMAT + ZEIT.heimat;
+
+  // Eine Gruppe von Segmenten auf ihr Zeitfenster verteilen, nach Streckenlänge
+  function gruppe(plan, von, bis, tVon, dauer) {
+    const km = FLUG_KM.slice(von, bis + 1);
+    const summe = km.reduce((s, k) => s + k, 0) || 1;
+    let t = tVon;
+    km.forEach((k, i) => {
+      const d = dauer * k / summe;
+      plan.push({ seg: von + i, von: t, bis: t + d });
+      t += d;
+    });
+  }
+
+  function segmentPlan() {
+    const plan = [];
+    plan.push({ seg: 0, von: T_HIN, bis: T_AMERIKA });
+    gruppe(plan, AM_VON, AM_BIS, T_AMERIKA, ZEIT.amerika);
+    gruppe(plan, AR_VON, AR_BIS, T_ARGENTINIEN, ZEIT.argentinien);
+    plan.push({ seg: FLUEGE.length - 2, von: T_ZURUECK, bis: T_HEIMAT });
+    plan.push({ seg: FLUEGE.length - 1, von: T_HEIMAT, bis: T_ENDE });
+    return plan;
+  }
+
+  function kameraPlan() {
+    const dt = boxFuerOrte(["fra", "muc"], 2.5, 9);
+    const am = boxFuerOrte(["cdmx", "lim", "bue"], 6, 0);
+    const ar = boxFuerOrte(["bue", "bar", "cal", "sla", "igu"], 3, 0);
+    return [
+      { t: 0,                   box: dt },
+      { t: T_HIN,               box: dt },
+      { t: T_HIN + 1.5,         box: GRUND },
+      { t: T_AMERIKA - 0.2,     box: GRUND },
+      { t: T_AMERIKA + 1.3,     box: am },
+      { t: T_ARGENTINIEN - 0.4, box: am },
+      { t: T_ARGENTINIEN + 1.2, box: ar },
+      { t: T_ZURUECK - 0.9,     box: ar },
+      { t: T_ZURUECK + 0.8,     box: GRUND },
+      { t: T_HEIMAT - 0.5,      box: GRUND },
+      { t: T_HEIMAT + 1.0,      box: dt },
+      { t: T_ENDE + 1.2,        box: dt }
+    ];
+  }
+
+  function boxMischen(a, b, e) { return a.map((v, i) => v + (b[i] - v) * e); }
+
+  panel.querySelector("#kFliegen").addEventListener("click", () => {
+    if (fliegtGerade) return;
+    const knopf = panel.querySelector("#kFliegen");
+
+    // Zoomzustand und laufende Kamerafahrten zurücksetzen
+    if (animation) cancelAnimationFrame(animation);
+    svg.classList.remove("gezoomt");
+    Object.values(regionGruppen).forEach(g => g.classList.remove("weg"));
+    Object.values(ortGruppen).forEach(g => g.classList.remove("sichtbar"));
+    $("#kTitel").textContent = "Die Strecke";
+    $("#kZurueck").hidden = true;
+    info.innerHTML = '<span class="ki-leer">Unterwegs …</span>';
+
+    const laengen = flugPfade.map(p => { try { return p.getTotalLength(); } catch { return 0; } });
+    const plan = segmentPlan();
+    const kamera = kameraPlan();
+
+    if (reduziert) {
+      $("#kZaehler").textContent = Math.round(GESAMT_KM).toLocaleString("de-DE") + " km";
+      info.innerHTML = '<span class="ki-leer">Tipp eine Region an</span>';
+      return;
+    }
+
+    fliegtGerade = true;
+    knopf.disabled = true;
+    flieger.removeAttribute("hidden");
+    let heimatSichtbar = null;
+
+    const t0 = performance.now();
+    const schritt = (jetzt) => {
+      if (!document.contains(svg)) { fliegtGerade = false; return; }
+      const t = (jetzt - t0) / 1000;
+
+      /* Kamera */
+      let a = kamera[0], b = kamera[kamera.length - 1];
+      for (let i = 0; i < kamera.length - 1; i++)
+        if (t >= kamera[i].t && t <= kamera[i + 1].t) { a = kamera[i]; b = kamera[i + 1]; break; }
+      if (t > kamera[kamera.length - 1].t) a = b = kamera[kamera.length - 1];
+      const spanne = Math.max(.001, b.t - a.t);
+      const q = Math.max(0, Math.min(1, (t - a.t) / spanne));
+      const e = q < .5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;
+      boxSetzen(boxMischen(a.box, b.box, e));
+
+      // In den Deutschland-Phasen die beiden Flughäfen benennen
+      const nah = t < T_HIN + 1.2 || t > T_HEIMAT + 0.4;
+      if (nah !== heimatSichtbar) {
+        heimatSichtbar = nah;
+        ["fra", "muc"].forEach(id => ortGruppen[id].classList.toggle("sichtbar", nah));
+        Object.values(regionGruppen).forEach(g => g.classList.toggle("weg", nah));
+      }
+
+      /* Flugzeug */
+      let seg = plan[0], anteil = 0;
+      if (t <= plan[0].von) { seg = plan[0]; anteil = 0; }
+      else {
+        seg = plan[plan.length - 1]; anteil = 1;
+        for (const s of plan)
+          if (t >= s.von && t <= s.bis) { seg = s; anteil = (t - s.von) / (s.bis - s.von); break; }
+      }
+
+      try {
+        const pfad = flugPfade[seg.seg], L = laengen[seg.seg];
+        const pos = pfad.getPointAtLength(L * anteil);
+        const vor = pfad.getPointAtLength(Math.min(L, L * anteil + Math.max(1, L * 0.01)));
+        // Das Emoji zeigt von Haus aus nach rechts oben, daher die 45 Grad Ausgleich
+        const winkel = Math.atan2(vor.y - pos.y, vor.x - pos.x) * 180 / Math.PI + 45;
+        flieger.setAttribute("transform",
+          `translate(${pos.x.toFixed(2)} ${pos.y.toFixed(2)}) rotate(${winkel.toFixed(1)}) scale(${faktor(aktuelleBox).toFixed(4)})`);
+      } catch {}
+
+      // Kilometer aus den echten Distanzen, nicht aus der Pfadlänge
+      const km = FLUG_KM.slice(0, seg.seg).reduce((s, k) => s + k, 0) + FLUG_KM[seg.seg] * anteil;
+      $("#kZaehler").textContent = Math.round(km).toLocaleString("de-DE") + " km";
+
+      if (t < T_ENDE) requestAnimationFrame(schritt);
+      else {
+        flieger.setAttribute("hidden", "");            // angekommen, also weg damit
+        $("#kZaehler").textContent = Math.round(GESAMT_KM).toLocaleString("de-DE") + " km";
+        knopf.disabled = false;
+        knopf.textContent = "Nochmal abfliegen";
+        fliegtGerade = false;
+        // Nach kurzem Verweilen in München zurück auf die Gesamtansicht
+        setTimeout(() => {
+          if (fliegtGerade || svg.classList.contains("gezoomt")) return;
+          ["fra", "muc"].forEach(id => ortGruppen[id].classList.remove("sichtbar"));
+          Object.values(regionGruppen).forEach(g => g.classList.remove("weg"));
+          heimatSichtbar = null;
+          boxAnimieren(GRUND, 900);
+          info.innerHTML = '<span class="ki-leer">Tipp eine Region an</span>';
+        }, 1600);
+      }
+    };
+    requestAnimationFrame(schritt);
+  });
+
+  return panel;
+}
+
+/* ============================================================
+   TAG 11 — QUIZ
+   ============================================================ */
+const FRAGEN = [
+  {
+    f: "Du desinfizierst dir dreimal am Tag die Hände. Wie viel Desinfektionsmittel brauchst du für die ganzen 46 Tage?",
+    o: ["Ein 100-ml-Fläschchen reicht", "einen knappen Viertelliter",
+        "gut 400 Milliliter", "fast zwei Liter"],
+    r: 2,
+    e: "46 Tage mal drei macht 138 Anwendungen, und empfohlen werden drei Milliliter pro Mal — macht 414 Milliliter. Ins Handgepäck dürfen davon genau 100. Der Rest muss in den Koffer, und der ist erfahrungsgemäß auch schon voll."
+  },
+  {
+    f: "Mexiko-Stadt steht auf dem Grund eines trockengelegten Sees. Was macht die Stadt deshalb?",
+    o: ["Sie schwimmt bei Starkregen kurzzeitig auf", "Sie sinkt — stellenweise um bis zu 50 cm pro Jahr", "Sie wird jedes Jahr um 2 cm angehoben", "Nichts, das ist ein Mythos"],
+    r: 1,
+    e: "Stimmt wirklich. Weil Grundwasser abgepumpt wird, sackt der alte Seeboden ab. Manche Gebäude stehen sichtbar schief — die Kathedrale am Zócalo hat deswegen Jahrzehnte an Stützarbeiten hinter sich."
+  },
+  {
+    f: "Teotihuacán ist eine der größten Ruinenstädte Amerikas. Wer hat sie gebaut?",
+    o: ["Die Azteken", "Die Maya", "Weiß bis heute niemand", "Die Tolteken, gesichert seit 1902"],
+    r: 2,
+    e: "Ungeklärt. Als die Azteken die Stadt fanden, lag sie schon Jahrhunderte verlassen da — sie waren so beeindruckt, dass sie ihr den Namen „Ort, an dem die Götter geboren wurden“ gaben. Auch der ursprüngliche Name ist verloren."
+  },
+  {
+    f: "Der Iztaccíhuatl, auf dem du stehen wirst, heißt auf Nahuatl „weiße Frau“. Warum?",
+    o: ["Weil nur Frauen ihn besteigen durften", "Weil seine Silhouette wie eine Liegende aussieht",
+        "Weil oben eine weiße Marienstatue steht", "Weil der Schnee dort nie schmilzt"],
+    r: 1,
+    e: "Vom Tal aus sieht der Bergrücken aus wie eine liegende Frau — Kopf, Brust, Knie, Füße heißen die Abschnitte bis heute. Der Legende nach war sie eine Prinzessin, und der rauchende Popocatépetl nebenan ist ihr Krieger, der bei ihr Wache hält."
+  },
+  {
+    f: "In Puebla gibt es ein Gericht, das man nur wenige Wochen im Jahr bekommt — und ihr seid genau dann da. Welches?",
+    o: ["Chiles en Nogada", "Mole Poblano", "Cochinita Pibil", "Tacos al Pastor"],
+    r: 0,
+    e: "Von Juli bis September, wenn Granatapfel und Walnuss frisch sind: eine gefüllte Chili unter weißer Nusssauce mit roten Kernen und Petersilie — grün, weiß, rot, die Nationalfarben. Die anderen drei gibt es das ganze Jahr."
+  },
+  {
+    f: "In Lima regnet es im Jahr durchschnittlich etwa …",
+    o: ["so viel wie in Hamburg", "halb so viel wie in Berlin",
+        "zehn Millimeter, also praktisch gar nichts", "mehr als im Schwarzwald"],
+    r: 2,
+    e: "Rund zehn Millimeter im ganzen Jahr — in Deutschland sind es je nach Ecke 600 bis 900. Sonnig wird es trotzdem selten: Von Juni bis November hängt der Küstennebel <i>garúa</i> über der Stadt."
+  },
+  {
+    f: "In San Antonio de Areco dreht sich alles um Gauchos. Was ist ein <i>facón</i>?",
+    o: ["ein breites Messer, das hinten im Gürtel steckt", "ein Kurzer vor dem Abendessen",
+        "der Sattel aus Schaffell", "der Vorarbeiter einer Estancia"],
+    r: 0,
+    e: "Das Gaucho-Messer, hinten in der Schärpe getragen — zum Arbeiten, zum Essen und früher auch zum Streiten. Areco lebt bis heute von seinen Silberschmieden, die <i>facones</i> und Mate-Becher verzieren."
+  },
+  {
+    f: "Der Perito Moreno bei El Calafate ist unter den Gletschern weltweit eine Ausnahme. Warum?",
+    o: ["Er ist blau statt weiß", "Er schrumpft nicht", "Er bewegt sich rückwärts", "Er schwimmt auf dem offenen Meer"],
+    r: 1,
+    e: "Während fast alle Gletscher zurückgehen, hält der Perito Moreno seit Jahrzehnten sein Volumen. Er schiebt sich bis zu zwei Meter am Tag vor — und alle paar Stunden kracht vorne eine Eiswand ins Wasser."
+  },
+  {
+    f: "Auf der Estancia wird euch Mate gereicht. Womit blamiert man sich dabei sofort?",
+    o: ["Man rührt mit dem Trinkröhrchen um", "Man trinkt im Stehen",
+        "Man reicht ihn mit der linken Hand weiter", "Man pustet vorher hinein"],
+    r: 0,
+    e: "Die <i>bombilla</i> bleibt, wo sie steckt — wer damit rührt, verstopft den Filter und outet sich als Anfänger. Zweite Regel, noch wichtiger: „Gracias“ sagt man erst, wenn man nichts mehr will. Wer sich beim ersten Becher höflich bedankt, bekommt keinen zweiten."
+  },
+  {
+    f: "Über die Wasserfälle von Iguazú soll Eleanor Roosevelt beim ersten Anblick etwas gesagt haben. Was?",
+    o: ["„Nun bin ich still.“", "„Poor Niagara.“", "„Das ist zu laut.“", "„Ich bleibe hier.“"],
+    r: 1,
+    e: "Zwei Worte, überliefert seit ihrem Besuch 1944. Nachvollziehbar: Iguazú hat 275 einzelne Fälle auf fast drei Kilometern Breite — Niagara ist einer."
+  },
+  {
+    f: "September in Argentinien heißt für die Klamotten …",
+    o: ["Hochsommer, 35 Grad", "eine Übergangsjacke reicht überall",
+        "Winterende — in Patagonien unter null, in Iguazú 25 Grad", "Regenzeit, aber durchgehend warm"],
+    r: 2,
+    e: "Südhalbkugel, also Winter. In Bariloche und El Calafate liegt Schnee, in Tilcara klettert es tagsüber auf 20 Grad und fällt nachts fast auf null — und Iguazú ist subtropisch. Ihr braucht praktisch zwei Garderoben."
+  },
+  {
+    f: flach(`Die Reise ist um, der Koffer voller Erinnerungen — und beim Packen
+              für den Rückflug wird klar: Das ist Übergepäck. Was kostet bei
+              Lufthansa ein zusätzliches Gepäckstück?`),
+    o: ["35 Euro, so viel wie beim Billigflieger", "80 Euro",
+        "rund 250 Euro", "gar nichts, zwei Stück sind inklusive"],
+    r: 2,
+    e: "Auf der weiten Langstrecke verlangt Lufthansa für das zusätzliche Gepäckstück rund 250 Euro, am Schalter noch mehr. Günstiger wäre, die Schokolade aus Bariloche schon unterwegs aufzuessen — aber dafür ist es dann ja zu spät."
+  }
+];
+
+INHALTE[11] = {
+  lead: flach(`Zwölf Fragen quer durch die Reise, in der Reihenfolge, in der ihr
+               unterwegs seid — vom Kofferpacken bis zum Rückflug.`),
+  render(w) {
+    let i = 0, punkte = 0, gesperrt = false;
+
+    const kopf = el("div");
+    kopf.innerHTML = `
+      <div class="q-fortschritt"><span id="qNr"></span><span id="qStand"></span></div>
+      <div class="q-balken"><i id="qBalken" style="width:0%"></i></div>`;
+    w.appendChild(kopf);
+
+    const buehne = el("div");
+    w.appendChild(buehne);
+
+    /* Die Optionen werden bei jedem Durchgang neu gemischt. Sonst steht
+       die richtige Antwort immer an derselben Stelle, und nach ein paar
+       Fragen rät man die Position statt der Sache. */
+    function gemischt(q) {
+      const a = q.o.map((text, k) => ({ text, richtig: k === q.r }));
+      for (let n = a.length - 1; n > 0; n--) {
+        const m = Math.floor(Math.random() * (n + 1));
+        [a[n], a[m]] = [a[m], a[n]];
+      }
+      return a;
+    }
+
+    function frage() {
+      const q = FRAGEN[i];
+      $("#qNr").textContent = `Frage ${i + 1} von ${FRAGEN.length}`;
+      $("#qStand").textContent = `${punkte} richtig`;
+      $("#qBalken").style.width = (i / FRAGEN.length * 100) + "%";
+
+      buehne.innerHTML = "";
+      buehne.appendChild(el("h3", "q-frage", q.f));
+      const wahl = gemischt(q);
+      const opts = el("div", "q-optionen");
+      wahl.forEach((o, k) => {
+        const b = el("button", "q-opt");
+        b.type = "button";
+        b.innerHTML = `<span class="marke">${"ABCD"[k]}</span><span>${o.text}</span>`;
+        b.addEventListener("click", () => antwort(k, opts, q, wahl));
+        opts.appendChild(b);
+      });
+      buehne.appendChild(opts);
+      gesperrt = false;
+    }
+
+    function antwort(k, opts, q, wahl) {
+      if (gesperrt) return;
+      gesperrt = true;
+      const knoepfe = [...opts.children];
+      knoepfe.forEach(b => b.disabled = true);
+
+      const richtigIdx = wahl.findIndex(o => o.richtig);
+      const getroffen = wahl[k].richtig;
+      knoepfe[richtigIdx].classList.add("richtig");
+      if (getroffen) { punkte++; konfetti(35, .5, .3); }
+      else knoepfe[k].classList.add("falsch");
+
+      $("#qStand").textContent = `${punkte} richtig`;
+
+      const e = el("div", "q-erklaerung");
+      e.innerHTML = `<b>${getroffen ? "Richtig." : "Knapp daneben."}</b> ${q.e}`;
+      buehne.appendChild(e);
+
+      const weiter = el("p");
+      weiter.style.marginTop = "18px";
+      weiter.innerHTML = `<button class="btn" id="qWeiter">${i + 1 < FRAGEN.length ? "Nächste Frage" : "Auswertung"}</button>`;
+      buehne.appendChild(weiter);
+      $("#qWeiter").focus();
+      $("#qWeiter").addEventListener("click", () => {
+        i++;
+        if (i < FRAGEN.length) frage(); else ergebnis();
+      });
+    }
+
+    function ergebnis() {
+      $("#qBalken").style.width = "100%";
+      $("#qNr").textContent = "Fertig";
+      const best = speicher.get("quizBest", 0);
+      if (punkte > best) speicher.set("quizBest", punkte);
+
+      // Ein Urteil je möglichem Punktestand, also von null bis zur Fragenzahl
+      const urteile = [
+        "Keine einzige. Aber genau deswegen fahren wir ja hin.",
+        "Einer. Der Rest wird vor Ort gelernt — dann bleibt es sowieso besser hängen.",
+        "Zwei. Reicht für den ersten Abend.",
+        "Drei. Ausbaufähig, aber wir haben ja 46 Tage.",
+        "Vier. Solide Grundausstattung.",
+        "Fünf von zwölf. Knapp unter der Hälfte.",
+        "Sechs. Genau die Hälfte — und genug, um beim Abendessen mitzureden.",
+        "Sieben von zwölf. Du hast offensichtlich schon gelesen.",
+        "Acht. Beim Mate wirst du dich jedenfalls nicht blamieren.",
+        "Neun von zwölf. Ich glaube, du freust dich genauso wie ich.",
+        "Zehn. Bei den letzten beiden hättest du raten können — hast du vermutlich auch.",
+        "Elf von zwölf. Eine hat gefehlt. Die verrate ich dir unterwegs.",
+        "Alle zwölf. Ich frage jetzt lieber nicht, wie lange du dich schon damit beschäftigst."
+      ];
+
+      buehne.innerHTML = `
+        <div class="q-ergebnis">
+          <div class="q-punkte">${punkte}<small> / ${FRAGEN.length}</small></div>
+          <p style="max-width:44ch;margin:16px auto 0;color:var(--schrift-2);text-wrap:pretty">${urteile[punkte]}</p>
+          ${best > 0 && punkte <= best ? `<p style="font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;color:var(--jade);margin-top:14px">BESTER VERSUCH: ${Math.max(best, punkte)}</p>` : ""}
+          <p class="knopfreihe" style="margin-top:22px"><button class="btn geist" id="qNeu">Nochmal</button></p>
+        </div>`;
+      if (punkte > FRAGEN.length / 2) konfetti(120);
+      $("#qNeu").addEventListener("click", () => { i = 0; punkte = 0; frage(); });
+    }
+
+    frage();
+  }
+};
+
+/* ============================================================
+   TAG 12 — RUBBELLOSE
+   ============================================================ */
+const LOS_SYM = {
+  schlaf: `<path d="M20.4 14.6 A8.6 8.6 0 1 1 9.4 3.6 a6.8 6.8 0 0 0 11 11 z"/>
+           <path d="M4.6 6.2 h3.2 l-3.2 3.4 h3.2" stroke-width="1.2" opacity=".6"/>`,
+  essen:  `<path d="M8 21.5 V12"/>
+           <path d="M5.4 2.8 V8.4 a2.6 2.6 0 0 0 5.2 0 V2.8"/>
+           <path d="M16.4 21.5 V12.6"/>
+           <path d="M16.4 2.6 c3.4 2.2 3.4 8.4 0 10 z"/>`,
+  tango:  `<path d="M10.4 17.6 V5.4 L20 3.2 v12"/>
+           <ellipse cx="7.6" cy="18.2" rx="3" ry="2.3" transform="rotate(-18 7.6 18.2)"/>
+           <ellipse cx="17.2" cy="15.8" rx="3" ry="2.3" transform="rotate(-18 17.2 15.8)"/>
+           <path d="M10.4 8.4 L20 6.2" stroke-width="1.2" opacity=".6"/>`
+};
+
+const LOSE = [
+  { sym: "schlaf", titel: "Einmal ausschlafen", land: "Mexiko",
+    text: "Ein Vormittag ohne Wecker und ohne „wir müssten mal los“. Du sagst wann — und der 25. August, nach zwei Tagen Iztaccíhuatl, wäre ein guter Kandidat." },
+  { sym: "essen",  titel: "Ich lade dich ein", land: "Peru",
+    text: "Ein Abend in Lima, in einem Restaurant deiner Wahl. Du suchst aus, ich zahle — und Lima gilt als beste Küchenstadt Südamerikas, die Auswahl ist also nicht das Problem." },
+  { sym: "tango",  titel: "Eine Nacht Tango", land: "Argentinien",
+    text: "Eine Milonga in Buenos Aires, Anfängerstunde inklusive. Nach drei Liedern sieht es bestimmt schon fast nach Tango aus — und die Porteños sind höflich genug, das für Absicht zu halten." }
+];
+
+INHALTE[12] = {
+  lead: flach(`Drei Lose, eines pro Land. Freirubbeln mit dem Finger —
+               und was drunter steht, gilt.`),
+  render(w) {
+    const hinweis = el("p");
+    hinweis.style.cssText = "font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--schrift-2)";
+    hinweis.textContent = "Rubbeln zum Aufdecken";
+    w.appendChild(hinweis);
+
+    const g = el("div", "lose");
+    w.appendChild(g);
+
+    LOSE.forEach((l, idx) => {
+      const schonFrei = speicher.get("los:" + idx, false);
+      const box = el("div", "los" + (schonFrei ? " frei" : ""));
+      box.innerHTML = `
+        <div class="los-inhalt">
+          <div class="l-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34"
+            fill="none" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round">${LOS_SYM[l.sym]}</svg></div>
+          <div class="l-land">${l.land}</div>
+          <div class="l-titel">${l.titel}</div>
+          <div class="l-text">${l.text}</div>
+        </div>`;
+
+      if (!schonFrei) {
+        const cv = el("canvas");
+        cv.setAttribute("aria-label", "Rubbelfeld " + (idx + 1) + " — freirubbeln");
+        box.appendChild(cv);
+        g.appendChild(box);
+        rubbeln(cv, box, idx);
+      } else {
+        g.appendChild(box);
+      }
+    });
+
+    // Zurücksetzen ist zum Ausprobieren gedacht — ein eingelöstes
+    // Versprechen rubbelt man nicht noch einmal frei.
+    if (VORSCHAU) {
+      const reset = el("p", "mitte");
+      reset.style.marginTop = "20px";
+      reset.innerHTML = '<button class="btn geist" id="loseNeu">Lose zurücksetzen</button>';
+      w.appendChild(reset);
+      $("#loseNeu").addEventListener("click", () => {
+        LOSE.forEach((_, i) => speicher.set("los:" + i, false));
+        w.innerHTML = ""; INHALTE[12].render(w);
+      });
+    }
+  }
+};
+
+function rubbeln(cv, box, idx) {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const ctx = cv.getContext("2d", { willReadFrequently: true });
+  let bereit = false;
+
+  function initialisieren() {
+    const b = box.getBoundingClientRect();
+    if (b.width < 10) { requestAnimationFrame(initialisieren); return; }
+    // Höhe vom Inhalt übernehmen, damit die Schicht ihn vollständig deckt
+    const H = Math.max(128, b.height);
+    cv.width = b.width * dpr;
+    cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const g = ctx.createLinearGradient(0, 0, b.width, H);
+    g.addColorStop(0, "#B07F1E");
+    g.addColorStop(.45, "#E4AC38");
+    g.addColorStop(.55, "#F3D890");
+    g.addColorStop(1, "#B07F1E");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, b.width, H);
+
+    // Feine Talavera-Rauten in die Rubbelschicht
+    ctx.strokeStyle = "rgba(16,26,46,.16)";
+    ctx.lineWidth = 1;
+    for (let x = -H; x < b.width + H; x += 16) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + H, H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x + H, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+
+    ctx.fillStyle = "rgba(16,26,46,.62)";
+    ctx.font = "600 11px ui-monospace, monospace";
+    ctx.textAlign = "center";
+    ctx.letterSpacing = "3px";
+    ctx.fillText("HIER RUBBELN", b.width / 2, H / 2 + 4);
+
+    ctx.globalCompositeOperation = "destination-out";
+    bereit = true;
+  }
+  initialisieren();
+
+  let malt = false;
+
+  function punkt(e) {
+    const r = cv.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX - r.left, y: t.clientY - r.top };
+  }
+  function kratzen(e) {
+    if (!bereit) return;
+    e.preventDefault();
+    const p = punkt(e);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 21, 0, 7);
+    ctx.fill();
+  }
+  function pruefen() {
+    if (!bereit) return;
+    const d = ctx.getImageData(0, 0, cv.width, cv.height).data;
+    let leer = 0;
+    for (let i = 3; i < d.length; i += 40) if (d[i] < 30) leer++;
+    if (leer / (d.length / 40) > 0.52) {
+      box.classList.add("frei");
+      speicher.set("los:" + idx, true);
+      konfetti(60, .5, .4);
+    }
+  }
+
+  const start = (e) => { malt = true; kratzen(e); };
+  const zug   = (e) => { if (malt) kratzen(e); };
+  const ende  = () => { if (malt) { malt = false; pruefen(); } };
+
+  cv.addEventListener("mousedown", start);
+  cv.addEventListener("mousemove", zug);
+  addEventListener("mouseup", ende);
+  cv.addEventListener("touchstart", start, { passive: false });
+  cv.addEventListener("touchmove", zug, { passive: false });
+  cv.addEventListener("touchend", ende);
+}
+
+/* ============================================================
+   TAG 13 — KOFFERCHAOS
+   ============================================================ */
+const DINGE = [
+  // Was für diese Reise wirklich in den Koffer gehört
+  { z: "🥾", gut: true,  w: "Bergschuhe" },
+  { z: "🧥", gut: true,  w: "Winterjacke" },
+  { z: "🧤", gut: true,  w: "Handschuhe" },
+  { z: "🧣", gut: true,  w: "Schal" },
+  { z: "🕶️", gut: true,  w: "Sonnenbrille" },
+  { z: "🔦", gut: true,  w: "Stirnlampe" },
+  { z: "🧴", gut: true,  w: "Sonnencreme" },
+  { z: "💊", gut: true,  w: "Kopfschmerztabletten" },
+  { z: "📸", gut: true,  w: "Kamera" },
+  { z: "🔌", gut: true,  w: "Adapter" },
+  { z: "🧦", gut: true,  w: "Warme Socken" },
+  { z: "📖", gut: true,  w: "Buch" },
+  // Was ganz sicher nicht mitkommt
+  { z: "🎄", gut: false, w: "Weihnachtsbaum" },
+  { z: "🪑", gut: false, w: "Küchenstuhl" },
+  { z: "🐢", gut: false, w: "Schildkröte" },
+  { z: "🧯", gut: false, w: "Feuerlöscher" },
+  { z: "🎺", gut: false, w: "Trompete" },
+  { z: "🛷", gut: false, w: "Rodelschlitten" },
+  { z: "🌵", gut: false, w: "Zimmerkaktus" },
+  { z: "🍳", gut: false, w: "Bratpfanne" },
+  { z: "🖨️", gut: false, w: "Drucker" },
+  { z: "🛁", gut: false, w: "Badewanne" },
+  // Selten, dafür fünfzig Punkte
+  { z: "🎫", gut: true, bonus: true, w: "Boarding Pass" }
+];
+
+INHALTE[13] = {
+  lead: flach(`Sachen fallen vom Himmel. Fang die, die mitkommen.
+               Vorsicht: In Argentinien ist Winter — die Jacke muss rein.`),
+  render(w) {
+    const best = speicher.get("kofferBest", 0);
+
+    const huelle = el("div", "spiel-huelle");
+    huelle.innerHTML = `
+      <div class="spiel-hud">
+        <span>Punkte <b id="sPunkte">0</b></span>
+        <span>Leben <b id="sLeben">♥♥♥</b></span>
+        <span>Rekord <b id="sBest">${best}</b></span>
+      </div>
+      <div style="position:relative">
+        <canvas id="kofferSpiel"></canvas>
+        <div class="spiel-overlay" id="sOverlay">
+          <h4>Koffer bereit?</h4>
+          <p>Koffer mit Finger, Maus oder Pfeiltasten bewegen. Nur einpacken, was in den Urlaub gehört.</p>
+          <button class="btn" id="sStart">Los</button>
+        </div>
+      </div>`;
+    w.appendChild(huelle);
+
+    const legende = el("div", "panel");
+    legende.innerHTML = `<p class="panel-titel">Spielregeln</p>
+      <p style="margin:0;font-size:.88rem;color:var(--schrift-2);line-height:1.6">
+        Richtiges gefangen: <b style="color:var(--jade)">+10</b>.
+        Falsches gefangen: <b style="color:var(--carmin-hell)">ein Leben weg</b>.
+        Richtiges verpasst: auch ein Leben weg. Nach fünf Fehlern ist Schluss.
+        Wenn etwas mit <b style="color:var(--akzent)">goldenem Ring</b> fällt, ist es
+        der Boarding Pass — der bringt <b style="color:var(--akzent)">+50</b>.
+      </p>
+      <p style="margin:12px 0 0;font-size:.88rem;color:var(--schrift-2);line-height:1.6">
+        Es fängt gemütlich an und wird dann immer schneller, ohne Ende.
+        Gewinnen kann man nicht — es geht nur darum, wie lange du durchhältst.
+      </p>`;
+    w.appendChild(legende);
+
+    kofferSpiel();
+  }
+};
+
+function kofferSpiel() {
+  const cv = $("#kofferSpiel"), ctx = cv.getContext("2d");
+  const ov = $("#sOverlay");
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  let B = 0, H = 0;
+
+  function messen() {
+    const b = cv.parentElement.getBoundingClientRect();
+    if (b.width < 40) { requestAnimationFrame(messen); return; }   // Layout noch nicht da
+    const alt = B;
+    B = b.width;
+    H = Math.min(400, Math.max(280, B * 0.62));
+    cv.width = B * dpr; cv.height = H * dpr;
+    cv.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    koffer.x = alt ? koffer.x * (B / alt) : B / 2;
+    koffer.x = Math.max(koffer.b / 2, Math.min(B - koffer.b / 2, koffer.x));
+  }
+  const koffer = { x: 0, b: 74, h: 52, y: 0 };
+  messen();
+  addEventListener("resize", messen);
+
+  const LEBEN_START = 5;
+  let objekte = [], punkte = 0, leben = LEBEN_START, laeuft = false, tempo = 1, tick = 0, raf = 0;
+  let letzterStempel = 0, spawnZaehler = 0;
+  let links = false, rechts = false;
+  let blitze = [];
+
+  // Der Boarding Pass ist der seltene Hauptgewinn, sonst gleichverteilt
+  const ALLTAG = DINGE.filter(d => !d.bonus);
+  const BONUS  = DINGE.filter(d => d.bonus);
+
+  function spawn() {
+    const topf = (BONUS.length && Math.random() < 0.07) ? BONUS : ALLTAG;
+    const d = topf[(Math.random() * topf.length) | 0];
+    objekte.push({
+      x: 34 + Math.random() * (B - 68),
+      y: -30,
+      v: (1.7 + Math.random() * 1.1) * tempo,
+      d
+    });
+  }
+
+  function zeichneKoffer() {
+    const y = H - koffer.h - 12;
+    ctx.save();
+    ctx.translate(koffer.x, y);
+    // Korpus
+    ctx.fillStyle = "#B8353F";
+    ctx.strokeStyle = "#E4AC38";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(-koffer.b / 2, 0, koffer.b, koffer.h, 6);
+    ctx.fill(); ctx.stroke();
+    // Gurte
+    ctx.fillStyle = "rgba(228,172,56,.75)";
+    ctx.fillRect(-koffer.b / 2 + 14, 0, 6, koffer.h);
+    ctx.fillRect(koffer.b / 2 - 20, 0, 6, koffer.h);
+    // Griff
+    ctx.strokeStyle = "#E4AC38";
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, 15, Math.PI, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function schleife(jetzt) {
+    // Zeitbasiert statt framebasiert — sonst läuft das Spiel auf 120-Hz-Displays doppelt so schnell
+    if (jetzt == null) jetzt = performance.now();
+    let dt = (jetzt - letzterStempel) / 16.667;
+    if (!letzterStempel || !(dt > 0) || dt > 4) dt = 1;
+    letzterStempel = jetzt;
+
+    ctx.clearRect(0, 0, B, H);
+
+    // Boden
+    ctx.strokeStyle = "rgba(228,172,56,.2)";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, H - 10); ctx.lineTo(B, H - 10); ctx.stroke();
+
+    if (laeuft) {
+      tick += dt;
+      spawnZaehler += dt;
+      /* Gemütlicher Start, dann zieht es unaufhaltsam an: Der Abstand
+         zwischen zwei Sachen fällt asymptotisch gegen 20 Frames, das
+         Falltempo wächst dagegen ohne Grenze. Irgendwann ist die Lücke
+         zu klein — verlieren ist also nur eine Frage der Zeit. */
+      const rate = 20 + 95 * Math.exp(-tick / 2000);
+      if (spawnZaehler >= rate) { spawn(); spawnZaehler = 0; }
+      tempo = 0.7 + tick / 2200;
+
+      if (links)  koffer.x -= 7.5 * dt;
+      if (rechts) koffer.x += 7.5 * dt;
+      koffer.x = Math.max(koffer.b / 2, Math.min(B - koffer.b / 2, koffer.x));
+
+      const kY = H - koffer.h - 12;
+      objekte = objekte.filter(o => {
+        o.y += o.v * dt;
+        const gefangen = o.y > kY - 6 && o.y < kY + koffer.h &&
+                         Math.abs(o.x - koffer.x) < koffer.b / 2 + 8;
+        if (gefangen) {
+          if (o.d.gut) {
+            const wert = o.d.bonus ? 50 : 10;
+            punkte += wert;
+            blitz(o.x, kY, "+" + wert, o.d.bonus ? "#E4AC38" : "#2E9E8F");
+          } else { leben--; blitz(o.x, kY, o.d.w + "?!", "#D95560"); }
+          return false;
+        }
+        if (o.y > H + 20) {
+          if (o.d.gut) { leben--; blitz(o.x, H - 30, "verpasst", "#D95560"); }
+          return false;
+        }
+        return true;
+      });
+
+      if (leben <= 0) return schluss();
+      $("#sPunkte").textContent = punkte;
+      $("#sLeben").textContent = "♥".repeat(Math.max(0, leben)) + "♡".repeat(LEBEN_START - Math.max(0, leben));
+    }
+
+    ctx.font = "26px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (const o of objekte) {
+      if (o.d.bonus) {                       // Goldring, damit der Hauptgewinn auffällt
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, 21, 0, 7);
+        ctx.strokeStyle = "#E4AC38";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+      }
+      ctx.fillText(o.d.z, o.x, o.y);
+    }
+
+    zeichneKoffer();
+
+    blitze = blitze.filter(b => b.t > 0);
+    for (const b of blitze) {
+      b.t -= dt; b.y -= 1.1 * dt;
+      ctx.globalAlpha = Math.max(0, b.t / 45);
+      ctx.fillStyle = b.f;
+      ctx.font = "600 13px ui-monospace, monospace";
+      ctx.fillText(b.s, b.x, b.y);
+      ctx.globalAlpha = 1;
+    }
+
+    raf = requestAnimationFrame(schleife);
+  }
+
+  function blitz(x, y, s, f) { blitze.push({ x, y, s, f, t: 45 }); }
+
+  function start() {
+    objekte = []; punkte = 0; leben = LEBEN_START; tick = 0; tempo = 0.7; blitze = [];
+    letzterStempel = 0; spawnZaehler = 60;   // kurzer Vorlauf, bevor das Erste fällt
+    laeuft = true;
+    ov.classList.add("weg");
+    cancelAnimationFrame(raf);
+    schleife();
+  }
+
+  function schluss() {
+    laeuft = false;
+    cancelAnimationFrame(raf);
+    const best = speicher.get("kofferBest", 0);
+    const neu = punkte > best;
+    if (neu) { speicher.set("kofferBest", punkte); konfetti(120); }
+    $("#sBest").textContent = Math.max(best, punkte);
+    ov.classList.remove("weg");
+    ov.innerHTML = `
+      <h4>${neu ? "Neuer Rekord" : "Koffer voll"}</h4>
+      <p style="font-family:var(--mono);font-size:1.9rem;color:var(--oro);font-weight:600">${punkte}</p>
+      <p>${punkte >= 150 ? "Beeindruckend. Du packst offenbar auch im echten Leben effizient."
+         : punkte >= 80 ? "Ordentlich. Der Weihnachtsbaum bleibt trotzdem zu Hause."
+         : "Naja. Wir packen den Koffer besser gemeinsam."}</p>
+      <button class="btn" id="sStart">Nochmal</button>`;
+    $("#sStart").addEventListener("click", start);
+    $("#sStart").focus();
+  }
+
+  $("#sStart").addEventListener("click", start);
+
+  cv.addEventListener("mousemove", e => {
+    const r = cv.getBoundingClientRect();
+    koffer.x = e.clientX - r.left;
+  });
+  cv.addEventListener("touchmove", e => {
+    e.preventDefault();
+    const r = cv.getBoundingClientRect();
+    koffer.x = e.touches[0].clientX - r.left;
+  }, { passive: false });
+
+  const runter = e => {
+    if (e.key === "ArrowLeft")  { links = true;  e.preventDefault(); }
+    if (e.key === "ArrowRight") { rechts = true; e.preventDefault(); }
+  };
+  const rauf = e => {
+    if (e.key === "ArrowLeft")  links = false;
+    if (e.key === "ArrowRight") rechts = false;
+  };
+  addEventListener("keydown", runter);
+  addEventListener("keyup", rauf);
+
+  // Aufräumen, wenn das Overlay geschlossen wird
+  const beobachter = new MutationObserver(() => {
+    if (!$("#overlay").classList.contains("auf")) {
+      laeuft = false;
+      cancelAnimationFrame(raf);
+      removeEventListener("keydown", runter);
+      removeEventListener("keyup", rauf);
+      beobachter.disconnect();
+    }
+  });
+  beobachter.observe($("#overlay"), { attributes: true, attributeFilter: ["class"] });
+
+  schleife();
+}
+
+/* ============================================================
+   TAG 14 — NOTFALL-SPANISCH
+   ============================================================ */
+const SAETZE = [
+  { de: "Einen Pisco Sour, bitte.",              es: "Un pisco sour, por favor.",            l: "un PIS-ko SAU-er, por fa-WOR",           wo: "Lima" },
+  { de: "Noch einen.",                            es: "Otro más.",                            l: "O-tro MAS",                              wo: "überall" },
+  { de: "Ist das scharf?",                        es: "¿Pica mucho?",                         l: "PI-ka MU-tscho",                         wo: "CDMX" },
+  { de: "Sehr scharf. Aber gut.",                 es: "Muy picante. Pero rico.",              l: "muy pi-KAN-te, PE-ro RI-ko",             wo: "CDMX" },
+  { de: "Wo ist die nächste Toilette?",           es: "¿Dónde está el baño?",                 l: "DON-de es-TA el BAN-jo",                 wo: "überall" },
+  { de: "Können wir das teilen?",                 es: "¿Lo podemos compartir?",               l: "lo po-DE-mos kom-par-TIR",               wo: "überall" },
+  { de: "Was empfehlen Sie?",                     es: "¿Qué me recomienda?",                  l: "ke me re-ko-MJEN-da",                    wo: "überall" },
+  { de: "Die Rechnung, bitte.",                   es: "La cuenta, por favor.",                l: "la KWEN-ta, por fa-WOR",                 wo: "überall" },
+  { de: "Ich bin nur müde, nicht sauer.",         es: "Solo estoy cansada, no enojada.",      l: "SO-lo es-TOY kan-SA-da, no e-no-CHA-da", wo: "überall" },
+  { de: "Das ist zu teuer.",                      es: "Está muy caro.",                       l: "es-TA muy KA-ro",                        wo: "Märkte" },
+  { de: "Wie hoch sind wir hier?",                es: "¿A qué altura estamos?",               l: "a ke al-TU-ra es-TA-mos",                wo: "Izta · Tilcara" },
+  { de: "Ich brauche eine Pause.",                es: "Necesito un descanso.",                l: "ne-se-SI-to un des-KAN-so",              wo: "am Berg" },
+  { de: "Gibt es Chiles en Nogada?",              es: "¿Hay chiles en nogada?",               l: "ai TSCHI-les en no-GA-da",               wo: "Puebla" },
+  { de: "Wie kalt wird es heute Nacht?",          es: "¿Qué tan frío hará esta noche?",       l: "ke tan FRI-o a-RA ES-ta NO-tsche",       wo: "Patagonien" }
+];
+
+INHALTE[14] = {
+  lead: flach(`Vierzehn Karten. Tippen zum Umdrehen — sie werden auch vorgelesen.
+               Der Rest kommt beim Bestellen von selbst.`),
+  render(w) {
+    const g = el("div", "karten-gitter");
+    SAETZE.forEach((s) => {
+      const k = el("button", "kk");
+      k.type = "button";
+      k.setAttribute("aria-label", "Karte umdrehen: " + s.de);
+      k.innerHTML = `
+        <span class="kk-inner">
+          <span class="kk-seite kk-vorn">
+            <span class="de">${s.de}</span>
+            <span class="hinweis">Tippen</span>
+          </span>
+          <span class="kk-seite kk-hinten">
+            <span class="es">${s.es}</span>
+            <span class="lautschrift">${s.l}</span>
+            <span class="wo">${s.wo}</span>
+          </span>
+        </span>`;
+      k.addEventListener("click", () => {
+        k.classList.toggle("um");
+        if (k.classList.contains("um")) sprich(s.es);
+      });
+      g.appendChild(k);
+    });
+    w.appendChild(g);
+
+    const p = el("div", "panel");
+    p.innerHTML = `<p class="panel-titel">Drei Länder, drei Zungenschläge</p>
+      <p style="margin:0 0 12px;font-size:.89rem;color:var(--schrift-2);line-height:1.6">
+        In <b style="color:var(--schrift)">Mexiko</b> wird sehr deutlich und höflich gesprochen — <i>usted</i> ist normal.
+      </p>
+      <p style="margin:0 0 12px;font-size:.89rem;color:var(--schrift-2);line-height:1.6">
+        In <b style="color:var(--schrift)">Peru</b> klingt es weicher, Endsilben verschlucken sich gern.
+      </p>
+      <p style="margin:0;font-size:.89rem;color:var(--schrift-2);line-height:1.6">
+        In <b style="color:var(--schrift)">Argentinien</b> wird alles anders: <i>ll</i> und <i>y</i> klingen wie „sch". Aus <i>calle</i> wird „KA-sche", aus <i>yo</i> wird „scho". Und statt <i>tú</i> sagt man <i>vos</i>.
+      </p>`;
+    w.appendChild(p);
+  }
+};
+
+function sprich(text) {
+  try {
+    if (!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "es-MX";
+    u.rate = 0.88;
+    const stimmen = speechSynthesis.getVoices();
+    const s = stimmen.find(v => /^es[-_]/i.test(v.lang));
+    if (s) u.voice = s;
+    speechSynthesis.speak(u);
+  } catch {}
+}
+if ("speechSynthesis" in window) speechSynthesis.getVoices();
+
+/* ============================================================
+   TAG 15 — DIE LETZTE LISTE
+   ============================================================ */
+const PACKEN = [
+  { g: "Ohne das geht gar nichts", punkte: [
+    ["Reisepass", "Sechs Monate gültig"],
+    ["Impfausweis", "Gelbfieber für Iguazú"],
+    ["Kreditkarte und Bargeld", "In Argentinien zählt Bargeld"],
+    ["Reiseadapter", "Typ A in Mexiko, Typ I in Argentinien"],
+    ["Offline-Karten geladen", "Vor dem Abflug, nicht danach"]
+  ]},
+  { g: "Für den Iztaccíhuatl — 5.230 Meter", punkte: [
+    ["Feste Bergschuhe", "Eingelaufen, nicht neu"],
+    ["Handschuhe und Mütze", "Am Gipfel unter null"],
+    ["Zwiebellook zum Ausziehen", "Aufstieg heiß, Gipfel eisig"],
+    ["Stirnlampe", "Ihr startet nachts"],
+    ["Kopfschmerztabletten", "Die Höhe kommt schneller als gedacht"]
+  ]},
+  { g: "Für Patagonien — Bariloche und der Gletscher", punkte: [
+    ["Richtig warme Jacke", "Nicht die Übergangsjacke"],
+    ["Thermounterwäsche", "El Calafate ist Winter"],
+    ["Wasserdichte Schuhe", "Auf dem Eis wird alles nass"],
+    ["Sonnenbrille", "Gletscher blendet mehr als Schnee"],
+    ["Lippenbalsam", "Kälte und Wind"]
+  ]},
+  { g: "Für den Norden und die Wasserfälle", punkte: [
+    ["Etwas Leichtes", "Iguazú hat 25 Grad"],
+    ["Regenjacke", "Am Teufelsschlund wirst du nass"],
+    ["Mückenschutz", "Subtropen"],
+    ["Sonnencreme, hoher Faktor", "Tilcara liegt auf 2.465 Metern"]
+  ]},
+  { g: "Was man vergisst", punkte: [
+    ["Powerbank", "Lange Tage, wenig Steckdosen"],
+    ["Ein Buch", "Frankfurt–Mexiko sind zwölf Stunden"],
+    ["Waschmittel für unterwegs", "Drei Wochen, ein Koffer"],
+    ["Platz für Rückmitbringsel", "Schokolade aus Bariloche, Talavera aus Puebla"]
+  ]}
+];
+
+INHALTE[15] = {
+  lead: flach(`Morgen um halb zwei geht der Flieger. Heute ist der Tag,
+               an dem man merkt, was noch fehlt.`),
+  render(w) {
+    const alle = PACKEN.reduce((n, g) => n + g.punkte.length, 0);
+    let ab = 0;
+
+    PACKEN.forEach((grp, gi) => {
+      const box = el("div", "pl-gruppe");
+      box.appendChild(el("p", "pl-kopf", grp.g));
+      grp.punkte.forEach(([text, note], pi) => {
+        const key = `pack:${gi}:${pi}`;
+        const an = speicher.get(key, false);
+        if (an) ab++;
+        const z = el("button", "pl-zeile" + (an ? " ab" : ""));
+        z.type = "button";
+        z.setAttribute("aria-pressed", an ? "true" : "false");
+        z.innerHTML = `
+          <span class="pl-box" aria-hidden="true">✓</span>
+          <span class="pl-text">${text}</span>
+          <span class="pl-reaktion">${note}</span>`;
+        z.addEventListener("click", () => {
+          const jetzt = !z.classList.contains("ab");
+          z.classList.toggle("ab", jetzt);
+          z.setAttribute("aria-pressed", jetzt ? "true" : "false");
+          speicher.set(key, jetzt);
+          ab += jetzt ? 1 : -1;
+          standAktualisieren();
+        });
+        box.appendChild(z);
+      });
+      w.appendChild(box);
+    });
+
+    const stand = el("div", "pl-stand");
+    w.appendChild(stand);
+
+    const reset = el("p", "mitte");
+    reset.style.marginTop = "16px";
+    reset.innerHTML = '<button class="btn geist" id="plNeu">Liste leeren</button>';
+    w.appendChild(reset);
+    $("#plNeu").addEventListener("click", () => {
+      PACKEN.forEach((g, gi) => g.punkte.forEach((_, pi) => speicher.set(`pack:${gi}:${pi}`, false)));
+      w.innerHTML = ""; INHALTE[15].render(w);
+    });
+
+    function standAktualisieren() {
+      const prozent = Math.round(ab / alle * 100);
+      let text;
+      if (prozent === 100) text = "Fertig. Der Koffer kann zu.";
+      else if (prozent >= 75) text = "Fast. Der Rest passt noch rein.";
+      else if (prozent >= 40) text = "Guter Zwischenstand.";
+      else if (prozent > 0) text = "Angefangen ist die halbe Miete. Angeblich.";
+      else text = "Noch nichts. Es ist der letzte Abend.";
+      stand.innerHTML = `<b>${ab} / ${alle}</b>${text}`;
+      if (prozent === 100) konfetti(140);
+    }
+    standAktualisieren();
+  }
+};
+
+/* ============================================================
+   TAG 16 — BOARDING
+   ============================================================ */
+INHALTE[16] = {
+  lead: "Kein Türchen mehr. Nur noch Gate, Sitzplatz und zwölf Stunden über den Atlantik.",
+  render(w) {
+    const bp = el("div", "bp");
+    bp.innerHTML = `
+      <div class="bp-kopf">
+        <span>Boarding Pass</span>
+        <span>${CFG.flugnr}</span>
+      </div>
+      <div class="bp-koerper">
+        <div class="bp-strecke">
+          <div class="bp-ort">
+            <div class="code">${CFG.vonCode}</div>
+            <div class="stadt">${CFG.vonStadt}</div>
+          </div>
+          <div class="bp-pfeil"><span aria-hidden="true">${symbol("flug", 19)}</span></div>
+          <div class="bp-ort" style="text-align:right">
+            <div class="code">MEX</div>
+            <div class="stadt">Ciudad de México</div>
+          </div>
+        </div>
+        <div class="bp-gitter">
+          <div class="bp-feld"><div class="k">Passagier</div><div class="v">${CFG.name ? CFG.name.toUpperCase() : "DU"}</div></div>
+          <div class="bp-feld"><div class="k">Datum</div><div class="v">16 AUG</div></div>
+          <div class="bp-feld"><div class="k">Weiter</div><div class="v">LIM · EZE</div></div>
+          <div class="bp-feld"><div class="k">Gepäck</div><div class="v">GEPACKT</div></div>
+          <div class="bp-feld"><div class="k">Sitz</div><div class="v">NEBENAN</div></div>
+          <div class="bp-feld"><div class="k">Status</div><div class="v" style="color:var(--jade)">BEREIT</div></div>
+        </div>
+      </div>
+      <div class="bp-fuss" id="bpCode"></div>`;
+    w.appendChild(bp);
+
+    // Barcode
+    const bc = bp.querySelector("#bpCode");
+    let s = "";
+    for (let i = 0; i < 68; i++) {
+      const br = 1 + ((i * 7919) % 4);
+      s += `<i style="width:${br}px;opacity:${.35 + ((i * 13) % 6) / 10}"></i>`;
+    }
+    bc.innerHTML = s;
+
+    const uhr = el("div", "final-uhr");
+    uhr.innerHTML = `
+      <div><div class="z" id="fH">–</div><div class="l">Stunden</div></div>
+      <div><div class="z" id="fM">–</div><div class="l">Minuten</div></div>
+      <div><div class="z" id="fS">–</div><div class="l">Sekunden</div></div>`;
+    w.appendChild(uhr);
+
+    const n = el("div", "notiz");
+    n.innerHTML = `Sechs Tage lang war hier jeden Tag eine Kleinigkeit.
+      Ab jetzt passiert das Echte — und zwar draußen, in echt, ohne Bildschirm.
+      <br><br>Vámonos.
+      ${SIG ? `<span class="sig">${SIG}</span>` : ""}`;
+    w.appendChild(n);
+
+    const knopf = el("p", "mitte");
+    knopf.innerHTML = '<button class="btn" id="gate">Gate öffnen</button>';
+    w.appendChild(knopf);
+    $("#gate").addEventListener("click", () => {
+      konfetti(200, .5, .45);
+      setTimeout(() => konfetti(160, .25, .5), 280);
+      setTimeout(() => konfetti(160, .75, .5), 520);
+      $("#gate").textContent = "¡Buen viaje!";
+      $("#gate").disabled = true;
+    });
+
+    let id = setInterval(fTick, 1000);
+    fTick();
+    function fTick() {
+      if (!document.contains(uhr)) { clearInterval(id); return; }
+      const rest = ABFLUG - new Date();
+      const p = (n) => String(Math.max(0, n)).padStart(2, "0");
+      const s = Math.max(0, Math.floor(rest / 1000));
+      $("#fH").textContent = p(Math.floor(s / 3600));
+      $("#fM").textContent = p(Math.floor(s / 60) % 60);
+      $("#fS").textContent = p(s % 60);
+    }
+  }
+};
+
+/* ============================================================
+   START
+   ============================================================ */
+feldBauen();
+
+// Um Mitternacht das Feld neu bauen, falls die Seite offen bleibt
+setInterval(() => {
+  const marker = TUEREN.map(t => istFrei(t.tag) ? "1" : "0").join("");
+  if (marker !== feldBauen.marker) {
+    feldBauen.marker = marker;
+    if (!$("#overlay").classList.contains("auf")) feldBauen();
+  }
+}, 30000);
+feldBauen.marker = TUEREN.map(t => istFrei(t.tag) ? "1" : "0").join("");
+
+if (VORSCHAU) {
+  $("#untertitel").innerHTML = "Vorschaumodus — alle sieben Türchen sind offen. Für Katharina gilt weiterhin das Datum.";
+
+  const leiste = el("div", "vorschau-leiste");
+  leiste.innerHTML = '<span class="vl-titel">Direkt öffnen</span>';
+  TUEREN.forEach(t => {
+    const b = el("button", "vl-knopf", String(t.tag));
+    b.type = "button";
+    b.title = t.titel;
+    b.setAttribute("aria-label", `Türchen ${t.tag}. August: ${t.titel}`);
+    b.addEventListener("click", () => oeffne(t.tag));
+    leiste.appendChild(b);
+  });
+  const aus = el("button", "vl-knopf vl-aus", "Vorschau aus");
+  aus.type = "button";
+  aus.title = "Zeigt die Seite so, wie Katharina sie sieht";
+  aus.addEventListener("click", () => {
+    speicher.set("vorschaumodus", false);
+    location.href = location.pathname.replace(/vorschau\/?$/, "") + "?vorschau=0";
+  });
+  leiste.appendChild(aus);
+  $("#untertitel").after(leiste);
+}
+
+// Direktsprung per Adresse, z. B. …/vorschau/#t13
+(() => {
+  const m = location.hash.match(/^#t(\d+)$/);
+  if (m && TUEREN.some(t => t.tag === +m[1]) && istFrei(+m[1])) {
+    setTimeout(() => oeffne(+m[1]), 60);
+  }
+})();
+
+// Beim ersten Besuch: kleiner Empfang
+if (!speicher.get("begruesst", false)) {
+  speicher.set("begruesst", true);
+  setTimeout(() => konfetti(90, .5, .3), 700);
+}
+})();
 </script>
 </body>
 </html>
