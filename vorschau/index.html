@@ -2,24 +2,44 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="refresh" content="0; url=../?vorschau=1">
+<meta name="color-scheme" content="dark light">
+<title>Vámonos Test</title>
+
+<!-- Eigenes Manifest mit start_url auf genau diese Seite. Wird die
+     Vorschau zum Startbildschirm gelegt, startet die App also hier —
+     setzt das Merkmal im App-eigenen Speicher und leitet dann weiter.
+     Mit dem Manifest der Hauptseite ginge der Vorschaumodus verloren,
+     weil dessen start_url ohne Parameter startet. -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="../icon-192.png">
+<meta name="apple-mobile-web-app-title" content="Vámonos Test">
+<meta name="application-name" content="Vámonos Test">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#101A2E">
 <link rel="canonical" href="../?vorschau=1">
-<title>Vorschau — Sieben Türchen</title>
+
 <style>
   body {
     margin: 0; min-height: 100vh;
     display: grid; place-items: center;
     background: #101A2E; color: #A9B4C9;
     font-family: ui-monospace, "Cascadia Mono", monospace;
-    font-size: .82rem; letter-spacing: .1em;
+    font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
+    text-align: center; padding: 24px;
   }
   a { color: #E4AC38; }
 </style>
 </head>
 <body>
-<p>Weiter zur <a href="../?vorschau=1">Vorschau</a> …</p>
-<script>location.replace("../?vorschau=1");</script>
+<p>Vorschau wird geöffnet …<br><br><a href="../?vorschau=1">Weiter</a></p>
+<script>
+  try { localStorage.setItem("cd7:vorschaumodus", "true"); } catch (e) {}
+  location.replace("../?vorschau=1");
+</script>
 </body>
 </html>
