@@ -4167,16 +4167,14 @@ if (VORSCHAU) {
    VORSPANN
    Die Abendsonne geht auf, der Gaucho galoppiert durchs Bild und
    zieht eine Staubfahne hinter sich her; was bleibt, ist der Name.
-   Läuft einmal am Tag — bei jedem Aufruf wäre es eine Bremse statt
-   eines Auftakts. Antippen bricht ab.
+   Läuft bei jedem Öffnen; wer es eilig hat, tippt einmal und ist
+   sofort drin. Bei reduzierter Bewegung entfällt er.
    ============================================================ */
 function vorspann() {
-  const heuteSchluessel = new Date().toISOString().slice(0, 10);
-  if (reduziert || speicher.get("vorspannAm", "") === heuteSchluessel) return;
+  if (reduziert) return;
   // Im Hintergrund geladen? Dann gar nicht erst anfangen — der Bildaufbau
   // ruht dort, und der Vorspann bliebe über der Seite liegen.
   if (document.hidden) return;
-  speicher.set("vorspannAm", heuteSchluessel);
 
   const buehne = el("div", "vorspann");
   buehne.innerHTML = `
