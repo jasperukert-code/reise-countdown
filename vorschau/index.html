@@ -3263,7 +3263,13 @@ function galoppSpiel() {
   let schrittphase = 0, letzterStempel = 0, raf = 0;
   let berge = [], naechstes = 0;
 
-  function tempoJetzt() { return 5.4 + strecke / 2600; }
+  /* Das Tempo hängt an der Breite: Auf einem schmalen Display ist ein
+     Hindernis nur halb so lange sichtbar, bevor es da ist. Sonst wäre
+     das Spiel auf dem Handy von der ersten Sekunde an unfair. */
+  function tempoJetzt() {
+    const grund = 4.2 + Math.min(1.6, B / 520);
+    return grund + strecke / 2600;
+  }
 
   function bergeSetzen() {
     berge = [];
@@ -3492,7 +3498,7 @@ function galoppSpiel() {
     hindernisse = []; strecke = 0; hoehe = 0; steig = 0; amBoden = true;
     letzterStempel = 0; schrittphase = 0;
     tempo = tempoJetzt();
-    naechstes = B * 0.75;
+    naechstes = B * 1.35;          // Vorlauf, damit man sich erst einmal sortieren kann
     bergeSetzen();
     laeuft = true;
     ov.classList.add("weg");
