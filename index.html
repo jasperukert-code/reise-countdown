@@ -1142,12 +1142,13 @@ footer {
 .vorspann.weg { opacity: 0; pointer-events: none; }
 .vs-bild { position: absolute; inset: 0; width: 100%; height: 100%; }
 .vs-wort {
-  /* Sitzt unter dem Horizont, der bei 45 % der Höhe liegt */
+  /* Sitzt unter dem Horizont bei 45 %; die Querposition steuert das
+     Skript, weil der Name erst durchs Bild gezogen wird. */
   position: absolute;
   top: 56%;
-  left: 50%;
-  transform-origin: 50% 0;
+  left: 0;
   white-space: nowrap;
+  letter-spacing: .1em;
   font-family: var(--display);
   font-size: clamp(2.6rem, 13vw, 6rem);
   font-style: italic;
@@ -4211,8 +4212,13 @@ function vorspann() {
      der Name. Jeder Schritt setzt ein, wenn der vorige steht. */
   const T_BERGE  = 500,  T_BERGE_DAUER = 1300;
   const T_RITT   = 1700, T_RITT_DAUER  = 2500;
-  const T_WORT   = 3800, T_WORT_DAUER  = 900;
-  const T_ZOOM   = 5000, T_ZOOM_DAUER  = 1300;
+  /* Der Name hängt sich mit Abstand an den Reiter, stößt rechts an,
+     federt in die Mitte — und wird dann durchflogen. */
+  const T_WORT   = 2500;
+  const T_RAND   = 4250;
+  const T_HALT   = 4380;
+  const T_MITTE  = 5200;
+  const T_ZOOM   = 5550, T_ZOOM_DAUER = 1300;
   const DAUER    = T_ZOOM + T_ZOOM_DAUER;
   const staub = [];
 
@@ -4253,6 +4259,11 @@ function vorspann() {
   setTimeout(beenden, DAUER + 1200);
 
   const weich = (x) => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+  // Läuft übers Ziel hinaus und kommt zurück — das Einfedern in die Mitte
+  const federn = (x) => {
+    const c1 = 1.7, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+  };
 
   function bild(jetzt) {
     const t = jetzt - t0;
@@ -4320,11 +4331,24 @@ function vorspann() {
       ctx.beginPath(); ctx.arc(s.x, s.y, (1 - s.l) * 16 + 3, 0, 7); ctx.fill();
     }
 
-    // Der Name bleibt zurück
-    const auf = weich((t - T_WORT) / T_WORT_DAUER);
+    /* Der Name wird vom Reiter mitgeschleift: erst hinterher, dann stößt
+       er rechts an, federt in die Mitte und bleibt dort stehen. */
+    const wb = wort.offsetWidth || 220;
+    const links = -wb / 2 - 30;
+    const rechts = B - wb / 2 - 10;
+    let wx = links;
+    if (t >= T_RAND && t < T_HALT) {
+      wx = rechts;
+    } else if (t >= T_HALT && t < T_MITTE) {
+      wx = rechts + (B / 2 - rechts) * federn((t - T_HALT) / (T_MITTE - T_HALT));
+    } else if (t >= T_MITTE) {
+      wx = B / 2;
+    } else if (t > T_WORT) {
+      wx = links + weich((t - T_WORT) / (T_RAND - T_WORT)) * (rechts - links);
+    }
+    const auf = weich((t - T_WORT) / 420);
     wort.style.opacity = t < T_ZOOM ? auf : 0;
-    wort.style.transform = `translateX(-50%) scale(${1.35 - 0.35 * auf})`;
-    wort.style.letterSpacing = (0.26 - 0.16 * auf) + "em";
+    wort.style.transform = `translate(${wx.toFixed(1)}px, 0) translateX(-50%)`;
 
     /* Schlusszoom: Die Leinwand wird zum Vorhang, aus dem der Name
        ausgestanzt ist. Er wächst auf das erste o zu, bis dessen Innenraum
