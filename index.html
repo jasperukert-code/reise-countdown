@@ -571,6 +571,7 @@ footer {
   0% { opacity: .8; transform: scale(.4); }
   70%, 100% { opacity: 0; transform: scale(1.8); }
 }
+/* Marker liegen in gegenskalierten Gruppen — hier gelten feste Größen */
 .stadt-label {
   font-family: var(--mono);
   font-size: 12.5px;
@@ -584,6 +585,130 @@ footer {
   opacity: 0;
   animation: einfaden .6s ease-out forwards;
 }
+
+/* Beim Zoom skaliert die viewBox — Punkte, Linien und Schrift werden
+   über --k gegengerechnet, damit sie optisch gleich groß bleiben. */
+.karte-svg .kueste { stroke-width: calc(1px * var(--k, 1)); }
+.karte-svg .breitengrad {
+  stroke: var(--linie);
+  stroke-width: calc(.8px * var(--k, 1));
+  stroke-dasharray: calc(3px * var(--k, 1)) calc(7px * var(--k, 1));
+  opacity: .7;
+}
+.karte-svg .route-linie { stroke-width: calc(2.4px * var(--k, 1)); }
+.karte-svg .fahrt-linie {
+  fill: none;
+  stroke: var(--jade);
+  stroke-width: calc(1.6px * var(--k, 1));
+  stroke-dasharray: calc(2px * var(--k, 1)) calc(4px * var(--k, 1));
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity .4s;
+}
+.karte-svg.gezoomt .fahrt-linie { opacity: .85; }
+.karte-svg.gezoomt .route-linie { opacity: .18; }
+
+/* Maßstabsleiste erscheint erst im Zoom */
+.massstab { opacity: 0; transition: opacity .35s; pointer-events: none; }
+.karte-svg.gezoomt .massstab { opacity: 1; }
+.massstab text {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  fill: var(--schrift-2);
+}
+
+/* Regionspunkte blenden beim Zoom aus, Einzelorte ein */
+.station { transition: opacity .3s; }
+.station.weg { opacity: 0; pointer-events: none; }
+
+.detailort { opacity: 0; pointer-events: none; transition: opacity .35s; }
+.detailort.sichtbar { opacity: 1; }
+.detail-punkt {
+  fill: var(--carmin-hell);
+  stroke: var(--karte);
+  stroke-width: 1.5px;
+}
+.detail-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  fill: var(--schrift);
+  paint-order: stroke;
+  stroke: var(--karte);
+  stroke-width: 3.2px;
+  stroke-linejoin: round;
+}
+
+/* Flugzeug für die Abflug-Animation */
+.flieger-marke .flieger-form {
+  fill: var(--akzent);
+  stroke: var(--karte);
+  stroke-width: 1px;
+}
+
+/* Zurück-Knopf und Kilometerzähler */
+.k-zurueck {
+  float: right;
+  font-family: var(--mono);
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  background: none;
+  border: 1px solid var(--linie-satt);
+  border-radius: var(--r);
+  color: var(--akzent);
+  padding: 3px 9px;
+  cursor: pointer;
+  margin-top: -3px;
+}
+.k-zurueck:hover { background: var(--verschlossen); }
+.k-zurueck:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+
+.k-steuerung {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--linie);
+}
+.k-zaehler {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--akzent);
+  letter-spacing: .04em;
+}
+
+/* Zeile mit Höhe und Temperatur unter jeder Etappe */
+.et-lage {
+  margin: 6px 0 0;
+  font-family: var(--mono);
+  font-size: .64rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--jade);
+}
+
+/* Ausflüge, eingerückt unter der Basisetappe */
+.et-dazu {
+  margin: 12px 0 0 14px;
+  padding: 10px 0 0 14px;
+  border-left: 2px solid var(--linie);
+}
+.ed-kopf { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 9px; margin-bottom: 4px; }
+.ed-kopf b { font-family: var(--display); font-size: 1rem; }
+.ed-wann {
+  font-family: var(--mono); font-size: .62rem;
+  color: var(--akzent); font-variant-numeric: tabular-nums;
+}
+.ed-was {
+  font-family: var(--mono); font-size: .56rem;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--schrift-2); margin-left: auto;
+}
+.et-dazu p { margin: 0; font-size: .84rem; line-height: 1.5; color: var(--schrift-2); }
 @keyframes einfaden { to { opacity: 1; } }
 .flieger { offset-path: var(--pfad); animation: fliegen 3.4s ease-out forwards; font-size: 15px; }
 
@@ -1351,56 +1476,131 @@ addEventListener("keydown", (e) => { if (e.key === "Escape" && $("#overlay").cla
 /* ============================================================
    DIE ETAPPEN — Grundlage für Karte, Quiz und Packliste
    ============================================================ */
-const ETAPPEN = [
-  { nr: 1,  ort: "Ciudad de México",  land: "mx", lon: -99.13, lat: 19.43, hoehe: "2.240 m", temp: "12–23 °C",
-    fakt: "Gebaut auf einem trockengelegten See — und sie sinkt bis heute, stellenweise 50 Zentimeter im Jahr. Im August ist Regenzeit: Die Vormittage sind klar, nachmittags schüttet es." },
-  { nr: 2,  ort: "Teotihuacán",       land: "mx", lon: -98.84, lat: 19.69, hoehe: "2.300 m", temp: "12–24 °C",
-    fakt: "Niemand weiß, wer diese Stadt gebaut hat. Als die Azteken sie fanden, lag sie schon Jahrhunderte verlassen da — sie gaben ihr den Namen „Ort, an dem die Götter geboren wurden“. Die Sonnenpyramide ist 65 Meter hoch." },
-  { nr: 3,  ort: "Iztaccíhuatl",      land: "mx", lon: -98.64, lat: 19.18, hoehe: "5.230 m", temp: "unter 0 °C",
-    fakt: "Der dritthöchste Berg Mexikos. Sein Name heißt auf Nahuatl „weiße Frau“, weil die Silhouette wie eine Liegende aussieht. Nebenan raucht der Popocatépetl." },
-  { nr: 4,  ort: "Puebla",            land: "mx", lon: -98.21, lat: 19.04, hoehe: "2.135 m", temp: "11–24 °C",
-    fakt: "Die Heimat der Talavera-Keramik, deren Blau-Weiß hier überall an den Fassaden klebt. Und ihr kommt zur richtigen Zeit: Chiles en Nogada gibt es nur von Juli bis September." },
+const ORTE = {
+  fra:  { name: "Frankfurt",             lon:   8.57, lat:  50.05 },
+  muc:  { name: "München",               lon:  11.79, lat:  48.35 },
+  cdmx: { name: "Mexiko-Stadt",          lon: -99.13, lat:  19.43 },
+  teo:  { name: "Teotihuacán",           lon: -98.84, lat:  19.69 },
+  izta: { name: "Iztaccíhuatl",          lon: -98.64, lat:  19.18 },
+  pue:  { name: "Puebla",                lon: -98.21, lat:  19.04 },
+  lim:  { name: "Lima",                  lon: -77.03, lat: -12.05 },
+  bue:  { name: "Buenos Aires",          lon: -58.38, lat: -34.60 },
+  sar:  { name: "San Antonio de Areco",  lon: -59.47, lat: -34.25 },
+  vla:  { name: "La Villa",              lon: -71.65, lat: -40.76 },
+  bar:  { name: "Bariloche",             lon: -71.31, lat: -41.13 },
+  cal:  { name: "El Calafate",           lon: -72.28, lat: -50.34 },
+  sla:  { name: "Salta",                 lon: -65.41, lat: -24.79 },
+  til:  { name: "Tilcara",               lon: -65.39, lat: -23.58 },
+  est:  { name: "Estancia El Bordo",     lon: -65.06, lat: -24.62 },
+  igu:  { name: "Puerto Iguazú",         lon: -54.57, lat: -25.60 }
+};
 
-  { nr: 5,  ort: "Lima",              land: "pe", lon: -77.03, lat: -12.05, hoehe: "150 m",  temp: "15–19 °C",
+/* Der Reiseplan in zeitlicher Reihenfolge. `dazu` sind Ausflüge von dieser Basis aus. */
+const ETAPPEN = [
+  { o: "fra", land: "de", von: "16. Aug", art: "start", hoehe: "112 m", temp: "18–26 °C",
+    fakt: "13:30 ab Frankfurt, LH 498. Zwölf Stunden Flug — und weil ihr sieben Zeitzonen nach Westen fliegt, landet ihr um 17:30 Ortszeit am selben Nachmittag." },
+
+  { o: "cdmx", land: "mx", von: "16. Aug", bis: "27. Aug", naechte: 11, hoehe: "2.240 m", temp: "12–23 °C",
+    fakt: "Elf Nächte am Stück — genug, um anzukommen statt abzuhaken. Die Stadt ist auf einen trockengelegten See gebaut und sinkt bis heute, stellenweise 50 Zentimeter im Jahr. Im August ist Regenzeit: Vormittags klar, nachmittags schüttet es.",
+    dazu: [
+      { o: "teo",  wann: "21. Aug", was: "Tagesausflug",
+        fakt: "Niemand weiß, wer diese Stadt gebaut hat. Als die Azteken sie fanden, lag sie schon Jahrhunderte verlassen da — sie gaben ihr den Namen „Ort, an dem die Götter geboren wurden“. Die Sonnenpyramide ist 65 Meter hoch." },
+      { o: "izta", wann: "23.–24. Aug", was: "Gipfelbesteigung, zwei Tage",
+        fakt: "5.230 Meter, der dritthöchste Berg Mexikos. Sein Name heißt auf Nahuatl „weiße Frau“, weil der Bergrücken wie eine Liegende aussieht — Kopf, Brust, Knie heißen die Abschnitte bis heute. Nebenan raucht der Popocatépetl." }
+    ]},
+
+  { o: "pue", land: "mx", von: "27. Aug", bis: "29. Aug", naechte: 2, hoehe: "2.135 m", temp: "11–24 °C",
+    fakt: "Heimat der Talavera-Keramik, deren Blau-Weiß hier an den Fassaden klebt — dasselbe Muster, das diese Seite im Hintergrund trägt. Und ihr seid im richtigen Fenster: Chiles en Nogada gibt es nur von Juli bis September." },
+
+  { o: "cdmx", land: "mx", von: "29. Aug", bis: "31. Aug", naechte: 2, hoehe: "2.240 m", temp: "12–23 °C",
+    fakt: "Zurück in die Stadt, auf dem Weg noch reiten. Zwei Nächte, um Mexiko zu Ende zu sehen." },
+
+  { o: "lim", land: "pe", von: "31. Aug", bis: "3. Sep", naechte: 3, hoehe: "150 m", temp: "15–19 °C",
     fakt: "Eine der trockensten Hauptstädte der Welt — rund zehn Millimeter Regen im Jahr. Trotzdem selten sonnig: Von Juni bis November liegt der Küstennebel <i>garúa</i> über der Stadt." },
 
-  { nr: 6,  ort: "Buenos Aires",      land: "ar", lon: -58.38, lat: -34.60, hoehe: "25 m",   temp: "8–16 °C",
-    fakt: "Mehr Buchläden pro Kopf als jede andere Stadt der Welt. Der schönste, El Ateneo, steckt in einem umgebauten Theater von 1919 — die Logen sind Leseplätze geblieben." },
-  { nr: 7,  ort: "La Villa",          land: "ar", lon: -71.65, lat: -40.76, hoehe: "800 m",  temp: "−2–7 °C",
-    fakt: "Der ruhige Nachbar von Bariloche, zwischen Seen und Araukarienwäldern. Im August liegt hier Schnee." },
-  { nr: 8,  ort: "Bariloche",         land: "ar", lon: -71.31, lat: -41.13, hoehe: "893 m",  temp: "−2–7 °C",
-    fakt: "Die Schweiz Argentiniens, inklusive Holzchalets und einer absurden Dichte an Schokoladenläden. August ist Hochsaison — am Cerro Catedral wird Ski gefahren." },
-  { nr: 9,  ort: "El Calafate",       land: "ar", lon: -72.28, lat: -50.34, hoehe: "200 m",  temp: "−3–5 °C",
-    fakt: "Tor zum Perito Moreno, einem der wenigen Gletscher der Welt, der nicht schrumpft. Alle paar Stunden bricht eine Eiswand ab. Der Ort heißt nach einer Beere — wer sie isst, kehrt angeblich nach Patagonien zurück." },
-  { nr: 10, ort: "Salta",             land: "ar", lon: -65.41, lat: -24.79, hoehe: "1.187 m", temp: "5–23 °C",
-    fakt: "„Salta la linda“ — die Schöne. Koloniale Altstadt im Nordwesten, und der Ausgangspunkt in die Weinberge von Cafayate, wo der Torrontés wächst." },
-  { nr: 11, ort: "Tilcara",           land: "ar", lon: -65.39, lat: -23.58, hoehe: "2.465 m", temp: "2–22 °C",
-    fakt: "Mitten in der Quebrada de Humahuaca. Über dem Dorf liegt das Pucará, eine präkolumbische Festung. Tagsüber über 20 Grad, nachts nahe null — die Höhe macht den Unterschied." },
-  { nr: 12, ort: "Puerto Iguazú",     land: "ar", lon: -54.57, lat: -25.60, hoehe: "180 m",  temp: "14–25 °C",
+  { o: "bue", land: "ar", von: "3. Sep", bis: "6. Sep", naechte: 3, hoehe: "25 m", temp: "8–16 °C",
+    fakt: "Mehr Buchläden pro Kopf als jede andere Stadt der Welt. Der schönste, El Ateneo, steckt in einem umgebauten Theater von 1919 — die Logen sind Leseplätze geblieben.",
+    dazu: [
+      { o: "sar", wann: "5. Sep", was: "Tagesausflug mit dem Auto",
+        fakt: "Die Gaucho-Stadt schlechthin, gut hundert Kilometer nordwestlich. Kopfsteinpflaster, Silberschmieden und Estancias — hier wird das Landleben gepflegt, das Buenos Aires längst abgelegt hat." }
+    ]},
+
+  { o: "vla", land: "ar", von: "6. Sep", bis: "8. Sep", naechte: 2, hoehe: "800 m", temp: "−2–7 °C",
+    fakt: "Der ruhige Nachbar von Bariloche, zwischen Seen und Araukarienwäldern. Anfang September liegt hier noch Schnee." },
+
+  { o: "bar", land: "ar", von: "8. Sep", bis: "11. Sep", naechte: 3, hoehe: "893 m", temp: "−2–7 °C",
+    fakt: "Die Schweiz Argentiniens, inklusive Holzchalets und einer absurden Dichte an Schokoladenläden. Noch Skisaison — am Cerro Catedral liegt Schnee bis in den Oktober." },
+
+  { o: "cal", land: "ar", von: "11. Sep", bis: "14. Sep", naechte: 3, hoehe: "200 m", temp: "−3–5 °C",
+    fakt: "Tor zum Perito Moreno, einem der wenigen Gletscher weltweit, der nicht schrumpft. Er schiebt sich bis zu zwei Meter am Tag vor, dann kracht vorne eine Eiswand ins Wasser. Der Ort heißt nach einer Beere — wer sie isst, kehrt angeblich nach Patagonien zurück.",
+    dazu: [
+      { o: "cal", wann: "12. Sep", was: "Gletscher-Trekking",
+        fakt: "Mit Steigeisen auf das Eis. Dafür stehen die wasserdichten Schuhe auf der Packliste." },
+      { o: "cal", wann: "13. Sep", was: "Bootstour",
+        fakt: "Vom Wasser aus sieht man erst, wie hoch die Abbruchkante wirklich ist — rund sechzig Meter über der Oberfläche." }
+    ]},
+
+  { o: "sla", land: "ar", von: "14. Sep", bis: "15. Sep", naechte: 1, hoehe: "1.187 m", temp: "5–23 °C",
+    fakt: "„Salta la linda“ — die Schöne. Koloniale Altstadt im Nordwesten, Ausgangspunkt für alles Weitere. Ein Tag Aufenthalt, dann geht es mit dem Auto weiter." },
+
+  { o: "til", land: "ar", von: "15. Sep", bis: "18. Sep", naechte: 3, hoehe: "2.465 m", temp: "2–22 °C",
+    fakt: "Mitten in der Quebrada de Humahuaca. Über dem Dorf liegt das Pucará, eine präkolumbische Festung. Tagsüber über 20 Grad, nachts nahe null — das macht die Höhe." },
+
+  { o: "est", land: "ar", von: "18. Sep", bis: "20. Sep", naechte: 2, hoehe: "900 m", temp: "6–25 °C",
+    fakt: "Zwei Tage Estancia, mit Reiten und Kochen. Kein Programm, kein Weiterfahren — der ruhigste Punkt der ganzen Reise." },
+
+  { o: "igu", land: "ar", von: "20. Sep", bis: "23. Sep", naechte: 3, hoehe: "180 m", temp: "14–25 °C",
     fakt: "275 einzelne Wasserfälle, darunter der Teufelsschlund. Eleanor Roosevelt soll beim Anblick nur „Poor Niagara“ gesagt haben. Subtropisch — die einzige Etappe, auf der es richtig warm wird." },
-  { nr: 13, ort: "Buenos Aires",      land: "ar", lon: -58.38, lat: -34.60, hoehe: "25 m",   temp: "8–16 °C",
-    fakt: "Zurück zum Anfang, für den letzten Abend. Und für alles, was beim ersten Mal nicht geklappt hat." }
+
+  { o: "bue", land: "ar", von: "23. Sep", bis: "30. Sep", naechte: 7, hoehe: "25 m", temp: "10–19 °C",
+    fakt: "Sieben Nächte zum Schluss, zurück am Anfang. Inzwischen ist Frühling — und ihr habt Zeit für alles, was beim ersten Mal nicht geklappt hat." },
+
+  { o: "muc", land: "de", von: "30. Sep", art: "ziel", hoehe: "519 m", temp: "9–18 °C",
+    fakt: "16:35 ab Buenos Aires, Ankunft am nächsten Tag in München. 46 Tage, drei Länder — und diesmal geht die Zeitverschiebung in die unangenehme Richtung." }
 ];
 
 const LAENDER = {
-  mx: { name: "Mexiko",     zeit: "−8 Std.", farbe: "var(--carmin-hell)" },
-  pe: { name: "Peru",       zeit: "−7 Std.", farbe: "var(--jade)" },
+  de: { name: "Deutschland", zeit: "MESZ",    farbe: "var(--cobalto)" },
+  mx: { name: "Mexiko",      zeit: "−8 Std.", farbe: "var(--carmin-hell)" },
+  pe: { name: "Peru",        zeit: "−7 Std.", farbe: "var(--jade)" },
   ar: { name: "Argentinien", zeit: "−5 Std.", farbe: "var(--oro)" }
 };
 
-/* Kartenpunkte — Etappen, die auf dieser Zoomstufe zusammenfallen, teilen sich einen Punkt */
-const KARTENPUNKTE = [
-  { lon: -98.9, lat: 19.4,  kurz: "MEXIKO",     etappen: [1, 2, 3, 4], anker: "end",    dx: -13, dy: 4 },
-  { lon: -77.0, lat: -12.1, kurz: "LIMA",       etappen: [5],          anker: "end",    dx: -13, dy: 4 },
-  { lon: -65.4, lat: -24.2, kurz: "SALTA",      etappen: [10, 11],     anker: "end",    dx: -13, dy: 4 },
-  { lon: -54.6, lat: -25.6, kurz: "IGUAZÚ",     etappen: [12],         anker: "start",  dx: 13,  dy: 4 },
-  { lon: -58.4, lat: -34.6, kurz: "BUENOS AIRES", etappen: [6, 13],    anker: "end",    dx: -13, dy: 4 },
-  { lon: -71.5, lat: -41.0, kurz: "BARILOCHE",  etappen: [7, 8],       anker: "end",    dx: -13, dy: 4 },
-  { lon: -72.3, lat: -50.3, kurz: "EL CALAFATE", etappen: [9],         anker: "end",    dx: -13, dy: 4 }
+/* Regionen für den Zoom. Jede fasst die Orte zusammen, die auf Übersichtshöhe verschmelzen. */
+const REGIONEN = [
+  { id: "eu",  kurz: "DEUTSCHLAND",  titel: "Start und Ziel",      orte: ["fra", "muc"],                anker: "end",   dx: -13, dy: 4 },
+  { id: "mx",  kurz: "MEXIKO",       titel: "Mexiko",              orte: ["cdmx", "teo", "izta", "pue"], anker: "end",  dx: -13, dy: 4 },
+  { id: "pe",  kurz: "LIMA",         titel: "Lima",                orte: ["lim"],                       anker: "end",   dx: -13, dy: 4 },
+  { id: "sal", kurz: "SALTA",        titel: "Der Nordwesten",      orte: ["sla", "til", "est"],         anker: "end",   dx: -13, dy: 4 },
+  { id: "igu", kurz: "IGUAZÚ",       titel: "Puerto Iguazú",       orte: ["igu"],                       anker: "start", dx: 13,  dy: 4 },
+  { id: "ba",  kurz: "BUENOS AIRES", titel: "Buenos Aires",        orte: ["bue", "sar"],                anker: "end",   dx: -13, dy: 4 },
+  { id: "bar", kurz: "BARILOCHE",    titel: "Bariloche & La Villa", orte: ["vla", "bar"],               anker: "end",   dx: -13, dy: 4 },
+  { id: "cal", kurz: "EL CALAFATE",  titel: "El Calafate",         orte: ["cal"],                       anker: "end",   dx: -13, dy: 4 }
 ];
 
-/* Reihenfolge der Flug- und Fahrtwege über die Kartenpunkte */
-const WEGE = [[0, 1], [1, 4], [4, 5], [5, 6], [6, 2], [2, 3], [3, 4]];
+/* Die Flüge in Reihenfolge — das ist die Linie, die das Flugzeug abfliegt. */
+const FLUEGE = [
+  ["fra", "cdmx"], ["cdmx", "lim"], ["lim", "bue"], ["bue", "bar"], ["bar", "cal"],
+  ["cal", "sla"], ["sla", "igu"], ["igu", "bue"], ["bue", "muc"]
+];
+
+/* Landwege, nur im Zoom sichtbar */
+const FAHRTEN = [
+  ["cdmx", "teo"], ["cdmx", "izta"], ["cdmx", "pue"],
+  ["bue", "sar"], ["vla", "bar"], ["sla", "til"], ["til", "est"]
+];
+
+/* Entfernung auf der Kugel, für den Kilometerzähler */
+const R_ERDE = 6371;
+const bogen = (g) => g * Math.PI / 180;
+function distanzKm(a, b) {
+  const dLat = bogen(b.lat - a.lat), dLon = bogen(b.lon - a.lon);
+  const h = Math.sin(dLat / 2) ** 2 +
+            Math.cos(bogen(a.lat)) * Math.cos(bogen(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R_ERDE * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+const FLUG_KM = FLUEGE.map(([a, b]) => distanzKm(ORTE[a], ORTE[b]));
+const GESAMT_KM = FLUG_KM.reduce((s, k) => s + k, 0);
 
 /* ============================================================
    TAG 10 — DIE ROUTE
@@ -1408,79 +1608,109 @@ const WEGE = [[0, 1], [1, 4], [4, 5], [5, 6], [6, 2], [2, 3], [3, 4]];
 const INHALTE = {};
 
 INHALTE[10] = {
-  lead: flach(`Drei Länder, dreizehn Etappen, vom Vulkangipfel bis zum Gletscher.
-               Tipp auf einen Punkt, dann siehst du, was dort wartet.`),
+  lead: flach(`46 Tage, drei Länder, vom Vulkangipfel bis zum Gletscher.
+               Tipp eine Region an, dann zoomt die Karte hinein.`),
   render(w) {
     const n = el("div", "notiz");
-    n.innerHTML = `${gross(inTagen())} sitzen wir im Flieger.<br>
-      Bis dahin gibt es jeden Tag hier etwas — ein Spiel, ein Quiz, ein paar Versprechen zum Freirubbeln.
-      Immer nur eins, immer erst, wenn der Tag da ist.
+    n.innerHTML = `${gross(inTagen())} geht es endlich los.<br>
+      Bis dahin wartet hier jeden Tag eine Überraschung — immer nur eine,
+      immer erst, wenn der Tag da ist.
       ${SIG ? `<span class="sig">${SIG}</span>` : ""}`;
     w.appendChild(n);
 
-    const p = el("div", "panel");
-    p.innerHTML = '<p class="panel-titel">Die Strecke</p>';
-    const halter = el("div");
-    p.appendChild(halter);
-    const info = el("div", "karten-info");
-    info.innerHTML = '<span class="ki-leer">Tipp einen Punkt auf der Karte an.</span>';
-    p.appendChild(info);
-    halter.appendChild(karteSvg(info));
-    w.appendChild(p);
+    w.appendChild(karteBauen());
 
-    const m = el("p", "mitte");
-    m.innerHTML = '<button class="btn geist" id="nochmal">Route nochmal zeichnen</button>';
-    w.appendChild(m);
-    $("#nochmal").addEventListener("click", () => {
-      halter.innerHTML = "";
-      halter.appendChild(karteSvg(info));
-    });
-
-    // Etappenliste, nach Ländern gruppiert
+    // Der Reiseplan, nach Ländern gruppiert
     for (const [kuerzel, land] of Object.entries(LAENDER)) {
       const etappen = ETAPPEN.filter(e => e.land === kuerzel);
+      if (!etappen.length) continue;
       const box = el("div", "panel");
       box.innerHTML = `<p class="panel-titel">
         <span style="color:${land.farbe}">■</span> ${land.name}
         <span style="float:right;color:var(--schrift-2);letter-spacing:.1em">${land.zeit}</span></p>`;
-      etappen.forEach(e => {
-        const z = el("div", "etappe");
-        z.innerHTML = `
-          <div class="et-kopf">
-            <span class="et-nr">${String(e.nr).padStart(2, "0")}</span>
-            <b class="et-ort">${e.ort}</b>
-            <span class="et-daten">${e.hoehe} · ${e.temp}</span>
-          </div>
-          <p class="et-fakt">${e.fakt}</p>`;
-        box.appendChild(z);
-      });
+      etappen.forEach(e => box.appendChild(etappeZeile(e)));
       w.appendChild(box);
     }
   }
 };
 
-function karteSvg(info) {
+function zeitraum(e) {
+  if (!e.bis) return e.von;
+  return e.von + " – " + e.bis;
+}
+
+function etappeZeile(e) {
+  const z = el("div", "etappe");
+  const naechte = e.naechte
+    ? `${e.naechte} ${e.naechte === 1 ? "Nacht" : "Nächte"}`
+    : (e.art === "start" ? "Abflug" : e.art === "ziel" ? "Ankunft" : "");
+  z.innerHTML = `
+    <div class="et-kopf">
+      <span class="et-nr">${zeitraum(e)}</span>
+      <b class="et-ort">${ORTE[e.o].name}</b>
+      <span class="et-daten">${naechte}</span>
+    </div>
+    <p class="et-fakt">${e.fakt}</p>
+    <p class="et-lage">${e.hoehe} über dem Meer · ${e.temp}</p>`;
+  (e.dazu || []).forEach(d => {
+    const u = el("div", "et-dazu");
+    u.innerHTML = `<div class="ed-kopf"><span class="ed-wann">${d.wann}</span>
+      <b>${ORTE[d.o].name}</b><span class="ed-was">${d.was}</span></div>
+      <p>${d.fakt}</p>`;
+    z.appendChild(u);
+  });
+  return z;
+}
+
+/* ============================================================
+   DIE KARTE — Übersicht mit Zoom in jede Region
+   ============================================================ */
+function karteBauen() {
   const NS = "http://www.w3.org/2000/svg";
-  // Ausschnitt reicht rechts über Iguazú hinaus, damit die Ortsnamen Platz haben
-  const B = 520, H = 560;
-  const LON0 = -120, LON_SPAN = 78, LAT0 = 33, LAT_SPAN = 89;
+
+  // Basisausschnitt: Europa bis Feuerland. Die Projektion bleibt fest,
+  // gezoomt wird ausschließlich über die viewBox.
+  const B = 620, H = 560;
+  const LON0 = -122, LON_SPAN = 142, LAT0 = 56, LAT_SPAN = 116;
   const px = (lon) => (lon - LON0) / LON_SPAN * B;
   const py = (lat) => (LAT0 - lat) / LAT_SPAN * H;
+  const GRUND = [0, 0, B, H];
+
+  const panel = el("div", "panel");
+  panel.innerHTML = `<p class="panel-titel">
+      <span id="kTitel">Die Strecke</span>
+      <button class="k-zurueck" id="kZurueck" hidden>← Ganze Route</button>
+    </p>`;
 
   const svg = document.createElementNS(NS, "svg");
-  svg.setAttribute("viewBox", `0 0 ${B} ${H}`);
+  svg.setAttribute("viewBox", GRUND.join(" "));
   svg.setAttribute("class", "karte-svg");
   svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label",
-    "Karte von Mexiko bis Patagonien mit den Stationen der Reise");
+  svg.setAttribute("aria-label", "Karte der Reiseroute von Frankfurt über Mexiko und Peru nach Argentinien");
+  svg.style.setProperty("--k", "1");
+  panel.appendChild(svg);
 
-  // Küstenlinien als Längen-/Breitengrad-Paare — grob, aber wiedererkennbar
+  const info = el("div", "karten-info");
+  info.innerHTML = '<span class="ki-leer">Tipp eine Region an</span>';
+  panel.appendChild(info);
+
+  const steuerung = el("div", "k-steuerung");
+  steuerung.innerHTML = `
+    <button class="btn geist" id="kFliegen">Route abfliegen</button>
+    <span class="k-zaehler" id="kZaehler">0 km</span>`;
+  panel.appendChild(steuerung);
+
+  /* --- Landmassen ------------------------------------------------ */
   const kuesten = [
     // Mexiko mit Yucatán
     [-117,33, -114,32, -111,31, -108,31.5, -106,31.8, -103,29, -101,29.5, -99,27, -97.5,25.9,
      -97,22, -94.5,18.2, -92,18.6, -90,19.5, -87,21.5, -86.8,20.5, -88,18.5, -89,17, -91,15.8,
      -94,16, -96,15.7, -99,16.5, -102,17.9, -104,18.9, -105.5,20.4, -105.7,22, -108,25,
      -109.5,27, -112,29, -114,31, -117,33],
+    // Nordamerika, am oberen Rand angeschnitten
+    [-124,56, -110,56, -95,56, -80,56, -68,52, -60,47, -67,45, -70,43, -74,40, -76,37,
+     -78,34, -81,31, -80,25, -84,29, -88,30, -94,29.5, -97,26, -99,27, -101,29.5, -103,29,
+     -106,31.8, -111,31, -117,33, -124,40, -125,48, -124,56],
     // Mittelamerika
     [-92,15.5, -88.5,15.8, -87,13, -84,10.8, -82,9.5, -79,9.5, -77.5,8.6, -78,7.5, -81,8.5,
      -83,9.5, -86,11.8, -89,14, -92,14.5],
@@ -1490,7 +1720,14 @@ function karteSvg(info) {
      -57,-36, -62,-39, -62.5,-41, -65,-42.5, -65,-45, -67.5,-46, -67,-49, -69,-52, -68,-54.8,
      -67,-55.5, -70,-55, -71,-53.5, -74,-52.5, -75,-50, -73.5,-47, -75,-45, -73.5,-42, -73,-38,
      -72,-35, -71.5,-32, -70.5,-28, -70.5,-25, -70,-21, -71,-18, -74,-15.5, -76,-14, -79,-8,
-     -81,-6, -80.5,-4, -80,-2.5, -78.5,1, -77.5,4, -77.5,8.6]
+     -81,-6, -80.5,-4, -80,-2.5, -78.5,1, -77.5,4, -77.5,8.6],
+    // Europa, am oberen Rand angeschnitten
+    [-10,43, -9,39, -6,37, -2,36, 3,42, 7,43, 12,44, 16,42, 19,40, 15,38, 13,46, 17,48,
+     20,50, 21,54, 19,56, 12,56, 12,54, 8,54, 5,53, 4,51, 0,50, -2,49, -5,48, -1,46, -1,44, -10,43],
+    // Britische Inseln
+    [-5,50, -3,51, 1,51, 2,53, -1,55, -2,58, -5,58, -6,56, -5,53, -5,50],
+    // Nordwestafrika, angeschnitten
+    [-17,21, -16,28, -10,31, -6,35, 0,35, 10,34, 15,32, 20,32, 20,20, 10,20, 0,20, -8,21, -17,21]
   ];
 
   kuesten.forEach(paare => {
@@ -1501,35 +1738,41 @@ function karteSvg(info) {
     p.setAttribute("d", d + "Z");
     p.setAttribute("fill", "var(--verschlossen)");
     p.setAttribute("stroke", "var(--linie)");
-    p.setAttribute("stroke-width", "1");
+    p.setAttribute("class", "kueste");
     p.setAttribute("stroke-linejoin", "round");
     svg.appendChild(p);
   });
 
-  // Wendekreise als leise Orientierung
-  [[23.44, "Wendekreis des Krebses"], [-23.44, "Wendekreis des Steinbocks"]].forEach(([lat]) => {
+  // Äquator und Wendekreise
+  [0, 23.44, -23.44].forEach(lat => {
     const l = document.createElementNS(NS, "line");
     l.setAttribute("x1", 0); l.setAttribute("x2", B);
     l.setAttribute("y1", py(lat)); l.setAttribute("y2", py(lat));
-    l.setAttribute("stroke", "var(--linie)");
-    l.setAttribute("stroke-width", ".8");
-    l.setAttribute("stroke-dasharray", "3 7");
-    l.setAttribute("opacity", ".7");
+    l.setAttribute("class", "breitengrad");
     svg.appendChild(l);
   });
 
-  const pt = KARTENPUNKTE.map(k => ({ ...k, x: px(k.lon), y: py(k.lat) }));
-
-  // Wege — leicht gebogen, damit sie sich nicht überlagern
-  WEGE.forEach(([a, b], i) => {
-    const A = pt[a], Z = pt[b];
+  /* --- Wege ------------------------------------------------------ */
+  function bogenPfad(a, z, staerke) {
+    const A = { x: px(a.lon), y: py(a.lat) }, Z = { x: px(z.lon), y: py(z.lat) };
     const mx = (A.x + Z.x) / 2, my = (A.y + Z.y) / 2;
     const dx = Z.x - A.x, dy = Z.y - A.y;
-    const laenge = Math.hypot(dx, dy) || 1;
-    const bauch = Math.min(46, laenge * 0.17);
-    const d = `M${A.x.toFixed(1)} ${A.y.toFixed(1)} Q${(mx - dy / laenge * bauch).toFixed(1)} ${(my + dx / laenge * bauch).toFixed(1)} ${Z.x.toFixed(1)} ${Z.y.toFixed(1)}`;
+    const l = Math.hypot(dx, dy) || 1;
+    const bauch = Math.min(52, l * staerke);
+    return `M${A.x.toFixed(1)} ${A.y.toFixed(1)} Q${(mx - dy / l * bauch).toFixed(1)} ${(my + dx / l * bauch).toFixed(1)} ${Z.x.toFixed(1)} ${Z.y.toFixed(1)}`;
+  }
+
+  // Landwege zuerst, damit die Flüge darüber liegen
+  FAHRTEN.forEach(([a, b]) => {
     const p = document.createElementNS(NS, "path");
-    p.setAttribute("d", d);
+    p.setAttribute("d", bogenPfad(ORTE[a], ORTE[b], 0.08));
+    p.setAttribute("class", "fahrt-linie");
+    svg.appendChild(p);
+  });
+
+  const flugPfade = FLUEGE.map(([a, b], i) => {
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", bogenPfad(ORTE[a], ORTE[b], 0.15));
     p.setAttribute("class", "route-linie");
     svg.appendChild(p);
     requestAnimationFrame(() => {
@@ -1537,67 +1780,285 @@ function karteSvg(info) {
         const L = p.getTotalLength();
         p.style.strokeDasharray = "6 8";
         p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }],
-          { duration: reduziert ? 1 : 620, delay: reduziert ? 0 : i * 300, fill: "forwards", easing: "ease-out" });
+          { duration: reduziert ? 1 : 520, delay: reduziert ? 0 : i * 210, fill: "forwards", easing: "ease-out" });
       } catch {}
     });
+    return p;
   });
 
-  // Stationen
-  pt.forEach((o, i) => {
+  /* Marker werden über transform gegenskaliert statt über die Schriftgröße:
+     bei starkem Zoom fiele font-size sonst unter ein Pixel und verschwände. */
+  const marker = [];
+  function markerSetzen(g, x, y, k) {
+    g.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${k})`);
+  }
+
+  /* --- Einzelorte, nur im Zoom sichtbar -------------------------- */
+  const ortGruppen = {};
+  for (const [id, o] of Object.entries(ORTE)) {
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "detailort");
+    const x = px(o.lon), y = py(o.lat);
+
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", 0); c.setAttribute("cy", 0); c.setAttribute("r", 3.6);
+    c.setAttribute("class", "detail-punkt");
+    g.appendChild(c);
+
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", 0); t.setAttribute("y", -10);
+    t.setAttribute("text-anchor", "middle");
+    t.setAttribute("class", "detail-label");
+    t.textContent = o.name;
+    g.appendChild(t);
+
+    svg.appendChild(g);
+    ortGruppen[id] = g;
+    marker.push({ g, x, y });
+    markerSetzen(g, x, y, 1);
+  }
+
+  /* --- Regionen als antippbare Punkte ---------------------------- */
+  const regionGruppen = {};
+  REGIONEN.forEach((r, i) => {
+    const mittel = r.orte.reduce((a, id) => ({
+      lon: a.lon + ORTE[id].lon / r.orte.length,
+      lat: a.lat + ORTE[id].lat / r.orte.length
+    }), { lon: 0, lat: 0 });
+    const x = px(mittel.lon), y = py(mittel.lat);
+
     const g = document.createElementNS(NS, "g");
     g.setAttribute("class", "station");
     g.setAttribute("tabindex", "0");
     g.setAttribute("role", "button");
-    const namen = o.etappen.map(nr => ETAPPEN[nr - 1].ort).join(", ");
-    g.setAttribute("aria-label", namen);
+    g.setAttribute("aria-label", r.titel + " — hineinzoomen");
 
     const treffer = document.createElementNS(NS, "circle");
-    treffer.setAttribute("cx", o.x); treffer.setAttribute("cy", o.y); treffer.setAttribute("r", 17);
+    treffer.setAttribute("cx", 0); treffer.setAttribute("cy", 0); treffer.setAttribute("r", 18);
     treffer.setAttribute("fill", "transparent");
     g.appendChild(treffer);
 
     const ring = document.createElementNS(NS, "circle");
-    ring.setAttribute("cx", o.x); ring.setAttribute("cy", o.y); ring.setAttribute("r", 9);
+    ring.setAttribute("cx", 0); ring.setAttribute("cy", 0); ring.setAttribute("r", 9);
     ring.setAttribute("class", "stadt-ring");
-    ring.style.transformOrigin = `${o.x}px ${o.y}px`;
-    ring.style.animationDelay = (i * 0.3) + "s";
+    ring.style.animationDelay = (i * 0.28) + "s";
     g.appendChild(ring);
 
     const pkt = document.createElementNS(NS, "circle");
-    pkt.setAttribute("cx", o.x); pkt.setAttribute("cy", o.y);
-    pkt.setAttribute("r", o.etappen.length > 1 ? 5.6 : 4.4);
+    pkt.setAttribute("cx", 0); pkt.setAttribute("cy", 0);
+    pkt.setAttribute("r", r.orte.length > 1 ? 5.4 : 4.2);
     pkt.setAttribute("class", "stadt-punkt");
-    pkt.style.animationDelay = (i * 0.3) + "s";
+    pkt.style.animationDelay = (i * 0.28) + "s";
     g.appendChild(pkt);
 
     const txt = document.createElementNS(NS, "text");
-    txt.setAttribute("x", o.x + o.dx); txt.setAttribute("y", o.y + o.dy);
-    txt.setAttribute("text-anchor", o.anker);
+    txt.setAttribute("x", r.dx); txt.setAttribute("y", r.dy);
+    txt.setAttribute("text-anchor", r.anker);
     txt.setAttribute("class", "stadt-label");
-    txt.style.animationDelay = (i * 0.3 + 0.2) + "s";
-    txt.textContent = o.kurz + (o.etappen.length > 1 ? "  ·" + o.etappen.length : "");
+    txt.style.animationDelay = (i * 0.28 + 0.2) + "s";
+    txt.textContent = r.kurz + (r.orte.length > 1 ? "  ·" + r.orte.length : "");
     g.appendChild(txt);
 
-    const zeigen = () => {
-      svg.querySelectorAll(".station").forEach(s => s.classList.remove("aktiv"));
-      g.classList.add("aktiv");
-      info.innerHTML = o.etappen.map(nr => {
-        const e = ETAPPEN[nr - 1];
-        return `<div class="ki-eintrag">
-          <div class="ki-kopf"><span class="ki-nr">Etappe ${String(e.nr).padStart(2, "0")}</span>
-          <b>${e.ort}</b><span class="ki-daten">${e.hoehe} · ${e.temp}</span></div>
-          <p>${e.fakt}</p></div>`;
-      }).join("");
-    };
-    g.addEventListener("click", zeigen);
+    g.addEventListener("click", () => hinein(r));
     g.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); zeigen(); }
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); hinein(r); }
     });
-
     svg.appendChild(g);
+    regionGruppen[r.id] = g;
+    marker.push({ g, x, y });
+    markerSetzen(g, x, y, 1);
   });
 
-  return svg;
+  /* --- Maßstab, nur im Zoom ------------------------------------- */
+  const massstab = document.createElementNS(NS, "g");
+  massstab.setAttribute("class", "massstab");
+  const msLinie = document.createElementNS(NS, "path");
+  massstab.appendChild(msLinie);
+  const msText = document.createElementNS(NS, "text");
+  massstab.appendChild(msText);
+  svg.appendChild(massstab);
+
+  const STUFEN = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000];
+
+  function massstabSetzen(box, k) {
+    // Kilometer pro Längengrad hängen von der Breite ab
+    const mittelLat = LAT0 - (box[1] + box[3] / 2) / H * LAT_SPAN;
+    const kmProGrad = 111.32 * Math.cos(bogen(mittelLat));
+    const sichtbareKm = box[2] / B * LON_SPAN * kmProGrad;
+    const ziel = STUFEN.find(s => s >= sichtbareKm * 0.22) || 5000;
+    const laenge = ziel / sichtbareKm * box[2];
+
+    const x = box[0] + box[2] * 0.06;
+    const y = box[1] + box[3] * 0.93;
+    const zacke = 4 * k;
+    msLinie.setAttribute("d",
+      `M${x} ${y - zacke} V${y} H${x + laenge} V${y - zacke}`);
+    msLinie.setAttribute("fill", "none");
+    msLinie.setAttribute("stroke", "var(--schrift-2)");
+    msLinie.setAttribute("stroke-width", 1.4 * k);
+    msText.setAttribute("x", x);
+    msText.setAttribute("y", y - 7 * k);
+    msText.setAttribute("transform", `translate(${x} ${y - 7 * k}) scale(${k}) translate(${-x} ${-(y - 7 * k)})`);
+    msText.textContent = ziel >= 1000 ? (ziel / 1000) + ".000 km" : ziel + " km";
+  }
+
+  /* --- Flugzeug für die Abflug-Animation ------------------------- */
+  const flieger = document.createElementNS(NS, "g");
+  flieger.setAttribute("class", "flieger-marke");
+  flieger.setAttribute("hidden", "");
+  const fSym = document.createElementNS(NS, "path");
+  // Kleines Flugzeug, Nase nach rechts
+  fSym.setAttribute("d", "M13 0 L-3 -6 L-6 -6 L-2.5 0 L-6 6 L-3 6 Z M-2 -1 L-9 -4 L-11 -3 L-8 0 L-11 3 L-9 4 L-2 1 Z");
+  fSym.setAttribute("class", "flieger-form");
+  flieger.appendChild(fSym);
+  svg.appendChild(flieger);
+
+  /* --- Zoomen ---------------------------------------------------- */
+  let aktuelleBox = GRUND.slice();
+  let animation = null;
+
+  function boxAnimieren(ziel, dauer = 620) {
+    if (animation) cancelAnimationFrame(animation);
+    const start = aktuelleBox.slice();
+    if (reduziert) { boxSetzen(ziel); return; }
+    const t0 = performance.now();
+    const lauf = (jetzt) => {
+      const p = Math.min(1, (jetzt - t0) / dauer);
+      const e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;   // easeInOutCubic
+      boxSetzen(start.map((v, i) => v + (ziel[i] - v) * e));
+      if (p < 1) animation = requestAnimationFrame(lauf);
+    };
+    animation = requestAnimationFrame(lauf);
+  }
+
+  /* Gegenskalierung: nicht nur gegen den Zoom, sondern auch gegen die
+     Anzeigebreite — sonst schrumpfen die Ortsnamen auf dem Handy auf
+     sechs Pixel. Unter 430 px wird nicht weiter hochskaliert, sonst
+     überlappen sich die Beschriftungen in der Übersicht. */
+  function faktor(box) {
+    const breite = svg.getBoundingClientRect().width;
+    return box[2] / Math.max(breite || B, 430);
+  }
+
+  function boxSetzen(box) {
+    aktuelleBox = box;
+    svg.setAttribute("viewBox", box.map(v => v.toFixed(2)).join(" "));
+    const k = faktor(box);
+    svg.style.setProperty("--k", k.toFixed(4));
+    marker.forEach(m => markerSetzen(m.g, m.x, m.y, k));
+    massstabSetzen(box, k);
+  }
+
+  // Bei Größenänderung neu ausrechnen
+  if (window.ResizeObserver) {
+    let letzteBreite = 0;
+    new ResizeObserver(() => {
+      const b = Math.round(svg.getBoundingClientRect().width);
+      if (b && b !== letzteBreite) { letzteBreite = b; boxSetzen(aktuelleBox); }
+    }).observe(svg);
+  }
+
+  function hinein(r) {
+    const lons = r.orte.map(id => ORTE[id].lon), lats = r.orte.map(id => ORTE[id].lat);
+    // Mindestausdehnung, damit einzelne Orte nicht ins Unendliche zoomen
+    const spanne = Math.max(2.6, (Math.max(...lons) - Math.min(...lons)) * 2.4,
+                                 (Math.max(...lats) - Math.min(...lats)) * 2.4);
+    const mLon = (Math.max(...lons) + Math.min(...lons)) / 2;
+    const mLat = (Math.max(...lats) + Math.min(...lats)) / 2;
+    const bw = spanne / LON_SPAN * B;
+    const bh = bw * (H / B);
+    boxAnimieren([px(mLon) - bw / 2, py(mLat) - bh / 2, bw, bh]);
+
+    svg.classList.add("gezoomt");
+    Object.values(regionGruppen).forEach(g => g.classList.add("weg"));
+    Object.entries(ortGruppen).forEach(([id, g]) =>
+      g.classList.toggle("sichtbar", r.orte.includes(id)));
+
+    $("#kTitel").textContent = r.titel;
+    $("#kZurueck").hidden = false;
+
+    // Übernachtungen und Ausflüge dieser Region, in zeitlicher Reihenfolge
+    const stuecke = [];
+    ETAPPEN.forEach(e => {
+      if (r.orte.includes(e.o)) stuecke.push({
+        wann: zeitraum(e), ort: ORTE[e.o].name, fakt: e.fakt,
+        rechts: e.naechte ? e.naechte + (e.naechte === 1 ? " Nacht" : " Nächte") : ""
+      });
+      (e.dazu || []).forEach(d => {
+        if (r.orte.includes(d.o) && d.o !== e.o)
+          stuecke.push({ wann: d.wann, ort: ORTE[d.o].name, fakt: d.fakt, rechts: d.was });
+      });
+    });
+
+    info.innerHTML = stuecke.map(s => `
+      <div class="ki-eintrag">
+        <div class="ki-kopf"><span class="ki-nr">${s.wann}</span>
+        <b>${s.ort}</b>
+        <span class="ki-daten">${s.rechts}</span></div>
+        <p>${s.fakt}</p>
+      </div>`).join("") || '<span class="ki-leer">Keine Übernachtung hier</span>';
+  }
+
+  function hinaus() {
+    boxAnimieren(GRUND);
+    svg.classList.remove("gezoomt");
+    Object.values(regionGruppen).forEach(g => g.classList.remove("weg"));
+    Object.values(ortGruppen).forEach(g => g.classList.remove("sichtbar"));
+    $("#kTitel").textContent = "Die Strecke";
+    $("#kZurueck").hidden = true;
+    info.innerHTML = '<span class="ki-leer">Tipp eine Region an</span>';
+  }
+
+  panel.querySelector("#kZurueck").addEventListener("click", hinaus);
+
+  /* --- Die Route abfliegen --------------------------------------- */
+  let fliegtGerade = false;
+  panel.querySelector("#kFliegen").addEventListener("click", () => {
+    if (fliegtGerade) return;
+    if (svg.classList.contains("gezoomt")) hinaus();
+    fliegtGerade = true;
+    const knopf = panel.querySelector("#kFliegen");
+    knopf.disabled = true;
+
+    const laengen = flugPfade.map(p => { try { return p.getTotalLength(); } catch { return 0; } });
+    const gesamtL = laengen.reduce((s, l) => s + l, 0) || 1;
+    const dauer = reduziert ? 1 : 7000;
+    flieger.removeAttribute("hidden");
+
+    const t0 = performance.now();
+    const schritt = (jetzt) => {
+      if (!document.contains(svg)) { fliegtGerade = false; return; }
+      const p = Math.min(1, (jetzt - t0) / dauer);
+      let rest = p * gesamtL, idx = 0;
+      while (idx < laengen.length - 1 && rest > laengen[idx]) { rest -= laengen[idx]; idx++; }
+
+      try {
+        const pfad = flugPfade[idx];
+        const pos = pfad.getPointAtLength(rest);
+        const vor = pfad.getPointAtLength(Math.min(laengen[idx], rest + 2));
+        const winkel = Math.atan2(vor.y - pos.y, vor.x - pos.x) * 180 / Math.PI;
+        flieger.setAttribute("transform",
+          `translate(${pos.x.toFixed(2)} ${pos.y.toFixed(2)}) rotate(${winkel.toFixed(1)}) scale(${faktor(aktuelleBox).toFixed(4)})`);
+      } catch {}
+
+      // Kilometer aus den echten Distanzen, nicht aus der Pfadlänge
+      const km = FLUG_KM.slice(0, idx).reduce((s, k) => s + k, 0) +
+                 (FLUG_KM[idx] || 0) * (rest / (laengen[idx] || 1));
+      $("#kZaehler").textContent = Math.round(km).toLocaleString("de-DE") + " km";
+
+      if (p < 1) requestAnimationFrame(schritt);
+      else {
+        $("#kZaehler").textContent = Math.round(GESAMT_KM).toLocaleString("de-DE") + " km";
+        knopf.disabled = false;
+        knopf.textContent = "Nochmal abfliegen";
+        fliegtGerade = false;
+        setTimeout(() => flieger.setAttribute("hidden", ""), 1400);
+      }
+    };
+    requestAnimationFrame(schritt);
+  });
+
+  return panel;
 }
 
 /* ============================================================
