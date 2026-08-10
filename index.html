@@ -42,6 +42,7 @@ button { font: inherit; }
   --oro-tief:   #B07F1E;
   --carmin:     #B8353F;   /* Karminrot */
   --carmin-hell:#D95560;
+  --gaucho:     #F0C463;   /* Ton der Reiterfiguren */
   --jade:       #2E9E8F;   /* Jade */
   --cobalto:    #3A5FBF;   /* Kobaltblau */
 
@@ -55,6 +56,9 @@ button { font: inherit; }
   --akzent:     var(--oro);
   --auf-akzent: var(--noche);   /* Schrift auf Akzentflächen */
   --akzent-2:   var(--carmin-hell);
+  /* Die Reiter über der Uhr brauchen einen eigenen Ton: Der Akzent ist
+     im hellen Papier karminrot und wäre vom Herzen nicht zu unterscheiden. */
+  --reiter:     var(--gaucho);
   --schatten:   0 18px 44px rgba(0,0,0,.44);
   --karte:      #18253E;
   --karte-2:    #1E2E4C;
@@ -88,6 +92,7 @@ button { font: inherit; }
     --akzent:   var(--carmin);
     --auf-akzent: #FFF7EA;
     --akzent-2: var(--oro-tief);
+    --reiter:   #7A4A16;
     --schatten: 0 14px 34px rgba(27,31,46,.16);
     --karte:    #FBF7EC;
     --karte-2:  #F4EFDF;
@@ -111,6 +116,7 @@ button { font: inherit; }
   --akzent:   var(--carmin);
   --auf-akzent: #FFF7EA;
   --akzent-2: var(--oro-tief);
+  --reiter:   #7A4A16;
   --schatten: 0 14px 34px rgba(27,31,46,.16);
   --karte:    #FBF7EC;
   --karte-2:  #F4EFDF;
@@ -133,6 +139,7 @@ button { font: inherit; }
   --akzent:   var(--oro);
   --auf-akzent: var(--noche);
   --akzent-2: var(--carmin-hell);
+  --reiter:   var(--gaucho);
   --schatten: 0 18px 44px rgba(0,0,0,.44);
   --karte:    #18253E;
   --karte-2:  #1E2E4C;
@@ -274,7 +281,15 @@ h1 em {
   border-style: dashed;
 }
 
-/* Countdown-Uhr */
+/* Countdown-Uhr mit dem Streifen darüber, auf dem sich die beiden treffen.
+   Die Höhe oben ist der Platz für die Reiter — sie schiebt die Uhr nach
+   unten. Der Block schrumpft auf die Breite der Uhr, die Leinwand liegt
+   absolut darin und ist dadurch immer genau so breit wie der Kasten. */
+.uhr-block { position: relative; display: inline-block; padding-top: 68px; }
+.uhr-reiter {
+  position: absolute; left: 0; top: 0;
+  width: 100%; height: 68px;
+}
 .uhr {
   display: inline-flex; gap: 2px;
   border: 1px solid var(--linie-satt);
@@ -1334,11 +1349,14 @@ footer {
         <b>Argentinien</b>
       </p>
 
-      <div class="uhr" id="uhr" role="timer" aria-live="off">
-        <div><span class="z" id="uT">–</span><span class="l">Tage</span></div>
-        <div><span class="z" id="uH">–</span><span class="l">Stunden</span></div>
-        <div><span class="z" id="uM">–</span><span class="l">Minuten</span></div>
-        <div><span class="z" id="uS">–</span><span class="l">Sekunden</span></div>
+      <div class="uhr-block">
+        <canvas class="uhr-reiter" id="uhrReiter" aria-hidden="true"></canvas>
+        <div class="uhr" id="uhr" role="timer" aria-live="off">
+          <div><span class="z" id="uT">–</span><span class="l">Tage</span></div>
+          <div><span class="z" id="uH">–</span><span class="l">Stunden</span></div>
+          <div><span class="z" id="uM">–</span><span class="l">Minuten</span></div>
+          <div><span class="z" id="uS">–</span><span class="l">Sekunden</span></div>
+        </div>
       </div>
       <p class="uhr-hinweis" id="uhrHinweis">bis es losgeht</p>
     </header>
@@ -1569,6 +1587,181 @@ function tickKopf() {
 }
 tickKopf();
 setInterval(tickKopf, 1000);
+
+/* ============================================================
+   ZWEI REITER AUF DEM UHRENKASTEN
+   ============================================================ */
+/* Sie galoppieren aufeinander zu, halten Nase an Nase, beugen sich
+   zueinander — und dann wächst ein Herz aus ihnen heraus, steigt auf
+   und verglüht. Danach fängt es von vorn an.
+
+   Jedes Bild hängt allein an der Zeit innerhalb der Runde, auch die
+   Staubwölkchen. Dadurch lässt sich die Schleife jederzeit anhalten und
+   wieder anwerfen, und bei abgeschalteten Bewegungen genügt ein
+   einziger Aufruf für das Standbild. */
+(function reiterPaar() {
+  const cv = $("#uhrReiter");
+  if (!cv) return;
+  const ctx = cv.getContext("2d");
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const GR = 0.44;                   // Maßstab der Reiter
+  const NASE = 50 * GR - 5;          // Ursprung bis Schnauze, minus etwas Überlapp
+  const PUFF = 130;                  // Abstand zwischen zwei Staubwölkchen
+
+  const T_ANRITT = 2800;             // aufeinander zu
+  const T_BEUGE  = 3450;             // vorgebeugt, Nase an Nase
+  const T_HERZ   = 5700;             // Herz wächst, steigt, verglüht
+  const T_WEG    = 6500;             // alles verblasst
+  const RUNDE    = 7100;
+
+  let B = 0, H = 0, BODEN = 0, ton = "#F0C463", rot = "#D95560";
+
+  function messen() {
+    const k = cv.getBoundingClientRect();
+    B = Math.max(1, Math.round(k.width));
+    H = Math.max(1, Math.round(k.height));
+    cv.width = B * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    BODEN = H - 1;
+    const stil = getComputedStyle(document.documentElement);
+    ton = stil.getPropertyValue("--reiter").trim() || ton;
+    rot = stil.getPropertyValue("--carmin-hell").trim() || rot;
+  }
+
+  const weich = (x) => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+  // Abstand eines Reiters von der Mitte, zu einem beliebigen Zeitpunkt
+  const abstand = (zeit) => {
+    const weg = weich(Math.min(1, zeit / T_ANRITT));
+    return (B / 2 + 70) + (NASE - (B / 2 + 70)) * weg;
+  };
+
+  function herzPfad(x, y, r) {
+    ctx.beginPath();
+    ctx.moveTo(x, y + r * .72);
+    ctx.bezierCurveTo(x - r * 1.25, y - r * .38, x - r * .62, y - r * 1.3, x, y - r * .48);
+    ctx.bezierCurveTo(x + r * .62, y - r * 1.3, x + r * 1.25, y - r * .38, x, y + r * .72);
+    ctx.closePath();
+  }
+
+  function reiter(x, y, spiegel, phase, neigen) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (spiegel) ctx.scale(-1, 1);
+    gauchoZeichnen(ctx, 0, 0, phase, false, GR, { farbe: ton, neigen });
+    ctx.restore();
+  }
+
+  /* Immer dieselbe Zahl zum selben Wölkchen — so bleibt der Staub
+     unregelmäßig, ohne dass sich das Bild etwas merken müsste. */
+  const streu = (n) => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
+
+  function bild(t) {
+    ctx.clearRect(0, 0, B, H);
+    if (t >= T_WEG) return;
+    ctx.globalAlpha = t < T_HERZ ? 1
+      : 1 - weich((t - T_HERZ) / (T_WEG - T_HERZ));
+
+    const mitte = B / 2;
+    const d = abstand(t);
+
+    // Staub: jedes Wölkchen kennt seinen Startzeitpunkt und altert daraus
+    const grundAlpha = ctx.globalAlpha;
+    ctx.fillStyle = ton;
+    for (let i = 0; i * PUFF < Math.min(t, T_ANRITT); i++) {
+      const alter = (t - i * PUFF) / 850;
+      if (alter > 1) continue;
+      const dd = abstand(i * PUFF);
+      for (const seite of [-1, 1]) {
+        const z1 = streu(i * 2 + seite), z2 = streu(i * 7 + seite * 3);
+        const r = 1.1 + alter * (2.6 + z1 * 4);
+        const ab = 8 + z2 * 5 + alter * (5 + z1 * 8);
+        ctx.globalAlpha = grundAlpha * (.10 + z2 * .11) * (1 - alter);
+        ctx.beginPath();
+        ctx.arc(mitte + seite * (dd + ab), BODEN - 1 - alter * (2 + z1 * 7), r, 0, 7);
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = grundAlpha;
+
+    /* Die Beine folgen dem zurückgelegten Weg, nicht der Uhr — dadurch
+       wird der Galopp mit dem Bremsen von allein langsamer und steht
+       still, sobald die beiden angekommen sind. */
+    const weg = (B / 2 + 70) - d;
+    const phase = (weg / 22) % 1;
+    const neigen = weich((t - T_ANRITT) / (T_BEUGE - T_ANRITT)) * 10;
+    // Im Stehen atmen sie leicht, sonst stünden sie drei Sekunden wie Figuren
+    const ruhe = Math.min(1, Math.max(0, (t - T_ANRITT) / 500));
+    const atem = (v) => BODEN - ruhe * Math.sin((t - T_ANRITT) / 620 + v) * .8;
+    reiter(mitte - d, atem(0),   false, phase, neigen);
+    reiter(mitte + d, atem(1.9), true,  phase, neigen);
+
+    /* Das Herz wächst zwischen ihnen heraus und steigt auf; zwei kleinere
+       folgen versetzt und driften zur Seite. */
+    if (t > T_BEUGE) {
+      const hz = Math.min(1, (t - T_BEUGE) / (T_HERZ - T_BEUGE));
+      const grund = ctx.globalAlpha;
+      ctx.fillStyle = rot;
+      [[0, 1, 0], [-12, .42, .25], [10, .34, .48]].forEach(([vx, gr, ab]) => {
+        const e = (hz - ab) / (1 - ab);
+        if (e <= 0) return;
+        const r = 12.5 * gr * weich(Math.min(1, e * 3.2));
+        const y = BODEN - 21 - (24 + Math.abs(vx) * .8) * weich(e);
+        ctx.globalAlpha = grund * (1 - weich(Math.max(0, (e - .6) / .4))) * (vx ? .75 : 1);
+        herzPfad(mitte + vx * weich(e), y, r);
+        ctx.fill();
+      });
+      ctx.globalAlpha = grund;
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* Läuft nur, wenn sie auch jemand sehen kann: nicht im Hintergrund,
+     nicht außerhalb des Bildausschnitts, nicht hinter einem Türchen. */
+  let raf = 0, t0 = 0, laeuft = false, imBild = true;
+
+  function schleife(jetzt) {
+    if (!laeuft) return;
+    if (!t0) t0 = jetzt;
+    bild((jetzt - t0) % RUNDE);
+    raf = requestAnimationFrame(schleife);
+  }
+
+  function pruefen() {
+    const soll = imBild && !document.hidden &&
+                 !$("#overlay").classList.contains("auf");
+    if (soll === laeuft) return;
+    laeuft = soll;
+    if (soll) { t0 = 0; raf = requestAnimationFrame(schleife); }
+    else cancelAnimationFrame(raf);
+  }
+
+  messen();
+  if (reduziert) {
+    bild(T_BEUGE + 1100);            // Standbild: beisammen, mit Herz
+  } else {
+    if (window.IntersectionObserver) {
+      new IntersectionObserver((e) => { imBild = e[0].isIntersecting; pruefen(); })
+        .observe(cv);
+    }
+    document.addEventListener("visibilitychange", pruefen);
+    new MutationObserver(pruefen)
+      .observe($("#overlay"), { attributes: true, attributeFilter: ["class"] });
+    pruefen();
+  }
+
+  /* Neu vermessen, wenn sich die Breite ändert — und wenn das Gerät auf
+     helles Papier umstellt, denn dann wechseln die beiden die Farbe. */
+  function neuAufbauen() { messen(); if (reduziert) bild(T_BEUGE + 1100); }
+  let umbau = 0;
+  addEventListener("resize", () => {
+    clearTimeout(umbau);
+    umbau = setTimeout(neuAufbauen, 150);
+  });
+  const schema = matchMedia("(prefers-color-scheme: light)");
+  if (schema.addEventListener) schema.addEventListener("change", neuAufbauen);
+  // Ändert der Kasten seine Breite, muss die Leinwand nachziehen
+  if (window.ResizeObserver) new ResizeObserver(neuAufbauen).observe($("#uhr"));
+})();
 
 /* ============================================================
    DIE SIEBEN TÜRCHEN
@@ -3846,14 +4039,18 @@ function galoppSpiel() {
   schleife();
 }
 
-/* Der Reiter wird an zwei Stellen gebraucht: im Spiel und im Vorspann.
-   Ursprung ist der Bodenkontakt, gezeichnet wird nach rechts blickend. */
-function gauchoZeichnen(ctx, mx, my, phase, springt, groesse) {
+/* Der Reiter wird an drei Stellen gebraucht: im Spiel, im Vorspann und
+   über der Uhr. Ursprung ist der Bodenkontakt, gezeichnet wird nach
+   rechts blickend. In "mehr" lassen sich zwei Dinge nachstellen:
+   "farbe" für den hellen Seitenhintergrund, "neigen" für das Vorbeugen
+   zum Gegenüber. */
+function gauchoZeichnen(ctx, mx, my, phase, springt, groesse, mehr) {
   ctx.save();
   ctx.translate(mx, my);
   if (groesse && groesse !== 1) ctx.scale(groesse, groesse);
-  ctx.fillStyle = "#F0C463";
-  ctx.strokeStyle = "#F0C463";
+  const ton = (mehr && mehr.farbe) || "#F0C463";
+  ctx.fillStyle = ton;
+  ctx.strokeStyle = ton;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
 
@@ -3914,7 +4111,7 @@ function gauchoZeichnen(ctx, mx, my, phase, springt, groesse) {
   ctx.moveTo(-6, -50); ctx.lineTo(-2, -50); ctx.lineTo(-4, -32); ctx.lineTo(-9, -33);
   ctx.closePath(); ctx.fill();
   ctx.beginPath();                                   // Rumpf, im Sprung geduckt
-  const neig = springt ? 5 : 0;
+  const neig = (springt ? 5 : 0) + ((mehr && mehr.neigen) || 0);
   ctx.moveTo(-8, -52); ctx.lineTo(2, -52);
   ctx.lineTo(6 + neig, -72); ctx.lineTo(-4 + neig, -75);
   ctx.closePath(); ctx.fill();
