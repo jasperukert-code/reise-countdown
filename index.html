@@ -4197,6 +4197,7 @@ function vorspann() {
   const wort = buehne.querySelector(".vs-wort");
   const dpr = Math.min(devicePixelRatio || 1, 2);
   let B = 0, H = 0, BODEN = 0;
+  let flug = null;   // vorbereiteter Schriftzug für den Schlussflug
 
   function messen() {
     B = innerWidth; H = innerHeight;
@@ -4204,6 +4205,7 @@ function vorspann() {
     BODEN = Math.round(H * 0.475);
     cv.width = B * dpr; cv.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    flug = null;     // andere Maße, also neu vorbereiten
   }
   messen();
   addEventListener("resize", messen);
@@ -4267,10 +4269,130 @@ function vorspann() {
     return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
   };
 
-  function bild(jetzt) {
-    const t = jetzt - t0;
-    ctx.clearRect(0, 0, B, H);
+  /* ---------- Vorbereitung des Schlussflugs ----------
+     Der Name wird ein einziges Mal in eine eigene Leinwand gezeichnet,
+     deutlich feiner als der Bildschirm ihn braucht. Danach kostet jedes
+     Bild nur noch ein Rechteck, ein Bild und eine Ellipse. Vorher setzte
+     der Browser sechzig Mal je Sekunde eine meterhohe Schrift und stanzte
+     sie aus der ganzen Fläche — daran hat es geruckelt.
 
+     Nebenbei löst das den zweiten Fehler: Ausgestanzt wird jetzt nur noch
+     der Innenraum des ersten o. Der Schriftzug selbst bleibt deckend
+     stehen, statt als Loch durch die Seite dahinter zu blicken. */
+  const WORT = "Vámonos";
+  const UEBER = 4;   // Reserve, damit die Schrift beim Heranfliegen scharf bleibt
+
+  function flugVorbereiten(passt, wy, wh) {
+    const stil   = getComputedStyle(wort);
+    const basis  = parseFloat(stil.fontSize) * passt;    // Größe auf dem Schirm
+    const sperre = (parseFloat(stil.letterSpacing) || 0) * passt;
+    const takt   = UEBER * dpr;                          // Bildpunkte je Schirmpunkt
+    const F      = basis * takt;
+
+    const off = document.createElement("canvas");
+    const oc  = off.getContext("2d");
+    const setz = () => {
+      oc.font = `italic 700 ${F}px ${stil.fontFamily}`;
+      oc.textAlign = "center";
+      oc.textBaseline = "middle";
+      try { oc.letterSpacing = (sperre * takt) + "px"; } catch {}
+    };
+    setz();
+    const breite = oc.measureText(WORT).width;
+    off.width  = Math.ceil(breite + F);
+    off.height = Math.ceil(F * 1.8);
+    setz();                    // das Ändern der Maße setzt die Leinwand zurück
+    const mx = off.width / 2, my = off.height / 2;
+    oc.fillStyle = stil.color;
+    oc.fillText(WORT, mx, my);
+
+    /* Wo liegt der Innenraum des ersten o? Eine Faustformel aus der
+       Schriftgröße träfe bei einer kursiven Fetten daneben, also werden
+       die Bildpunkte selbst befragt: senkrecht durch das o bis zum
+       oberen und unteren Strich, dann waagerecht auf halber Höhe. */
+    const mo   = oc.measureText("o");
+    const hoch = mo.actualBoundingBoxAscent  || F * 0.27;
+    const tief = mo.actualBoundingBoxDescent || F * 0.02;
+    const oY   = Math.round(my + (tief - hoch) / 2);      // Mitte des o
+    const oX   = Math.round(mx - breite / 2
+                 + (oc.measureText("Vám").width
+                  + oc.measureText("Vámo").width - sperre * takt) / 2);
+
+    /* Von einem Punkt im Innenraum aus abwechselnd senkrecht und
+       waagerecht messen. Jede Messung setzt den Punkt in die Mitte der
+       gefundenen Strecke; bei einer Ellipse — auch einer schrägen —
+       läuft das in wenigen Runden auf ihren Mittelpunkt zu. Eine einzelne
+       Messung landete daneben, weil die Kursive das o schert. */
+    const strecke = (daten, ab, grenze) => {
+      let a = -1, b = -1;
+      for (let i = ab; i >= 0; i--)     if (daten[i * 4 + 3] > 90) { a = i; break; }
+      for (let i = ab; i < grenze; i++) if (daten[i * 4 + 3] > 90) { b = i; break; }
+      return (a >= 0 && b >= 0 && b - a > 2) ? [a + 1, b - 1] : null;
+    };
+    const querMitte = (y) => {
+      const w = strecke(oc.getImageData(0, Math.round(y), off.width, 1).data,
+                        Math.round(cx), off.width);
+      return w ? (w[0] + w[1]) / 2 : null;
+    };
+    let cx = oX, cy = oY, rx = 0, ry = 0, scher = 0;
+    try {
+      for (let runde = 0; runde < 3; runde++) {
+        const senk = strecke(
+          oc.getImageData(Math.round(cx), 0, 1, off.height).data,
+          Math.round(cy), off.height);
+        if (!senk) break;
+        cy = (senk[0] + senk[1]) / 2; ry = (senk[1] - senk[0]) / 2;
+        const waag = strecke(
+          oc.getImageData(0, Math.round(cy), off.width, 1).data,
+          Math.round(cx), off.width);
+        if (!waag) break;
+        cx = (waag[0] + waag[1]) / 2; rx = (waag[1] - waag[0]) / 2;
+      }
+      /* Wie stark ist der Innenraum geschert? Zwei Querschnitte ober- und
+         unterhalb der Mitte verraten es. Ohne diese Schräge bliebe rechts
+         im o ein Zwickel stehen, den das gerade Oval nicht erwischt. */
+      const ob = querMitte(cy - ry * 0.5), un = querMitte(cy + ry * 0.5);
+      if (ob !== null && un !== null) scher = (un - ob) / ry;
+      if (Math.abs(scher) > 0.6) scher = 0;
+    } catch { /* getImageData kann streiken, dann greift die Schätzung */ }
+
+    /* Aus der Schräge folgt die Höhe des unverzerrten Kreises: die
+       gemessene senkrechte Strecke ist bei einer geschertern Ellipse
+       kürzer als ihre Halbachse. */
+    let rb = ry;
+    if (scher) {
+      const kehr = 1 / (ry * ry) - (scher * scher) / (rx * rx);
+      rb = kehr > 0 ? 1 / Math.sqrt(kehr) : ry;
+      if (!(rb > ry) || rb > ry * 3) { rb = ry; scher = 0; }
+    }
+
+    let loch;
+    if (rx > F * 0.04 && ry > F * 0.05 && rx < F * 0.3 && ry < F * 0.3) {
+      loch = { x: cx, y: cy, rx, rb, scher };
+    } else {
+      const halb = (hoch + tief) / 2;
+      loch = { x: oX, y: oY, rx: halb * 0.5, rb: halb * 0.52, scher: 0 };
+    }
+
+    // Der Schlagschatten aus dem Stylesheet, hinter die Schrift gelegt
+    oc.globalCompositeOperation = "destination-over";
+    oc.fillStyle = "rgba(184,53,63,.35)";
+    oc.fillText(WORT, mx + 2 * passt * takt, my + 4 * passt * takt);
+
+    flug = {
+      bild: off,
+      b: off.width / takt, h: off.height / takt,       // Maße auf dem Schirm
+      ox: (loch.x - mx) / takt, oy: (loch.y - my) / takt,   // o, von der Bildmitte aus
+      rx: (loch.rx / takt) * 0.96, rb: (loch.rb / takt) * 0.96, scher: loch.scher,
+      mx: B / 2, my: wy + wh / 2,                      // wo der Schriftzug steht
+    };
+  }
+
+  /* Sonne, Anden, Horizontlinie — alles, was hinter dem Reiter liegt.
+     Als eigene Funktion, weil der Schlussflug sie noch einmal braucht:
+     dort wird sie leicht vergrößert gezeichnet, damit die Ferne beim
+     Heranfliegen mitzieht. */
+  function kulisse(t) {
     /* Abendsonne: nur die obere Hälfte, sie steht im Horizont.
        Der Reiter zieht später davor vorbei. */
     const sonne = weich(t / 1200);
@@ -4310,6 +4432,12 @@ function vorspann() {
     ctx.strokeStyle = `rgba(228,172,56,${.5 * berg})`;
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(0, BODEN); ctx.lineTo(B, BODEN); ctx.stroke();
+  }
+
+  function bild(jetzt) {
+    const t = jetzt - t0;
+    ctx.clearRect(0, 0, B, H);
+    kulisse(t);
 
     /* Der Ritt: von links aus dem Bild heraus nach rechts.
        Ein Galoppzyklus dauert 430 ms — gut zwei pro Sekunde. */
@@ -4361,49 +4489,101 @@ function vorspann() {
     const passt = Math.min(1, platz / Math.max(1, wb));
 
     const auf = weich((t - T_WORT) / 420);
-    wort.style.opacity = t < T_ZOOM ? auf : 0;
-    wort.style.transform =
-      `translate(${wx.toFixed(1)}px, ${wy.toFixed(1)}px) translateX(-50%) scale(${passt.toFixed(3)})`;
+    if (t < T_ZOOM) {
+      wort.style.opacity = auf;
+      wort.style.transform =
+        `translate(${wx.toFixed(1)}px, ${wy.toFixed(1)}px) translateX(-50%) scale(${passt.toFixed(3)})`;
+    }
 
-    /* Schlusszoom: Die Leinwand wird zum Vorhang, aus dem der Name
-       ausgestanzt ist. Er wächst auf das erste o zu, bis dessen Innenraum
-       das Bild füllt — man fliegt hindurch auf die Seite dahinter. */
+    /* Schlussflug: Man fliegt auf das erste o zu. Der Schriftzug wächst
+       aus dem Stand heraus immer schneller, das o rückt dabei in die
+       Bildmitte, und sein Innenraum ist ein Fenster auf die Seite
+       dahinter, das am Ende den ganzen Schirm einnimmt. */
     if (t >= T_ZOOM) {
       const z = Math.min(1, (t - T_ZOOM) / T_ZOOM_DAUER);
+      if (!flug) flugVorbereiten(passt, wy, wh);
       buehne.style.background = "transparent";
+
+      /* Die Skalierung wächst exponentiell — pro Zeitabschnitt derselbe
+         Faktor, das ist die gleichmäßige Annäherung. Der Exponent läuft
+         mit z hoch 1,6 aus dem Stand an und beschleunigt danach immer
+         weiter. So gibt es an keiner Stelle einen Geschwindigkeitssprung;
+         die alte Kurve knickte auf halbem Weg um, und genau dort saß der
+         Ruckler. Das Ziel ist erreicht, wenn das Loch den Schirm deckt. */
+      const noetig = Math.hypot(
+        (B / 2 + Math.abs(flug.scher) * H / 2) / flug.rx, H / 2 / flug.rb) * 1.08;
+      const ziel = Math.max(24, Math.min(220, noetig));
+      const s = Math.exp(Math.log(ziel) * Math.pow(z, 1.6));
+
+      // Das o zieht sanft in die Bildmitte, damit man frontal darauf zuhält
+      const p = weich(Math.max(0, z - 0.06) / 0.5);
+      const oX0 = flug.mx + flug.ox, oY0 = flug.my + flug.oy;
+      const zx = oX0 + (B / 2 - oX0) * p;
+      const zy = oY0 + (H / 2 - oY0) * p;
 
       ctx.clearRect(0, 0, B, H);
       ctx.fillStyle = GRUND;
       ctx.fillRect(0, 0, B, H);
 
-      const stil = getComputedStyle(wort);
-      // passt: dieselbe Verkleinerung wie eben noch beim Schriftzug
-      const basis = parseFloat(stil.fontSize) * passt;
+      /* Die Kulisse liegt weit hinten: sie wächst nur zum Schein mit und
+         verblasst dabei — Ferne zieht beim Anflug kaum vorbei. */
+      const rest = 1 - weich(z / 0.34);
+      if (rest > 0.01) {
+        const ks = 1 + (s - 1) * 0.1;
+        ctx.save();
+        ctx.globalAlpha = rest;
+        ctx.translate(zx, zy);
+        ctx.scale(ks, ks);
+        ctx.translate(-oX0, -oY0);
+        kulisse(t);
+        ctx.restore();
+      }
 
-      /* Gleichmäßiger Flug: Die Skalierung wächst exponentiell, das
-         entspricht konstanter Annäherung — pro Zeitabschnitt derselbe
-         Faktor. Eine Potenzkurve raste stattdessen am Ende davon.
-         Die ersten Prozent laufen quadratisch an, damit es nicht ruckt.
-         Das Ziel richtet sich danach, wie weit das Loch im o noch
-         aufziehen muss, statt fest bei hundertfach zu liegen. */
-      const anlauf = z < 0.22 ? (z / 0.22) * (z / 0.22) * 0.22 : z;
-      const ziel = Math.max(34, Math.min(90, (B / (basis * 0.26)) * 1.2));
-      const skala = Math.exp(Math.log(ziel) * anlauf);
+      /* Der Schriftzug, deckend und nur noch aufgezogen. Die ersten
+         Hundertstel blendet er über den im Seitenlayout — beide stehen
+         dort noch gleich groß am selben Fleck, deshalb sieht man den
+         Wechsel nicht mehr. */
+      const ueber = Math.min(1, z / 0.08);
+      if (ueber < 1) {
+        wort.style.opacity = 1 - ueber;
+        wort.style.transform =
+          `translate(${(B / 2).toFixed(1)}px, ${wy.toFixed(1)}px) ` +
+          `translateX(-50%) scale(${(passt * s).toFixed(4)})`;
+      } else if (wort.style.opacity !== "0") {
+        wort.style.opacity = 0;
+      }
+      ctx.globalAlpha = ueber;
+      ctx.drawImage(flug.bild,
+        zx - flug.ox * s - flug.b * s / 2,
+        zy - flug.oy * s - flug.h * s / 2,
+        flug.b * s, flug.h * s);
+      ctx.globalAlpha = 1;
 
+      /* Der Innenraum des o wird zum Fenster — hier geht es hindurch.
+         Die Schere legt das Oval in dieselbe Neigung wie die Kursive. */
       ctx.save();
       ctx.globalCompositeOperation = "destination-out";
-      ctx.font = `italic 700 ${basis * skala}px ${stil.fontFamily}`;
-      // Bei großen Graden fällt der Laufabstand nicht mehr auf, kostet aber
-      if (skala < 12) { try { ctx.letterSpacing = stil.letterSpacing; } catch {} }
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
-      // Das erste o mittig halten: Abstand bis zu seiner Mitte messen
-      const bisO = ctx.measureText("Vám").width;
-      const mitO = ctx.measureText("Vámo").width;
-      // Anfangs genau dort stehen, wo eben noch der Schriftzug saß
-      const yStart = wy + wh / 2;
-      const y = yStart + (H / 2 - yStart) * Math.min(1, z * 3);
-      ctx.fillText("Vámonos", B / 2 - (bisO + mitO) / 2, y);
+      ctx.translate(zx, zy);
+      ctx.transform(1, 0, flug.scher, 1, 0, 0);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, flug.rx * s, flug.rb * s, 0, 0, 7);
+      ctx.fill();
+      ctx.restore();
+
+      /* Ein warmer Saum am Rand, als fiele Licht von drüben herein. Er
+         wird im gestauchten Raum gezeichnet, in dem das Loch ein Kreis
+         ist — sonst schnitte ein runder Schein in das hohe Oval hinein. */
+      ctx.save();
+      ctx.translate(zx, zy);
+      ctx.transform(1, 0, flug.scher, 1, 0, 0);
+      ctx.scale(flug.rx * s, flug.rb * s);
+      const schein = ctx.createRadialGradient(0, 0, 0, 0, 0, 1.7);
+      schein.addColorStop(0, "rgba(228,172,56,0)");
+      schein.addColorStop(.58, "rgba(228,172,56,0)");
+      schein.addColorStop(.72, "rgba(228,172,56,.20)");
+      schein.addColorStop(1, "rgba(228,172,56,0)");
+      ctx.fillStyle = schein;
+      ctx.fillRect(-1.7, -1.7, 3.4, 3.4);
       ctx.restore();
     }
 
