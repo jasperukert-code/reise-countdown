@@ -1456,7 +1456,7 @@ function symbol(k, groesse) {
 
 const TUEREN = [
   { tag: 10, sym: "route",  titel: "Die Route",       teaser: "Dreizehn Etappen, vom Vulkangipfel bis zum Gletscher." },
-  { tag: 11, sym: "quiz",   titel: "Das Quiz",        teaser: "Neun Fragen. Die Hälfte glaubst du mir nicht." },
+  { tag: 11, sym: "quiz",   titel: "Das Quiz",        teaser: "Zwölf Fragen. Die Hälfte glaubst du mir nicht." },
   { tag: 12, sym: "los",    titel: "Drei Rubbellose", teaser: "Freirubbeln. Einlösbar unterwegs." },
   { tag: 13, sym: "koffer", titel: "Kofferchaos",     teaser: "Ein Spiel. Steigeisen ja, Weihnachtsbaum nein." },
   { tag: 14, sym: "reden",  titel: "Notfall-Spanisch",teaser: "Die Sätze, die wirklich zählen." },
@@ -2368,10 +2368,23 @@ function karteBauen() {
    ============================================================ */
 const FRAGEN = [
   {
+    f: "Du desinfizierst dir dreimal am Tag die Hände. Wie viel Desinfektionsmittel brauchst du für die ganzen 46 Tage?",
+    o: ["Ein 100-ml-Fläschchen reicht", "einen knappen Viertelliter",
+        "gut 400 Milliliter", "fast zwei Liter"],
+    r: 2,
+    e: "46 Tage mal drei macht 138 Anwendungen, und empfohlen werden drei Milliliter pro Mal — macht 414 Milliliter. Ins Handgepäck dürfen davon genau 100. Der Rest muss in den Koffer, und der ist erfahrungsgemäß auch schon voll."
+  },
+  {
     f: "Mexiko-Stadt steht auf dem Grund eines trockengelegten Sees. Was macht die Stadt deshalb?",
     o: ["Sie schwimmt bei Starkregen kurzzeitig auf", "Sie sinkt — stellenweise um bis zu 50 cm pro Jahr", "Sie wird jedes Jahr um 2 cm angehoben", "Nichts, das ist ein Mythos"],
     r: 1,
     e: "Stimmt wirklich. Weil Grundwasser abgepumpt wird, sackt der alte Seeboden ab. Manche Gebäude stehen sichtbar schief — die Kathedrale am Zócalo hat deswegen Jahrzehnte an Stützarbeiten hinter sich."
+  },
+  {
+    f: "Teotihuacán ist eine der größten Ruinenstädte Amerikas. Wer hat sie gebaut?",
+    o: ["Die Azteken", "Die Maya", "Weiß bis heute niemand", "Die Tolteken, gesichert seit 1902"],
+    r: 2,
+    e: "Ungeklärt. Als die Azteken die Stadt fanden, lag sie schon Jahrhunderte verlassen da — sie waren so beeindruckt, dass sie ihr den Namen „Ort, an dem die Götter geboren wurden“ gaben. Auch der ursprüngliche Name ist verloren."
   },
   {
     f: "Der Iztaccíhuatl, auf dem du stehen wirst, heißt auf Nahuatl „weiße Frau“. Warum?",
@@ -2381,12 +2394,6 @@ const FRAGEN = [
     e: "Vom Tal aus sieht der Bergrücken aus wie eine liegende Frau — Kopf, Brust, Knie, Füße heißen die Abschnitte bis heute. Der Legende nach war sie eine Prinzessin, und der rauchende Popocatépetl nebenan ist ihr Krieger, der bei ihr Wache hält."
   },
   {
-    f: "Teotihuacán ist eine der größten Ruinenstädte Amerikas. Wer hat sie gebaut?",
-    o: ["Die Azteken", "Die Maya", "Weiß bis heute niemand", "Die Tolteken, gesichert seit 1902"],
-    r: 2,
-    e: "Ungeklärt. Als die Azteken die Stadt fanden, lag sie schon Jahrhunderte verlassen da — sie waren so beeindruckt, dass sie ihr den Namen „Ort, an dem die Götter geboren wurden“ gaben. Auch der ursprüngliche Name ist verloren."
-  },
-  {
     f: "In Puebla gibt es ein Gericht, das man nur wenige Wochen im Jahr bekommt — und ihr seid genau dann da. Welches?",
     o: ["Chiles en Nogada", "Mole Poblano", "Cochinita Pibil", "Tacos al Pastor"],
     r: 0,
@@ -2394,40 +2401,56 @@ const FRAGEN = [
   },
   {
     f: "In Lima regnet es im Jahr durchschnittlich etwa …",
-    o: ["800 Millimeter", "300 Millimeter", "10 Millimeter", "1.400 Millimeter"],
+    o: ["so viel wie in Hamburg", "halb so viel wie in Berlin",
+        "zehn Millimeter, also praktisch gar nichts", "mehr als im Schwarzwald"],
     r: 2,
-    e: "Rund 10 mm. Zum Vergleich: In Deutschland sind es je nach Ecke 600 bis 900. Trotzdem wird Lima selten sonnig sein — im August hängt der Küstennebel <i>garúa</i> über der Stadt."
+    e: "Rund zehn Millimeter im ganzen Jahr — in Deutschland sind es je nach Ecke 600 bis 900. Sonnig wird es trotzdem selten: Von Juni bis November hängt der Küstennebel <i>garúa</i> über der Stadt."
+  },
+  {
+    f: "Der Koffer ist zu voll. Was kostet bei Lufthansa ein zweites Gepäckstück auf dem Flug nach Mexiko-Stadt?",
+    o: ["35 Euro, so viel wie beim Billigflieger", "80 Euro",
+        "rund 250 Euro — und zwar pro Richtung", "gar nichts, zwei Stück sind inklusive"],
+    r: 2,
+    e: "Auf der weiten Langstrecke verlangt Lufthansa für das zusätzliche Gepäckstück rund 250 Euro je Strecke, am Schalter noch mehr. Hin und zurück wären das etwa 500 Euro. Dafür kauft man sich vor Ort einen Koffer, füllt ihn und geht vom Rest noch essen."
+  },
+  {
+    f: "In San Antonio de Areco dreht sich alles um Gauchos. Was ist ein <i>facón</i>?",
+    o: ["ein breites Messer, das hinten im Gürtel steckt", "ein Kurzer vor dem Abendessen",
+        "der Sattel aus Schaffell", "der Vorarbeiter einer Estancia"],
+    r: 0,
+    e: "Das Gaucho-Messer, hinten in der Schärpe getragen — zum Arbeiten, zum Essen und früher auch zum Streiten. Areco lebt bis heute von seinen Silberschmieden, die <i>facones</i> und Mate-Becher verzieren."
   },
   {
     f: "Der Perito Moreno bei El Calafate ist unter den Gletschern weltweit eine Ausnahme. Warum?",
-    o: ["Er ist blau statt weiß", "Er schrumpft nicht", "Er bewegt sich rückwärts", "Er schwimmt auf dem Meer"],
+    o: ["Er ist blau statt weiß", "Er schrumpft nicht", "Er bewegt sich rückwärts", "Er schwimmt auf dem offenen Meer"],
     r: 1,
     e: "Während fast alle Gletscher zurückgehen, hält der Perito Moreno seit Jahrzehnten sein Volumen. Er schiebt sich bis zu zwei Meter am Tag vor — und alle paar Stunden kracht vorne eine Eiswand ins Wasser."
   },
   {
-    f: "August in Argentinien heißt für die Klamotten …",
-    o: ["Hochsommer, 35 Grad", "Übergangsjacke reicht überall",
-        "Winter — in Patagonien unter null, in Iguazú 25 Grad", "Regenzeit, aber durchgehend warm"],
-    r: 2,
-    e: "Südhalbkugel, also Winter. In Bariloche und El Calafate liegt Schnee, in Tilcara klettert es tagsüber auf 20 Grad und fällt nachts fast auf null — und Iguazú ist subtropisch. Ihr braucht praktisch zwei Garderoben."
-  },
-  {
-    f: "Was ist ein Colectivo?",
-    o: ["Ein Sammeltaxi oder Stadtbus", "Eine Genossenschaftsbäckerei", "Ein Straßenmusiker-Trio", "Ein argentinischer Grillabend"],
+    f: "Auf der Estancia wird euch Mate gereicht. Womit blamiert man sich dabei sofort?",
+    o: ["Man rührt mit dem Trinkröhrchen um", "Man trinkt im Stehen",
+        "Man reicht ihn mit der linken Hand weiter", "Man pustet vorher hinein"],
     r: 0,
-    e: "In ganz Lateinamerika unterwegs, überall etwas anders. In Mexiko-Stadt heißen sie meist <i>peseros</i>, in Buenos Aires ist der Colectivo schlicht der Stadtbus."
+    e: "Die <i>bombilla</i> bleibt, wo sie steckt — wer damit rührt, verstopft den Filter und outet sich als Anfänger. Zweite Regel, noch wichtiger: „Gracias“ sagt man erst, wenn man nichts mehr will. Wer sich beim ersten Becher höflich bedankt, bekommt keinen zweiten."
   },
   {
     f: "Über die Wasserfälle von Iguazú soll Eleanor Roosevelt beim ersten Anblick etwas gesagt haben. Was?",
     o: ["„Nun bin ich still.“", "„Poor Niagara.“", "„Das ist zu laut.“", "„Ich bleibe hier.“"],
     r: 1,
     e: "Zwei Worte, überliefert seit ihrem Besuch 1944. Nachvollziehbar: Iguazú hat 275 einzelne Fälle auf fast drei Kilometern Breite — Niagara ist einer."
+  },
+  {
+    f: "September in Argentinien heißt für die Klamotten …",
+    o: ["Hochsommer, 35 Grad", "eine Übergangsjacke reicht überall",
+        "Winterende — in Patagonien unter null, in Iguazú 25 Grad", "Regenzeit, aber durchgehend warm"],
+    r: 2,
+    e: "Südhalbkugel, also Winter. In Bariloche und El Calafate liegt Schnee, in Tilcara klettert es tagsüber auf 20 Grad und fällt nachts fast auf null — und Iguazú ist subtropisch. Ihr braucht praktisch zwei Garderoben."
   }
 ];
 
 INHALTE[11] = {
-  lead: flach(`Neun Fragen zu den Orten, an denen du in den nächsten Wochen stehst.
-               Kein Druck — aber der Punktestand wird gespeichert.`),
+  lead: flach(`Zwölf Fragen zu den Orten, an denen du in den nächsten Wochen stehst —
+               und zu zwei Dingen, die vorher zu klären wären.`),
   render(w) {
     let i = 0, punkte = 0, gesperrt = false;
 
@@ -2497,13 +2520,16 @@ INHALTE[11] = {
         "Keine einzige. Aber genau deswegen fahren wir ja hin.",
         "Einer. Der Rest wird vor Ort gelernt — dann bleibt es sowieso besser hängen.",
         "Zwei. Reicht für den ersten Abend.",
-        "Drei. Solide Grundausstattung.",
-        "Vier von neun. Knapp unter der Hälfte.",
-        "Fünf. Genug, um beim Abendessen mitzureden.",
-        "Sechs von neun. Du hast offensichtlich schon gelesen.",
-        "Sieben. Ich glaube, du freust dich genauso wie ich.",
-        "Acht von neun. Bei der letzten hättest du raten können — hast du vermutlich auch.",
-        "Alle neun. Ich frage jetzt lieber nicht, wie lange du dich schon damit beschäftigst."
+        "Drei. Ausbaufähig, aber wir haben ja 46 Tage.",
+        "Vier. Solide Grundausstattung.",
+        "Fünf von zwölf. Knapp unter der Hälfte.",
+        "Sechs. Genau die Hälfte — und genug, um beim Abendessen mitzureden.",
+        "Sieben von zwölf. Du hast offensichtlich schon gelesen.",
+        "Acht. Beim Mate wirst du dich jedenfalls nicht blamieren.",
+        "Neun von zwölf. Ich glaube, du freust dich genauso wie ich.",
+        "Zehn. Bei den letzten beiden hättest du raten können — hast du vermutlich auch.",
+        "Elf von zwölf. Eine hat gefehlt. Die verrate ich dir unterwegs.",
+        "Alle zwölf. Ich frage jetzt lieber nicht, wie lange du dich schon damit beschäftigst."
       ];
 
       buehne.innerHTML = `
