@@ -1168,11 +1168,18 @@ footer {
   86%  { opacity: 1; }
   100% { left: 100%; opacity: 0; }
 }
+/* Feste Spaltenzahl statt auto-fit: Bei sechs Feldern ergibt das saubere
+   Reihen. Mit Mindestbreite fehlte auf dem Handy ein einziges Pixel für
+   die zweite Spalte, und alles stand untereinander. */
 .bp-gitter {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 18px 12px;
   padding-top: 20px;
   border-top: 1px dashed var(--linie-satt);
+}
+@media (min-width: 560px) {
+  .bp-gitter { grid-template-columns: repeat(3, 1fr); }
 }
 .bp-feld .k {
   font-family: var(--mono); font-size: .55rem;
