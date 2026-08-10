@@ -1132,6 +1132,30 @@ footer {
 }
 .hoeren:hover { border-color: var(--akzent); color: var(--akzent); }
 
+/* Vorspann beim Öffnen */
+.vorspann {
+  position: fixed; inset: 0;
+  z-index: 300;
+  background: var(--grund);
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: opacity .4s ease;
+}
+.vorspann.weg { opacity: 0; pointer-events: none; }
+.vs-bild { position: absolute; inset: 0; width: 100%; height: 100%; }
+.vs-wort {
+  position: relative;
+  margin-top: 24vh;
+  font-family: var(--display);
+  font-size: clamp(2.6rem, 13vw, 6rem);
+  font-style: italic;
+  font-weight: 700;
+  color: var(--akzent);
+  text-shadow: 2px 4px 0 rgba(184, 53, 63, .35);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
 /* Rückblick auf die Woche im letzten Türchen */
 .bilanz-zeile {
   display: flex; justify-content: space-between; align-items: baseline;
@@ -3681,87 +3705,9 @@ function galoppSpiel() {
   }
 
   /* --- Gaucho zu Pferd, dieselbe Silhouette wie im App-Symbol ----- */
-  function zeichneReiter(y, phase, springt) {
-    ctx.save();
-    ctx.translate(REITER_X, BODEN - y);
-    ctx.fillStyle = "#F0C463";
-    ctx.strokeStyle = "#F0C463";
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+  const zeichneReiter = (y, phase, springt) =>
+    gauchoZeichnen(ctx, REITER_X, BODEN - y, phase, springt);
 
-    // Beine zuerst, damit der Rumpf darüber liegt
-    const beine = springt
-      ? [[16, 8, -16], [10, 6, -22], [-16, -8, -14], [-22, -10, -18]]
-      : null;
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    if (springt) {
-      beine.forEach(([ax, dx, dy]) => {
-        ctx.moveTo(ax, -34);
-        ctx.lineTo(ax + dx, -34 + dy + 20);
-      });
-    } else {
-      [[16, 0], [10, .5], [-16, .5], [-22, 0]].forEach(([ax, vers]) => {
-        const p = (phase + vers) % 1;
-        const schwung = Math.sin(p * Math.PI * 2) * 11;
-        const heben = Math.max(0, Math.sin(p * Math.PI * 2)) * 7;
-        ctx.moveTo(ax, -34);
-        ctx.lineTo(ax + schwung, -heben);
-      });
-    }
-    ctx.stroke();
-
-    // Rumpf, Kruppe, Brust
-    ctx.beginPath();
-    ctx.ellipse(-2, -44, 25, 11, 0, 0, 7); ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(-20, -46, 11, 11, 0, 0, 7); ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(16, -45, 10, 11, 0, 0, 7); ctx.fill();
-
-    // Hals und Kopf
-    ctx.beginPath();
-    ctx.moveTo(12, -52); ctx.lineTo(22, -64); ctx.lineTo(30, -72);
-    ctx.lineTo(35, -73); ctx.lineTo(37, -66); ctx.lineTo(30, -60);
-    ctx.lineTo(24, -50); ctx.lineTo(16, -40);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(31, -73); ctx.lineTo(39, -77); ctx.lineTo(46, -70);
-    ctx.lineTo(50, -62); ctx.lineTo(45, -60); ctx.lineTo(37, -65);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath();                                   // Ohr
-    ctx.moveTo(33, -74); ctx.lineTo(35, -81); ctx.lineTo(39, -74);
-    ctx.closePath(); ctx.fill();
-
-    // Schweif, im Galopp wehend
-    const weh = springt ? 6 : Math.sin(phase * Math.PI * 2) * 4;
-    ctx.beginPath();
-    ctx.moveTo(-28, -50);
-    ctx.lineTo(-42, -46 + weh); ctx.lineTo(-52, -34 + weh);
-    ctx.lineTo(-46, -32 + weh); ctx.lineTo(-36, -42); ctx.lineTo(-28, -45);
-    ctx.closePath(); ctx.fill();
-
-    // Reiter
-    ctx.beginPath();                                   // Bein
-    ctx.moveTo(-6, -50); ctx.lineTo(-2, -50); ctx.lineTo(-4, -32); ctx.lineTo(-9, -33);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath();                                   // Rumpf, im Sprung geduckt
-    const neig = springt ? 5 : 0;
-    ctx.moveTo(-8, -52); ctx.lineTo(2, -52);
-    ctx.lineTo(6 + neig, -72); ctx.lineTo(-4 + neig, -75);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath();                                   // Arm zu den Zügeln
-    ctx.moveTo(0 + neig, -70); ctx.lineTo(5 + neig, -71);
-    ctx.lineTo(22, -62); ctx.lineTo(20, -57);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath();                                   // Kopf
-    ctx.arc(1 + neig, -79, 5, 0, 7); ctx.fill();
-    ctx.beginPath();                                   // Hut
-    ctx.ellipse(1 + neig, -84, 11, 2.4, 0, 0, 7); ctx.fill();
-    ctx.fillRect(-3 + neig, -90, 8, 6);
-
-    ctx.restore();
-  }
 
   /* --- Schleife --------------------------------------------------- */
   function schleife(jetzt) {
@@ -3895,6 +3841,91 @@ function galoppSpiel() {
 
   bergeSetzen();
   schleife();
+}
+
+/* Der Reiter wird an zwei Stellen gebraucht: im Spiel und im Vorspann.
+   Ursprung ist der Bodenkontakt, gezeichnet wird nach rechts blickend. */
+function gauchoZeichnen(ctx, mx, my, phase, springt, groesse) {
+  ctx.save();
+  ctx.translate(mx, my);
+  if (groesse && groesse !== 1) ctx.scale(groesse, groesse);
+  ctx.fillStyle = "#F0C463";
+  ctx.strokeStyle = "#F0C463";
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  // Beine zuerst, damit der Rumpf darüber liegt
+  const beine = springt
+    ? [[16, 8, -16], [10, 6, -22], [-16, -8, -14], [-22, -10, -18]]
+    : null;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  if (springt) {
+    beine.forEach(([ax, dx, dy]) => {
+      ctx.moveTo(ax, -34);
+      ctx.lineTo(ax + dx, -34 + dy + 20);
+    });
+  } else {
+    [[16, 0], [10, .5], [-16, .5], [-22, 0]].forEach(([ax, vers]) => {
+      const p = (phase + vers) % 1;
+      const schwung = Math.sin(p * Math.PI * 2) * 11;
+      const heben = Math.max(0, Math.sin(p * Math.PI * 2)) * 7;
+      ctx.moveTo(ax, -34);
+      ctx.lineTo(ax + schwung, -heben);
+    });
+  }
+  ctx.stroke();
+
+  // Rumpf, Kruppe, Brust
+  ctx.beginPath();
+  ctx.ellipse(-2, -44, 25, 11, 0, 0, 7); ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(-20, -46, 11, 11, 0, 0, 7); ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(16, -45, 10, 11, 0, 0, 7); ctx.fill();
+
+  // Hals und Kopf
+  ctx.beginPath();
+  ctx.moveTo(12, -52); ctx.lineTo(22, -64); ctx.lineTo(30, -72);
+  ctx.lineTo(35, -73); ctx.lineTo(37, -66); ctx.lineTo(30, -60);
+  ctx.lineTo(24, -50); ctx.lineTo(16, -40);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(31, -73); ctx.lineTo(39, -77); ctx.lineTo(46, -70);
+  ctx.lineTo(50, -62); ctx.lineTo(45, -60); ctx.lineTo(37, -65);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath();                                   // Ohr
+  ctx.moveTo(33, -74); ctx.lineTo(35, -81); ctx.lineTo(39, -74);
+  ctx.closePath(); ctx.fill();
+
+  // Schweif, im Galopp wehend
+  const weh = springt ? 6 : Math.sin(phase * Math.PI * 2) * 4;
+  ctx.beginPath();
+  ctx.moveTo(-28, -50);
+  ctx.lineTo(-42, -46 + weh); ctx.lineTo(-52, -34 + weh);
+  ctx.lineTo(-46, -32 + weh); ctx.lineTo(-36, -42); ctx.lineTo(-28, -45);
+  ctx.closePath(); ctx.fill();
+
+  // Reiter
+  ctx.beginPath();                                   // Bein
+  ctx.moveTo(-6, -50); ctx.lineTo(-2, -50); ctx.lineTo(-4, -32); ctx.lineTo(-9, -33);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath();                                   // Rumpf, im Sprung geduckt
+  const neig = springt ? 5 : 0;
+  ctx.moveTo(-8, -52); ctx.lineTo(2, -52);
+  ctx.lineTo(6 + neig, -72); ctx.lineTo(-4 + neig, -75);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath();                                   // Arm zu den Zügeln
+  ctx.moveTo(0 + neig, -70); ctx.lineTo(5 + neig, -71);
+  ctx.lineTo(22, -62); ctx.lineTo(20, -57);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath();                                   // Kopf
+  ctx.arc(1 + neig, -79, 5, 0, 7); ctx.fill();
+  ctx.beginPath();                                   // Hut
+  ctx.ellipse(1 + neig, -84, 11, 2.4, 0, 0, 7); ctx.fill();
+  ctx.fillRect(-3 + neig, -90, 8, 6);
+
+  ctx.restore();
 }
 
 /* Die Etappendaten stehen als Text da ("16. Aug"). Für den Reisestand
@@ -4131,6 +4162,112 @@ if (VORSCHAU) {
     }
   });
 })();
+
+/* ============================================================
+   VORSPANN
+   Die Abendsonne geht auf, der Gaucho galoppiert durchs Bild und
+   zieht eine Staubfahne hinter sich her; was bleibt, ist der Name.
+   Läuft einmal am Tag — bei jedem Aufruf wäre es eine Bremse statt
+   eines Auftakts. Antippen bricht ab.
+   ============================================================ */
+function vorspann() {
+  const heuteSchluessel = new Date().toISOString().slice(0, 10);
+  if (reduziert || speicher.get("vorspannAm", "") === heuteSchluessel) return;
+  speicher.set("vorspannAm", heuteSchluessel);
+
+  const buehne = el("div", "vorspann");
+  buehne.innerHTML = `
+    <canvas class="vs-bild"></canvas>
+    <div class="vs-wort"><span>Vámonos</span></div>`;
+  document.body.appendChild(buehne);
+
+  const cv = buehne.querySelector("canvas");
+  const ctx = cv.getContext("2d");
+  const wort = buehne.querySelector(".vs-wort");
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  let B = 0, H = 0, BODEN = 0;
+
+  function messen() {
+    B = innerWidth; H = innerHeight; BODEN = Math.round(H * 0.62);
+    cv.width = B * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  messen();
+  addEventListener("resize", messen);
+
+  const DAUER = 3200;
+  const staub = [];
+  let raf = 0, fertig = false;
+  const t0 = performance.now();
+
+  function beenden() {
+    if (fertig) return;
+    fertig = true;
+    cancelAnimationFrame(raf);
+    buehne.classList.add("weg");
+    setTimeout(() => buehne.remove(), 420);
+  }
+  buehne.addEventListener("pointerdown", beenden);
+
+  const weich = (x) => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+
+  function bild(jetzt) {
+    const t = jetzt - t0;
+    ctx.clearRect(0, 0, B, H);
+
+    // Abendsonne steigt auf
+    const sonne = weich(t / 900);
+    const r = Math.min(B, H) * 0.34 * sonne;
+    if (r > 1) {
+      const mitte = ctx.createRadialGradient(B / 2, BODEN, 0, B / 2, BODEN, r);
+      mitte.addColorStop(0, "rgba(228,172,56,.30)");
+      mitte.addColorStop(1, "rgba(228,172,56,0)");
+      ctx.fillStyle = mitte;
+      ctx.beginPath(); ctx.arc(B / 2, BODEN, r, 0, 7); ctx.fill();
+      ctx.strokeStyle = `rgba(228,172,56,${.45 * sonne})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(B / 2, BODEN, r, 0, 7); ctx.stroke();
+    }
+
+    // Boden
+    ctx.strokeStyle = `rgba(228,172,56,${.5 * sonne})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, BODEN); ctx.lineTo(B, BODEN); ctx.stroke();
+
+    // Der Ritt: von links aus dem Bild heraus nach rechts
+    const ritt = weich((t - 350) / 1750);
+    const gx = -140 + ritt * (B + 300);
+    const groesse = Math.max(0.75, Math.min(1.35, B / 620));
+    if (t > 300 && ritt < 1) {
+      if (staub.length < 90 && t % 2 < 1.2) {
+        staub.push({ x: gx - 34 * groesse, y: BODEN, l: 1,
+                     vx: -(0.6 + Math.random() * 1.6), vy: -(Math.random() * 0.9) });
+      }
+      gauchoZeichnen(ctx, gx, BODEN, (t / 90) % 1, false, groesse);
+    }
+
+    // Staubfahne
+    for (let i = staub.length - 1; i >= 0; i--) {
+      const s = staub[i];
+      s.x += s.vx; s.y += s.vy; s.l -= 0.016;
+      if (s.l <= 0) { staub.splice(i, 1); continue; }
+      ctx.fillStyle = `rgba(228,172,56,${0.16 * s.l})`;
+      ctx.beginPath(); ctx.arc(s.x, s.y, (1 - s.l) * 16 + 3, 0, 7); ctx.fill();
+    }
+
+    // Der Name bleibt zurück
+    const auf = weich((t - 1450) / 750);
+    wort.style.opacity = auf;
+    wort.style.transform = `scale(${1.35 - 0.35 * auf})`;
+    wort.style.letterSpacing = (0.26 - 0.16 * auf) + "em";
+
+    if (t > DAUER) return beenden();
+    raf = requestAnimationFrame(bild);
+  }
+  raf = requestAnimationFrame(bild);
+}
+
+vorspann();
 
 if (!speicher.get("begruesst", false)) {
   speicher.set("begruesst", true);
