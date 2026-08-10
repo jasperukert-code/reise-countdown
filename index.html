@@ -4194,9 +4194,30 @@ function vorspann() {
   messen();
   addEventListener("resize", messen);
 
-  // Ritt endet bei 2400 ms, der Name steht ab 2550 — danach bleibt er kurz stehen
-  const DAUER = 3450;
+  /* Abfolge: Sonne, dann die Bergkette, dann der Reiter, zum Schluss
+     der Name. Jeder Schritt setzt ein, wenn der vorige steht. */
+  const T_BERGE  = 500,  T_BERGE_DAUER = 1300;
+  const T_RITT   = 1700, T_RITT_DAUER  = 2500;
+  const T_WORT   = 3800, T_WORT_DAUER  = 900;
+  const DAUER    = 5000;
   const staub = [];
+
+  /* Andenkette in Bruchteilen der Breite und der Kulissenhöhe.
+     Zwei Ebenen: die hintere höher und heller, die vordere spitzer. */
+  const KETTE_HINTEN = [0,.28, .11,.62, .21,.38, .33,.78, .45,.48, .57,.86, .69,.52, .81,.72, .92,.42, 1,.58];
+  const KETTE_VORNE  = [0,.14, .09,.44, .17,.24, .29,.64, .39,.32, .5,.56, .62,.3, .73,.48, .86,.26, 1,.4];
+
+  function kette(punkte, hoehe, versatz, farbe) {
+    ctx.beginPath();
+    ctx.moveTo(-4, BODEN + 4);
+    for (let i = 0; i < punkte.length; i += 2) {
+      ctx.lineTo(punkte[i] * B, BODEN - punkte[i + 1] * hoehe + versatz);
+    }
+    ctx.lineTo(B + 4, BODEN + 4);
+    ctx.closePath();
+    ctx.fillStyle = farbe;
+    ctx.fill();
+  }
   let raf = 0, fertig = false;
   const t0 = performance.now();
 
@@ -4220,7 +4241,7 @@ function vorspann() {
     ctx.clearRect(0, 0, B, H);
 
     // Abendsonne steigt auf
-    const sonne = weich(t / 900);
+    const sonne = weich(t / 1200);
     const r = Math.min(B, H) * 0.34 * sonne;
     if (r > 1) {
       const mitte = ctx.createRadialGradient(B / 2, BODEN, 0, B / 2, BODEN, r);
@@ -4233,23 +4254,30 @@ function vorspann() {
       ctx.beginPath(); ctx.arc(B / 2, BODEN, r, 0, 7); ctx.stroke();
     }
 
+    // Die Anden schieben sich vor die Sonne
+    const berg = weich((t - T_BERGE) / T_BERGE_DAUER);
+    if (berg > 0) {
+      const hoehe = Math.min(H * 0.3, 210);
+      kette(KETTE_HINTEN, hoehe, (1 - berg) * hoehe * 0.9, "#152340");
+      kette(KETTE_VORNE, hoehe * 0.72, (1 - berg) * hoehe * 0.5, "#0B1220");
+    }
+
     // Boden
-    ctx.strokeStyle = `rgba(228,172,56,${.5 * sonne})`;
+    ctx.strokeStyle = `rgba(228,172,56,${.5 * berg})`;
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(0, BODEN); ctx.lineTo(B, BODEN); ctx.stroke();
 
-    // Der Ritt: von links aus dem Bild heraus nach rechts.
-    // Ein Galoppzyklus dauert 320 ms — also gut drei pro Sekunde, wie beim
-    // echten Pferd. Mit 90 ms wirkte es wie im Schnelldurchlauf.
-    const ritt = weich((t - 350) / 2050);
+    /* Der Ritt: von links aus dem Bild heraus nach rechts.
+       Ein Galoppzyklus dauert 430 ms — gut zwei pro Sekunde. */
+    const ritt = weich((t - T_RITT) / T_RITT_DAUER);
     const gx = -140 + ritt * (B + 300);
     const groesse = Math.max(0.75, Math.min(1.35, B / 620));
-    if (t > 300 && ritt < 1) {
+    if (t > T_RITT - 60 && ritt < 1) {
       if (staub.length < 90 && t % 3 < 1.6) {
         staub.push({ x: gx - 34 * groesse, y: BODEN, l: 1,
                      vx: -(0.5 + Math.random() * 1.3), vy: -(Math.random() * 0.8) });
       }
-      gauchoZeichnen(ctx, gx, BODEN, (t / 320) % 1, false, groesse);
+      gauchoZeichnen(ctx, gx, BODEN, (t / 430) % 1, false, groesse);
     }
 
     // Staubfahne
@@ -4262,7 +4290,7 @@ function vorspann() {
     }
 
     // Der Name bleibt zurück
-    const auf = weich((t - 1750) / 800);
+    const auf = weich((t - T_WORT) / T_WORT_DAUER);
     wort.style.opacity = auf;
     wort.style.transform = `scale(${1.35 - 0.35 * auf})`;
     wort.style.letterSpacing = (0.26 - 0.16 * auf) + "em";
