@@ -1142,8 +1142,12 @@ footer {
 .vorspann.weg { opacity: 0; pointer-events: none; }
 .vs-bild { position: absolute; inset: 0; width: 100%; height: 100%; }
 .vs-wort {
-  position: relative;
-  margin-top: 24vh;
+  /* Sitzt unter dem Horizont, der bei 45 % der Höhe liegt */
+  position: absolute;
+  top: 56%;
+  left: 50%;
+  transform-origin: 50% 0;
+  white-space: nowrap;
   font-family: var(--display);
   font-size: clamp(2.6rem, 13vw, 6rem);
   font-style: italic;
@@ -4187,7 +4191,9 @@ function vorspann() {
   let B = 0, H = 0, BODEN = 0;
 
   function messen() {
-    B = innerWidth; H = innerHeight; BODEN = Math.round(H * 0.62);
+    B = innerWidth; H = innerHeight;
+    // Horizont knapp oberhalb der Bildmitte — darunter bleibt Platz für den Namen
+    BODEN = Math.round(H * 0.45);
     cv.width = B * dpr; cv.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
@@ -4240,18 +4246,30 @@ function vorspann() {
     const t = jetzt - t0;
     ctx.clearRect(0, 0, B, H);
 
-    // Abendsonne steigt auf
+    /* Abendsonne: nur die obere Hälfte, sie steht im Horizont.
+       Der Reiter zieht später davor vorbei. */
     const sonne = weich(t / 1200);
-    const r = Math.min(B, H) * 0.34 * sonne;
+    const r = Math.min(B, H) * 0.32 * sonne;
     if (r > 1) {
-      const mitte = ctx.createRadialGradient(B / 2, BODEN, 0, B / 2, BODEN, r);
-      mitte.addColorStop(0, "rgba(228,172,56,.30)");
-      mitte.addColorStop(1, "rgba(228,172,56,0)");
-      ctx.fillStyle = mitte;
-      ctx.beginPath(); ctx.arc(B / 2, BODEN, r, 0, 7); ctx.fill();
-      ctx.strokeStyle = `rgba(228,172,56,${.45 * sonne})`;
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(B / 2, BODEN, r, 0, 7); ctx.stroke();
+      const schein = ctx.createRadialGradient(B / 2, BODEN, r * 0.1, B / 2, BODEN, r * 1.5);
+      schein.addColorStop(0, "rgba(228,172,56,.22)");
+      schein.addColorStop(1, "rgba(228,172,56,0)");
+      ctx.fillStyle = schein;
+      ctx.beginPath();
+      ctx.arc(B / 2, BODEN, r * 1.5, Math.PI, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(228,172,56,.20)";
+      ctx.beginPath();
+      ctx.arc(B / 2, BODEN, r, Math.PI, 2 * Math.PI);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = `rgba(228,172,56,${.55 * sonne})`;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.arc(B / 2, BODEN, r, Math.PI, 2 * Math.PI);
+      ctx.stroke();
     }
 
     // Die Anden schieben sich vor die Sonne
@@ -4292,7 +4310,7 @@ function vorspann() {
     // Der Name bleibt zurück
     const auf = weich((t - T_WORT) / T_WORT_DAUER);
     wort.style.opacity = auf;
-    wort.style.transform = `scale(${1.35 - 0.35 * auf})`;
+    wort.style.transform = `translateX(-50%) scale(${1.35 - 0.35 * auf})`;
     wort.style.letterSpacing = (0.26 - 0.16 * auf) + "em";
 
     if (t > DAUER) return beenden();
