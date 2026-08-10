@@ -4160,7 +4160,12 @@ if (VORSCHAU) {
     const pause = weg ? Date.now() - weg : 0;
     weg = 0;
     if (pause > 20 * 60 * 1000 && !$("#overlay").classList.contains("auf")) {
-      location.reload();
+      location.reload();                 // lädt neu, der Vorspann kommt dabei
+    } else if (pause > 45 * 1000) {
+      /* Kürzere Pause: Eine App vom Startbildschirm wird meist aus dem
+         Speicher wiederhergestellt statt neu geladen, dann liefe kein
+         Startcode. Also hier von Hand anwerfen. */
+      vorspann();
     }
   });
 })();
@@ -4177,6 +4182,8 @@ function vorspann() {
   // Im Hintergrund geladen? Dann gar nicht erst anfangen — der Bildaufbau
   // ruht dort, und der Vorspann bliebe über der Seite liegen.
   if (document.hidden) return;
+  if (document.querySelector(".vorspann")) return;   // läuft schon
+  if ($("#overlay").classList.contains("auf")) return;   // Türchen ist offen
 
   const buehne = el("div", "vorspann");
   buehne.innerHTML = `
@@ -4205,8 +4212,13 @@ function vorspann() {
   const T_BERGE  = 500,  T_BERGE_DAUER = 1300;
   const T_RITT   = 1700, T_RITT_DAUER  = 2500;
   const T_WORT   = 3800, T_WORT_DAUER  = 900;
-  const DAUER    = 5000;
+  const T_ZOOM   = 5000, T_ZOOM_DAUER  = 1300;
+  const DAUER    = T_ZOOM + T_ZOOM_DAUER;
   const staub = [];
+
+  // Farbe des Vorhangs, der beim Schlusszoom durchstoßen wird
+  const GRUND = getComputedStyle(document.documentElement)
+    .getPropertyValue("--grund").trim() || "#101A2E";
 
   /* Andenkette in Bruchteilen der Breite und der Kulissenhöhe.
      Zwei Ebenen: die hintere höher und heller, die vordere spitzer. */
@@ -4272,10 +4284,11 @@ function vorspann() {
       ctx.stroke();
     }
 
-    // Die Anden schieben sich vor die Sonne
+    /* Die Anden schieben sich vor die Sonne. Ihre Höhe hängt am
+       Sonnenradius, damit die Scheibe immer darüber stehen bleibt. */
     const berg = weich((t - T_BERGE) / T_BERGE_DAUER);
     if (berg > 0) {
-      const hoehe = Math.min(H * 0.3, 210);
+      const hoehe = Math.min(Math.min(B, H) * 0.32 * 0.66, H * 0.15);
       kette(KETTE_HINTEN, hoehe, (1 - berg) * hoehe * 0.9, "#152340");
       kette(KETTE_VORNE, hoehe * 0.72, (1 - berg) * hoehe * 0.5, "#0B1220");
     }
@@ -4309,9 +4322,39 @@ function vorspann() {
 
     // Der Name bleibt zurück
     const auf = weich((t - T_WORT) / T_WORT_DAUER);
-    wort.style.opacity = auf;
+    wort.style.opacity = t < T_ZOOM ? auf : 0;
     wort.style.transform = `translateX(-50%) scale(${1.35 - 0.35 * auf})`;
     wort.style.letterSpacing = (0.26 - 0.16 * auf) + "em";
+
+    /* Schlusszoom: Die Leinwand wird zum Vorhang, aus dem der Name
+       ausgestanzt ist. Er wächst auf das erste o zu, bis dessen Innenraum
+       das Bild füllt — man fliegt hindurch auf die Seite dahinter. */
+    if (t >= T_ZOOM) {
+      const z = Math.min(1, (t - T_ZOOM) / T_ZOOM_DAUER);
+      const skala = 1 + Math.pow(z, 2.4) * 95;
+      buehne.style.background = "transparent";
+
+      ctx.clearRect(0, 0, B, H);
+      ctx.fillStyle = GRUND;
+      ctx.fillRect(0, 0, B, H);
+
+      const stil = getComputedStyle(wort);
+      const basis = parseFloat(stil.fontSize);
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.font = `italic 700 ${basis * skala}px ${stil.fontFamily}`;
+      try { ctx.letterSpacing = stil.letterSpacing; } catch {}
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      // Das erste o mittig halten: Abstand bis zu seiner Mitte messen
+      const bisO = ctx.measureText("Vám").width;
+      const mitO = ctx.measureText("Vámo").width;
+      // Anfangs dort stehen, wo eben noch der Schriftzug saß, dann zur Mitte
+      const yStart = H * 0.56 + basis * 0.34;
+      const y = yStart + (H / 2 - yStart) * Math.min(1, z * 3);
+      ctx.fillText("Vámonos", B / 2 - (bisO + mitO) / 2, y);
+      ctx.restore();
+    }
 
     if (t > DAUER) return beenden();
     raf = requestAnimationFrame(bild);
