@@ -1,0 +1,2386 @@
+<title>Sieben Türchen bis Lateinamerika</title>
+
+<style>
+/* ============================================================
+   TOKENS — Fileteado Porteño trifft Talavera
+   ============================================================ */
+:root {
+  /* Grundfarben */
+  --noche:      #101A2E;   /* tiefes Nachtblau */
+  --noche-2:    #16233C;   /* angehobenes Nachtblau */
+  --papel:      #EFEAD9;   /* Kalkpapier */
+  --papel-2:    #E4DDC8;   /* Kalkpapier, gealtert */
+
+  /* Akzente */
+  --oro:        #E4AC38;   /* Gold / Ocker */
+  --oro-tief:   #B07F1E;
+  --carmin:     #B8353F;   /* Karminrot */
+  --carmin-hell:#D95560;
+  --jade:       #2E9E8F;   /* Jade */
+  --cobalto:    #3A5FBF;   /* Kobaltblau */
+
+  /* Semantische Tokens — hier hängt alles dran */
+  --grund:      var(--noche);
+  --grund-2:    var(--noche-2);
+  --schrift:    #F2EDE0;
+  --schrift-2:  #A9B4C9;   /* Neutral mit Blaustich, nicht grau */
+  --linie:      rgba(228, 172, 56, .26);
+  --linie-satt: rgba(228, 172, 56, .55);
+  --akzent:     var(--oro);
+  --auf-akzent: var(--noche);   /* Schrift auf Akzentflächen */
+  --akzent-2:   var(--carmin-hell);
+  --schatten:   0 18px 44px rgba(0,0,0,.44);
+  --karte:      #18253E;
+  --karte-2:    #1E2E4C;
+  --verschlossen: rgba(255,255,255,.045);
+
+  /* Typo */
+  --display: "Bodoni MT", "Didot", "Playfair Display", "Hoefler Text", Georgia, serif;
+  --body: "Avenir Next", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "SF Mono", ui-monospace, "Cascadia Mono", "Roboto Mono", "DejaVu Sans Mono", monospace;
+
+  --w: min(1120px, 92vw);
+  --r: 4px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --grund:    var(--papel);
+    --grund-2:  var(--papel-2);
+    --schrift:  #1B1F2E;
+    --schrift-2:#5C6070;
+    --linie:    rgba(27,31,46,.16);
+    --linie-satt: rgba(184,53,63,.5);
+    --akzent:   var(--carmin);
+    --auf-akzent: #FFF7EA;
+    --akzent-2: var(--oro-tief);
+    --schatten: 0 14px 34px rgba(27,31,46,.16);
+    --karte:    #FBF7EC;
+    --karte-2:  #F4EFDF;
+    --verschlossen: rgba(27,31,46,.05);
+  }
+}
+
+:root[data-theme="light"] {
+  --grund:    var(--papel);
+  --grund-2:  var(--papel-2);
+  --schrift:  #1B1F2E;
+  --schrift-2:#5C6070;
+  --linie:    rgba(27,31,46,.16);
+  --linie-satt: rgba(184,53,63,.5);
+  --akzent:   var(--carmin);
+  --auf-akzent: #FFF7EA;
+  --akzent-2: var(--oro-tief);
+  --schatten: 0 14px 34px rgba(27,31,46,.16);
+  --karte:    #FBF7EC;
+  --karte-2:  #F4EFDF;
+  --verschlossen: rgba(27,31,46,.05);
+}
+
+:root[data-theme="dark"] {
+  --grund:    var(--noche);
+  --grund-2:  var(--noche-2);
+  --schrift:  #F2EDE0;
+  --schrift-2:#A9B4C9;
+  --linie:    rgba(228,172,56,.26);
+  --linie-satt: rgba(228,172,56,.55);
+  --akzent:   var(--oro);
+  --auf-akzent: var(--noche);
+  --akzent-2: var(--carmin-hell);
+  --schatten: 0 18px 44px rgba(0,0,0,.44);
+  --karte:    #18253E;
+  --karte-2:  #1E2E4C;
+  --verschlossen: rgba(255,255,255,.045);
+}
+
+* { box-sizing: border-box; }
+
+.wrap {
+  background: var(--grund);
+  color: var(--schrift);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Kalkputz-Textur, sehr subtil */
+.wrap::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  opacity: .5;
+  background-image:
+    radial-gradient(circle at 15% 12%, rgba(58,95,191,.16), transparent 42%),
+    radial-gradient(circle at 85% 78%, rgba(184,53,63,.14), transparent 46%);
+  z-index: 0;
+}
+
+.inner { width: var(--w); margin: 0 auto; position: relative; z-index: 1; }
+
+/* ============================================================
+   PAPEL PICADO — Wimpelkette
+   ============================================================ */
+.picado { display: flex; width: 100%; height: 46px; overflow: hidden; }
+.picado svg { display: block; width: 100%; height: 46px; }
+.flag { transform-origin: top center; animation: schwingen 4.6s ease-in-out infinite; }
+@keyframes schwingen {
+  0%, 100% { transform: rotate(-1.4deg); }
+  50%      { transform: rotate(1.4deg); }
+}
+
+/* ============================================================
+   KOPF
+   ============================================================ */
+header { padding: 30px 0 12px; text-align: center; }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--akzent);
+  margin: 0 0 14px;
+}
+
+h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2.1rem, 7.4vw, 4.1rem);
+  line-height: 1.02;
+  letter-spacing: -.012em;
+  margin: 0 0 6px;
+  text-wrap: balance;
+  color: var(--schrift);
+}
+h1 em {
+  font-style: italic;
+  color: var(--akzent);
+  text-shadow: 2px 3px 0 rgba(184,53,63,.32);
+}
+
+.untertitel {
+  color: var(--schrift-2);
+  font-size: .96rem;
+  margin: 0 auto 26px;
+  max-width: 46ch;
+  text-wrap: balance;
+}
+
+/* Route */
+.route {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; flex-wrap: wrap;
+  margin: 0 0 30px;
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+}
+.route b { color: var(--schrift); font-weight: 600; }
+.route span[aria-hidden] { color: var(--akzent); }
+
+/* Countdown-Uhr */
+.uhr {
+  display: inline-flex; gap: 2px;
+  border: 1px solid var(--linie-satt);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--grund-2);
+  box-shadow: var(--schatten);
+  margin-bottom: 8px;
+}
+.uhr div {
+  padding: 12px 16px 10px;
+  min-width: 74px;
+  background: var(--karte);
+}
+.uhr .z {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(1.45rem, 5vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--akzent);
+  display: block;
+}
+.uhr .l {
+  font-size: .58rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+  margin-top: 6px;
+  display: block;
+}
+.uhr-hinweis {
+  font-size: .74rem;
+  color: var(--schrift-2);
+  margin: 4px 0 34px;
+  font-family: var(--mono);
+  letter-spacing: .08em;
+}
+
+/* ============================================================
+   KACHELFELD
+   ============================================================ */
+.feld {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding-bottom: 40px;
+}
+@media (min-width: 760px) {
+  .feld { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .t1 { grid-column: span 2; grid-row: span 2; }
+  .t4 { grid-column: span 2; }
+  .t7 { grid-column: span 2; }
+}
+@media (max-width: 759px) {
+  .t1, .t4, .t7 { grid-column: span 2; }
+}
+
+.tuer {
+  position: relative;
+  border: 1px solid var(--linie);
+  border-radius: var(--r);
+  background: var(--karte);
+  color: inherit;
+  font-family: inherit;
+  padding: 18px 16px 16px;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform .22s cubic-bezier(.2,.8,.3,1), border-color .22s, box-shadow .22s;
+}
+.t1 { min-height: 200px; }
+
+/* Talavera-Eckornament */
+.tuer::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--linie);
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: .55;
+}
+
+.tuer:hover:not(.zu),
+.tuer:focus-visible:not(.zu) {
+  transform: translateY(-3px);
+  border-color: var(--linie-satt);
+  box-shadow: var(--schatten);
+}
+.tuer:focus-visible {
+  outline: 2px solid var(--akzent);
+  outline-offset: 3px;
+}
+
+.tuer .datum {
+  font-family: var(--mono);
+  font-size: .64rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+}
+.tuer .icon { display: block; line-height: 0; color: var(--akzent); }
+.tuer .icon svg { display: block; }
+.tuer .titel {
+  font-family: var(--display);
+  font-size: 1.14rem;
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -.005em;
+  text-wrap: balance;
+}
+.t1 .titel { font-size: clamp(1.3rem, 3.6vw, 1.75rem); }
+.tuer .teaser {
+  font-size: .8rem;
+  color: var(--schrift-2);
+  line-height: 1.45;
+}
+
+/* Zustände */
+.tuer.zu {
+  background: var(--verschlossen);
+  cursor: not-allowed;
+  border-style: dashed;
+}
+.tuer.zu .icon,
+.tuer.zu .titel,
+.tuer.zu .teaser { filter: blur(4px); opacity: .3; user-select: none; }
+.tuer.zu .schloss {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: .66rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+}
+.tuer.zu .schloss .s-icon { filter: none; opacity: .55; line-height: 0; color: var(--akzent); }
+.tuer:not(.zu) .schloss { display: none; }
+
+.tuer.heute {
+  border-color: var(--akzent);
+  border-style: solid;
+  background: var(--karte-2);
+}
+.tuer.heute::before {
+  content: "Heute";
+  position: absolute;
+  top: 0; right: 0;
+  background: var(--akzent);
+  color: var(--auf-akzent);
+  font-family: var(--mono);
+  font-size: .58rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  padding: 4px 9px 3px;
+  border-bottom-left-radius: var(--r);
+  z-index: 2;
+  font-weight: 600;
+}
+.tuer.heute:not(.gesehen) .icon { animation: wippen 2.4s ease-in-out infinite; }
+@keyframes wippen {
+  0%, 88%, 100% { transform: rotate(0) scale(1); }
+  92%  { transform: rotate(-9deg) scale(1.1); }
+  96%  { transform: rotate(9deg) scale(1.1); }
+}
+
+.tuer.gesehen .haken {
+  position: absolute; bottom: 10px; right: 12px;
+  font-size: .7rem; color: var(--jade);
+  font-family: var(--mono);
+  letter-spacing: .1em;
+}
+
+footer {
+  border-top: 1px solid var(--linie);
+  padding: 24px 0 60px;
+  text-align: center;
+  font-size: .78rem;
+  color: var(--schrift-2);
+  font-family: var(--mono);
+  letter-spacing: .08em;
+}
+
+/* ============================================================
+   OVERLAY
+   ============================================================ */
+.overlay {
+  position: fixed; inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--grund) 96%, black);
+  display: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.overlay.auf { display: block; animation: einblenden .3s ease; }
+@keyframes einblenden { from { opacity: 0; } to { opacity: 1; } }
+
+.overlay-inner {
+  width: min(720px, 92vw);
+  margin: 0 auto;
+  padding: 22px 0 90px;
+  position: relative;
+  z-index: 1;
+}
+
+.schliessen {
+  position: sticky; top: 14px;
+  float: right;
+  z-index: 5;
+  background: var(--karte);
+  border: 1px solid var(--linie-satt);
+  color: var(--schrift);
+  border-radius: 50%;
+  width: 40px; height: 40px;
+  font-size: 1.15rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background .2s, transform .2s;
+}
+.schliessen:hover { background: var(--akzent); color: var(--auf-akzent); transform: rotate(90deg); }
+.schliessen:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+
+.o-kopf { padding-top: 34px; margin-bottom: 26px; clear: both; }
+.o-datum {
+  font-family: var(--mono);
+  font-size: .66rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--akzent);
+  margin-bottom: 10px;
+}
+.o-titel {
+  font-family: var(--display);
+  font-size: clamp(1.8rem, 6vw, 2.9rem);
+  font-weight: 700;
+  line-height: 1.06;
+  margin: 0 0 12px;
+  text-wrap: balance;
+}
+.o-lead {
+  color: var(--schrift-2);
+  font-size: 1rem;
+  max-width: 58ch;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.o-inhalt > * + * { margin-top: 18px; }
+.o-inhalt p { max-width: 64ch; text-wrap: pretty; }
+
+/* Karte / Panel */
+.panel {
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  border-radius: var(--r);
+  padding: 20px 18px;
+}
+.panel-titel {
+  font-family: var(--mono);
+  font-size: .66rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--akzent);
+  margin: 0 0 14px;
+}
+
+/* Buttons */
+.btn {
+  font-family: var(--mono);
+  font-size: .74rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  background: var(--akzent);
+  color: var(--auf-akzent);
+  border: 1px solid var(--akzent);
+  border-radius: var(--r);
+  padding: 11px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: filter .2s, transform .12s;
+}
+.btn:hover { filter: brightness(1.12); }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid var(--akzent-2); outline-offset: 3px; }
+.btn.geist {
+  background: transparent;
+  color: var(--schrift);
+  border-color: var(--linie-satt);
+}
+.btn.geist:hover { background: var(--verschlossen); }
+.btn[disabled] { opacity: .4; cursor: not-allowed; }
+
+/* Notiz / persönliche Nachricht */
+.notiz {
+  background: linear-gradient(180deg, var(--karte-2), var(--karte));
+  border: 1px solid var(--linie-satt);
+  border-left: 3px solid var(--carmin-hell);
+  border-radius: var(--r);
+  padding: 20px 20px 18px;
+  font-family: var(--display);
+  font-size: 1.1rem;
+  line-height: 1.55;
+  font-style: italic;
+}
+.notiz .sig {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: .68rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--akzent);
+}
+
+/* ============================================================
+   TAG 1 — Karte
+   ============================================================ */
+.karte-svg { width: 100%; height: auto; display: block; border-radius: var(--r); }
+.route-linie {
+  fill: none;
+  stroke: var(--akzent);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 7 9;
+  stroke-dashoffset: 1200;
+  animation: zeichnen 3.4s ease-out forwards;
+}
+@keyframes zeichnen { to { stroke-dashoffset: 0; } }
+.stadt-punkt { fill: var(--carmin-hell); opacity: 0; animation: aufpoppen .5s ease-out forwards; }
+.stadt-ring { fill: none; stroke: var(--carmin-hell); stroke-width: 1.6; opacity: 0; animation: pulsring 2.6s ease-out infinite; }
+@keyframes aufpoppen { from { opacity: 0; r: 0; } to { opacity: 1; } }
+@keyframes pulsring {
+  0% { opacity: .8; transform: scale(.4); }
+  70%, 100% { opacity: 0; transform: scale(1.8); }
+}
+.stadt-label {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  fill: var(--schrift);
+  paint-order: stroke;
+  stroke: var(--karte);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+  opacity: 0;
+  animation: einfaden .6s ease-out forwards;
+}
+@keyframes einfaden { to { opacity: 1; } }
+.flieger { offset-path: var(--pfad); animation: fliegen 3.4s ease-out forwards; font-size: 15px; }
+
+/* Antippbare Stationen */
+.station { cursor: pointer; }
+.station:focus { outline: none; }
+.station:focus-visible .stadt-punkt,
+.station:hover .stadt-punkt { fill: var(--oro); r: 7; }
+.station.aktiv .stadt-punkt { fill: var(--oro); r: 7; }
+.station:focus-visible text { text-decoration: underline; }
+.stadt-punkt { transition: fill .18s, r .18s; }
+
+/* Infofeld unter der Karte */
+.karten-info {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--linie);
+  min-height: 84px;
+}
+.ki-leer {
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+}
+.ki-eintrag + .ki-eintrag { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--linie); }
+.ki-kopf {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px;
+  margin-bottom: 6px;
+}
+.ki-kopf b { font-family: var(--display); font-size: 1.2rem; }
+.ki-nr, .ki-daten {
+  font-family: var(--mono); font-size: .6rem;
+  letter-spacing: .16em; text-transform: uppercase;
+}
+.ki-nr { color: var(--akzent); }
+.ki-daten { color: var(--jade); margin-left: auto; white-space: nowrap; }
+.karten-info p { margin: 0; font-size: .88rem; line-height: 1.55; color: var(--schrift-2); }
+
+/* Etappenliste */
+.etappe { padding: 14px 0; border-top: 1px solid var(--linie); }
+.et-kopf { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 5px; }
+.et-nr {
+  font-family: var(--mono); font-size: .68rem;
+  color: var(--akzent); font-variant-numeric: tabular-nums;
+}
+.et-ort { font-family: var(--display); font-size: 1.15rem; font-weight: 700; }
+.et-daten {
+  font-family: var(--mono); font-size: .6rem;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--jade); margin-left: auto; white-space: nowrap;
+}
+.et-fakt { margin: 0; font-size: .88rem; color: var(--schrift-2); line-height: 1.55; }
+
+/* ============================================================
+   TAG 2 — Quiz
+   ============================================================ */
+.q-fortschritt {
+  font-family: var(--mono);
+  font-size: .66rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+  margin-bottom: 8px;
+  display: flex; justify-content: space-between;
+}
+.q-balken { height: 3px; background: var(--verschlossen); border-radius: 2px; overflow: hidden; margin-bottom: 22px; }
+.q-balken i { display: block; height: 100%; background: var(--akzent); transition: width .4s cubic-bezier(.2,.8,.3,1); }
+.q-frage {
+  font-family: var(--display);
+  font-size: clamp(1.25rem, 4.4vw, 1.7rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 20px;
+  text-wrap: balance;
+}
+.q-optionen { display: flex; flex-direction: column; gap: 9px; }
+.q-opt {
+  text-align: left;
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  border-radius: var(--r);
+  color: var(--schrift);
+  font-family: var(--body);
+  font-size: .93rem;
+  line-height: 1.4;
+  padding: 13px 15px;
+  cursor: pointer;
+  display: flex; gap: 12px; align-items: flex-start;
+  transition: border-color .18s, background .18s, transform .12s;
+}
+.q-opt:hover:not(:disabled) { border-color: var(--linie-satt); transform: translateX(3px); }
+.q-opt:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+.q-opt .marke {
+  font-family: var(--mono);
+  font-size: .72rem;
+  color: var(--akzent);
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.q-opt.richtig { border-color: var(--jade); background: color-mix(in srgb, var(--jade) 14%, var(--karte)); }
+.q-opt.falsch  { border-color: var(--carmin-hell); background: color-mix(in srgb, var(--carmin-hell) 12%, var(--karte)); }
+.q-opt:disabled { cursor: default; }
+.q-erklaerung {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--verschlossen);
+  border-left: 2px solid var(--akzent);
+  border-radius: 0 var(--r) var(--r) 0;
+  font-size: .89rem;
+  line-height: 1.55;
+  color: var(--schrift-2);
+}
+.q-erklaerung b { color: var(--schrift); font-weight: 600; }
+.q-ergebnis { text-align: center; padding: 22px 0; }
+.q-punkte {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(3rem, 13vw, 5rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--akzent);
+}
+.q-punkte small { font-size: .3em; color: var(--schrift-2); }
+
+/* ============================================================
+   TAG 3 — Rubbellose
+   ============================================================ */
+.lose { display: grid; gap: 14px; }
+.los {
+  position: relative;
+  border: 1px solid var(--linie-satt);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--karte);
+  min-height: 128px;
+}
+.los-inhalt {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 7px;
+  padding: 18px;
+  text-align: center;
+}
+.los-inhalt .l-icon { line-height: 0; color: var(--akzent); }
+.los-inhalt .l-titel {
+  font-family: var(--display);
+  font-size: 1.22rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.los-inhalt .l-text { font-size: .84rem; color: var(--schrift-2); max-width: 40ch; line-height: 1.45; }
+.los canvas { position: relative; display: block; width: 100%; height: 128px; cursor: crosshair; touch-action: none; }
+.los.frei canvas { display: none; }
+.los.frei { animation: gewonnen .5s ease; }
+@keyframes gewonnen {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.035); }
+}
+
+/* ============================================================
+   TAG 4 — Kofferspiel
+   ============================================================ */
+.spiel-huelle { position: relative; border-radius: var(--r); overflow: hidden; border: 1px solid var(--linie-satt); background: var(--grund-2); }
+#kofferSpiel { display: block; width: 100%; touch-action: none; }
+.spiel-hud {
+  display: flex; gap: 18px; justify-content: space-between;
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--schrift-2);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--linie);
+  background: var(--karte);
+}
+.spiel-hud b { color: var(--akzent); font-variant-numeric: tabular-nums; }
+.spiel-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; padding: 24px; text-align: center;
+  background: color-mix(in srgb, var(--grund) 88%, transparent);
+  backdrop-filter: blur(3px);
+}
+.spiel-overlay h4 {
+  font-family: var(--display);
+  font-size: 1.6rem; font-weight: 700; margin: 0;
+  text-wrap: balance;
+}
+.spiel-overlay p { font-size: .87rem; color: var(--schrift-2); max-width: 40ch; margin: 0; }
+.spiel-overlay.weg { display: none; }
+
+/* ============================================================
+   TAG 5 — Sprachkarten
+   ============================================================ */
+.karten-gitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 11px; }
+.kk { perspective: 900px; background: none; border: 0; padding: 0; cursor: pointer; height: 132px; font-family: inherit; }
+.kk:focus-visible { outline: 2px solid var(--akzent); outline-offset: 3px; border-radius: var(--r); }
+.kk-inner {
+  display: block;
+  position: relative; width: 100%; height: 100%;
+  transition: transform .55s cubic-bezier(.3,.9,.3,1.1);
+  transform-style: preserve-3d;
+}
+.kk.um .kk-inner { transform: rotateY(180deg); }
+.kk-seite {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  border: 1px solid var(--linie);
+  border-radius: var(--r);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px; padding: 12px; text-align: center;
+  background: var(--karte);
+}
+.kk-vorn .de { font-size: .93rem; line-height: 1.3; text-wrap: balance; }
+.kk-vorn .hinweis {
+  font-family: var(--mono); font-size: .55rem;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--schrift-2);
+}
+.kk-hinten {
+  transform: rotateY(180deg);
+  background: var(--karte-2);
+  border-color: var(--linie-satt);
+}
+.kk-hinten .es {
+  font-family: var(--display);
+  font-size: 1.02rem; font-weight: 700; line-height: 1.25;
+  color: var(--akzent); text-wrap: balance;
+}
+.kk-hinten .lautschrift { font-family: var(--mono); font-size: .64rem; color: var(--schrift-2); letter-spacing: .04em; }
+.kk-hinten .wo { font-family: var(--mono); font-size: .54rem; letter-spacing: .14em; text-transform: uppercase; color: var(--jade); }
+.hoeren {
+  margin-top: 4px;
+  background: var(--verschlossen);
+  border: 1px solid var(--linie);
+  border-radius: 20px;
+  font-size: .62rem;
+  font-family: var(--mono);
+  letter-spacing: .1em;
+  color: var(--schrift-2);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+.hoeren:hover { border-color: var(--akzent); color: var(--akzent); }
+
+/* ============================================================
+   TAG 6 — Packliste
+   ============================================================ */
+.pl-gruppe + .pl-gruppe { margin-top: 20px; }
+.pl-kopf {
+  font-family: var(--mono);
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--akzent);
+  margin-bottom: 9px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--linie);
+}
+.pl-zeile {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: background .16s;
+  width: 100%;
+  text-align: left;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: .94rem;
+}
+.pl-zeile:hover { background: var(--verschlossen); }
+.pl-zeile:focus-visible { outline: 2px solid var(--akzent); outline-offset: -1px; }
+.pl-box {
+  width: 19px; height: 19px; flex-shrink: 0;
+  border: 1.5px solid var(--linie-satt);
+  border-radius: 3px;
+  display: grid; place-items: center;
+  font-size: .74rem; color: transparent;
+  transition: background .18s, border-color .18s, color .18s;
+}
+.pl-zeile.ab .pl-box { background: var(--jade); border-color: var(--jade); color: #fff; }
+.pl-zeile.ab .pl-text { text-decoration: line-through; color: var(--schrift-2); }
+.pl-text { flex: 1; line-height: 1.35; }
+.pl-reaktion {
+  font-size: .76rem; color: var(--jade);
+  font-family: var(--mono); letter-spacing: .05em;
+  opacity: 0; transition: opacity .25s;
+  flex-shrink: 0;
+}
+.pl-zeile.ab .pl-reaktion { opacity: 1; }
+.pl-stand {
+  margin-top: 22px; padding: 16px;
+  border: 1px dashed var(--linie-satt);
+  border-radius: var(--r);
+  text-align: center;
+  font-family: var(--mono);
+  font-size: .8rem;
+  letter-spacing: .08em;
+  color: var(--schrift-2);
+}
+.pl-stand b { color: var(--akzent); font-size: 1.5rem; font-variant-numeric: tabular-nums; display: block; margin-bottom: 4px; }
+
+/* ============================================================
+   TAG 7 — Boarding Pass
+   ============================================================ */
+.bp {
+  background: var(--karte);
+  border: 1px solid var(--linie-satt);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--schatten);
+  animation: reinschieben .8s cubic-bezier(.2,.9,.3,1) both;
+}
+@keyframes reinschieben {
+  from { opacity: 0; transform: translateY(28px) rotate(-1.2deg); }
+  to   { opacity: 1; transform: none; }
+}
+.bp-kopf {
+  background: var(--akzent);
+  color: var(--auf-akzent);
+  padding: 12px 18px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--mono);
+  font-size: .66rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.bp-koerper { padding: 22px 18px; }
+.bp-strecke {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 24px;
+}
+.bp-ort .code {
+  font-family: var(--display);
+  font-size: clamp(1.9rem, 8vw, 3rem);
+  font-weight: 700; line-height: 1;
+}
+.bp-ort .stadt {
+  font-family: var(--mono); font-size: .6rem;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--schrift-2); margin-top: 5px;
+}
+.bp-pfeil { flex: 1; position: relative; height: 1px; background: var(--linie-satt); }
+.bp-pfeil span {
+  position: absolute; top: 50%; left: 0;
+  transform: translate(-50%, -50%) rotate(90deg);
+  line-height: 0;
+  color: var(--akzent);
+  animation: entlang 3.6s ease-in-out infinite;
+}
+@keyframes entlang {
+  0%   { left: 0;    opacity: 0; }
+  14%  { opacity: 1; }
+  86%  { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+.bp-gitter {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 18px 12px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--linie-satt);
+}
+.bp-feld .k {
+  font-family: var(--mono); font-size: .55rem;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--schrift-2); margin-bottom: 4px;
+}
+.bp-feld .v {
+  font-family: var(--mono); font-size: .92rem;
+  font-weight: 600; font-variant-numeric: tabular-nums;
+  color: var(--schrift);
+}
+.bp-fuss {
+  border-top: 1px dashed var(--linie-satt);
+  padding: 14px 18px;
+  display: flex; gap: 3px; align-items: flex-end;
+  height: 62px;
+  background: var(--karte-2);
+}
+.bp-fuss i { display: block; background: var(--schrift); width: 2px; height: 100%; opacity: .82; }
+
+/* Konfetti-Canvas */
+#konfetti {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 200;
+}
+
+/* Countdown im Finale */
+.final-uhr {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  margin: 26px 0;
+}
+.final-uhr div {
+  background: var(--karte); border: 1px solid var(--linie-satt);
+  border-radius: var(--r); padding: 14px 18px; min-width: 84px; text-align: center;
+}
+.final-uhr .z {
+  font-family: var(--mono); font-variant-numeric: tabular-nums;
+  font-size: 1.9rem; font-weight: 600; color: var(--akzent); line-height: 1;
+}
+.final-uhr .l {
+  font-family: var(--mono); font-size: .55rem;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--schrift-2); margin-top: 6px;
+}
+
+.mitte { text-align: center; }
+.knopfreihe { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .route-linie { stroke-dashoffset: 0; }
+}
+</style>
+
+<div class="wrap">
+
+  <div class="picado" aria-hidden="true">
+    <svg viewBox="0 0 1200 46" preserveAspectRatio="none" id="picadoSvg"></svg>
+  </div>
+
+  <div class="inner">
+    <header>
+      <p class="eyebrow">Ein Türchen pro Tag · 10. – 16. August</p>
+      <h1>Sieben Türchen<br>bis <em>Lateinamerika</em></h1>
+      <p class="untertitel" id="untertitel">Jeden Tag geht eines auf. Nicht früher — die Kacheln wissen, welcher Tag heute ist.</p>
+
+      <p class="route">
+        <b>Ciudad de México</b> <span aria-hidden="true">◆</span>
+        <b>Lima</b> <span aria-hidden="true">◆</span>
+        <b>Argentinien</b>
+      </p>
+
+      <div class="uhr" id="uhr" role="timer" aria-live="off">
+        <div><span class="z" id="uT">–</span><span class="l">Tage</span></div>
+        <div><span class="z" id="uH">–</span><span class="l">Stunden</span></div>
+        <div><span class="z" id="uM">–</span><span class="l">Minuten</span></div>
+        <div><span class="z" id="uS">–</span><span class="l">Sekunden</span></div>
+      </div>
+      <p class="uhr-hinweis" id="uhrHinweis">bis es losgeht</p>
+    </header>
+
+    <main class="feld" id="feld"></main>
+
+    <footer>
+      <p id="fussnote">Gebaut mit zu viel Vorfreude.</p>
+    </footer>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="oTitel">
+  <div class="overlay-inner">
+    <button class="schliessen" id="schliessen" aria-label="Türchen schließen">✕</button>
+    <div class="o-kopf">
+      <p class="o-datum" id="oDatum"></p>
+      <h2 class="o-titel" id="oTitel"></h2>
+      <p class="o-lead" id="oLead"></p>
+    </div>
+    <div class="o-inhalt" id="oInhalt"></div>
+  </div>
+</div>
+
+<canvas id="konfetti" aria-hidden="true"></canvas>
+
+<script>
+(() => {
+"use strict";
+
+/* ============================================================
+   KONFIGURATION — hier wird personalisiert
+   ============================================================ */
+const CFG = {
+  name:      "Katharina",              // Name der Partnerin
+  anrede:    "",                       // Kosename, falls gewünscht
+  absender:  "",                       // Wer unterschreibt
+  abflug:    "2026-08-16T13:30:00",    // Abflugzeit (lokal)
+  flugnr:    "LH 498",
+  vonCode:   "FRA",
+  vonStadt:  "Frankfurt",
+};
+
+const ANREDE = CFG.anrede || CFG.name || "du";
+const SIG    = CFG.absender ? "— " + CFG.absender : "";
+
+/* ============================================================
+   BASIS
+   ============================================================ */
+const JAHR = 2026;
+const ABFLUG = new Date(CFG.abflug);
+const $  = (s, r = document) => r.querySelector(s);
+const el = (t, c, h) => { const n = document.createElement(t); if (c) n.className = c; if (h != null) n.innerHTML = h; return n; };
+const flach = (m) => m.trim().replace(/\s*\n\s*/g, " ");
+
+const speicher = {
+  get(k, f) { try { const v = localStorage.getItem("cd7:" + k); return v === null ? f : JSON.parse(v); } catch { return f; } },
+  set(k, v) { try { localStorage.setItem("cd7:" + k, JSON.stringify(v)); } catch {} }
+};
+
+const params = new URLSearchParams(location.search);
+const VORSCHAU = params.get("vorschau") === "1";
+
+const heuteMitternacht = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+const tagDatum = (tag) => new Date(JAHR, 7, tag, 0, 0, 0, 0);   // Monat 7 = August
+const istFrei  = (tag) => VORSCHAU || heuteMitternacht() >= tagDatum(tag);
+const istHeute = (tag) => heuteMitternacht().getTime() === tagDatum(tag).getTime();
+
+const WOCHENTAG = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+const langesDatum = (tag) => WOCHENTAG[tagDatum(tag).getDay()] + ", " + tag + ". August " + JAHR;
+
+const reduziert = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ============================================================
+   PAPEL PICADO
+   ============================================================ */
+(function picado() {
+  const svg = $("#picadoSvg");
+  const farben = ["var(--carmin)", "var(--oro)", "var(--jade)", "var(--cobalto)", "var(--carmin-hell)"];
+  const breite = 60, anzahl = 20;
+  const raute = (cx, cy, r) => `M${cx} ${cy - r} L${cx + r} ${cy} L${cx} ${cy + r} L${cx - r} ${cy} Z`;
+
+  // Zwei alternierende Scherenschnitt-Muster, wie bei echten Papel-Picado-Bögen
+  function muster(x, m) {
+    const c = x + breite / 2;
+    if (m === 0) {
+      return `
+        <path d="${raute(c, 17, 7.5)}" fill="var(--grund)"/>
+        <path d="${raute(c - 15, 14, 3.2)}" fill="var(--grund)"/>
+        <path d="${raute(c + 15, 14, 3.2)}" fill="var(--grund)"/>
+        <path d="${raute(c, 30, 3.4)}" fill="var(--grund)"/>
+        <path d="M${x + 6} 26 a5 5 0 0 0 10 0 z" fill="var(--grund)"/>
+        <path d="M${x + breite - 16} 26 a5 5 0 0 0 10 0 z" fill="var(--grund)"/>`;
+    }
+    let r = "";
+    for (let k = -2; k <= 2; k++) r += `<path d="${raute(c + k * 10, 13, 3)}" fill="var(--grund)"/>`;
+    return r + `
+      <path d="M${c - 12} 24 a12 6.5 0 0 0 24 0 z" fill="var(--grund)"/>
+      <path d="M${x} 8 a4.5 4.5 0 0 0 9 0 z" fill="var(--grund)"/>
+      <path d="M${x + breite - 9} 8 a4.5 4.5 0 0 0 9 0 z" fill="var(--grund)"/>`;
+  }
+
+  let s = '<line x1="0" y1="3" x2="1200" y2="3" stroke="var(--linie-satt)" stroke-width="1.4"/>';
+  for (let i = 0; i < anzahl; i++) {
+    const x = i * breite;
+    const f = farben[i % farben.length];
+    const d = `M${x} 3 L${x + breite} 3 L${x + breite} 26 L${x + breite / 2} 40 L${x} 26 Z`;
+    s += `<g class="flag" style="animation-delay:${(i * 0.13).toFixed(2)}s;transform-origin:${x + breite / 2}px 3px">
+      <path d="${d}" fill="${f}" opacity=".88"/>
+      ${muster(x, i % 2)}
+    </g>`;
+  }
+  svg.innerHTML = s;
+})();
+
+/* ============================================================
+   KONFETTI
+   ============================================================ */
+const konfetti = (() => {
+  const c = $("#konfetti"), x = c.getContext("2d");
+  let teile = [], laeuft = false;
+  const farben = ["#E4AC38", "#B8353F", "#2E9E8F", "#3A5FBF", "#D95560", "#EFEAD9"];
+
+  function groesse() { c.width = innerWidth; c.height = innerHeight; }
+  addEventListener("resize", groesse); groesse();
+
+  function schritt() {
+    x.clearRect(0, 0, c.width, c.height);
+    teile = teile.filter(p => p.y < c.height + 40);
+    for (const p of teile) {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.13; p.dreh += p.vd;
+      x.save();
+      x.translate(p.x, p.y);
+      x.rotate(p.dreh);
+      x.fillStyle = p.f;
+      x.globalAlpha = Math.max(0, 1 - p.y / (c.height + 40));
+      x.fillRect(-p.b / 2, -p.h / 2, p.b, p.h);
+      x.restore();
+    }
+    if (teile.length) requestAnimationFrame(schritt);
+    else { laeuft = false; x.clearRect(0, 0, c.width, c.height); }
+  }
+
+  return function feuern(n = 110, ux = 0.5, uy = 0.35) {
+    if (reduziert) return;
+    groesse();
+    for (let i = 0; i < n; i++) {
+      teile.push({
+        x: c.width * ux + (Math.random() - .5) * 140,
+        y: c.height * uy + (Math.random() - .5) * 60,
+        vx: (Math.random() - .5) * 9,
+        vy: Math.random() * -11 - 3,
+        b: 5 + Math.random() * 7,
+        h: 3 + Math.random() * 5,
+        dreh: Math.random() * 6.28,
+        vd: (Math.random() - .5) * .3,
+        f: farben[(Math.random() * farben.length) | 0]
+      });
+    }
+    if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
+  };
+})();
+
+/* ============================================================
+   KOPF-COUNTDOWN
+   ============================================================ */
+function tickKopf() {
+  const rest = ABFLUG - new Date();
+  const p = (n) => String(Math.max(0, n)).padStart(2, "0");
+  if (rest <= 0) {
+    $("#uT").textContent = "00"; $("#uH").textContent = "00";
+    $("#uM").textContent = "00"; $("#uS").textContent = "00";
+    $("#uhrHinweis").textContent = "¡Buen viaje!";
+    return;
+  }
+  const s = Math.floor(rest / 1000);
+  $("#uT").textContent = p(Math.floor(s / 86400));
+  $("#uH").textContent = p(Math.floor(s / 3600) % 24);
+  $("#uM").textContent = p(Math.floor(s / 60) % 60);
+  $("#uS").textContent = p(s % 60);
+}
+tickKopf();
+setInterval(tickKopf, 1000);
+
+/* ============================================================
+   DIE SIEBEN TÜRCHEN
+   ============================================================ */
+/* Strichsymbole, 24×24, im Goldton der Seite — statt bunter Emoji */
+const SYM = {
+  route: `<path d="M3.5 19.5 Q9 19 10.5 12.5 T20.5 5" stroke-dasharray="2.4 2.6"/>
+          <circle cx="3.5" cy="19.5" r="2"/><circle cx="11.6" cy="12.1" r="1.5" opacity=".7"/>
+          <circle cx="20.5" cy="5" r="2"/>`,
+  quiz:  `<path d="M3.5 5.5 h17 v10.5 h-9.5 l-4 3.5 v-3.5 h-3.5 z"/>
+          <path d="M9.4 9.2 a2.6 2.6 0 0 1 4.6 1.7 c0 1.5-2 1.6-2 3" stroke-linecap="round"/>
+          <circle cx="12" cy="13.6" r=".85" fill="currentColor" stroke="none"/>`,
+  los:   `<path d="M3 7 h18 v3 a2 2 0 0 0 0 4 v3 h-18 v-3 a2 2 0 0 0 0-4 z"/>
+          <path d="M15 7.6 v9" stroke-dasharray="1.6 2"/>
+          <path d="M6 11 h6 M6 13.6 h4" stroke-width="1.2" opacity=".6"/>`,
+  koffer:`<rect x="3.5" y="8" width="17" height="11.5" rx="2"/>
+          <path d="M9 8 V6.2 a1.4 1.4 0 0 1 1.4-1.4 h3.2 A1.4 1.4 0 0 1 15 6.2 V8"/>
+          <path d="M8.6 8.6 v10.3 M15.4 8.6 v10.3" stroke-width="1.2" opacity=".55"/>`,
+  reden: `<path d="M2.5 4.8 h11.5 v7.4 h-6.2 l-3.1 2.9 v-2.9 h-2.2 z"/>
+          <path d="M9.8 9.6 h11.7 v7.4 h-2.2 v2.9 l-3.1-2.9 h-6.4 z" fill="var(--karte)"/>
+          <path d="M6 8 v-.9 M6 9.7 v.05" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M17.4 13.4 v.05 M17.4 15.1 v.9" stroke-width="1.4" stroke-linecap="round"/>`,
+  liste: `<path d="M3.5 6.6 l1.7 1.7 L8.6 4.9"/><path d="M11.5 7 h9" stroke-width="1.2"/>
+          <path d="M3.5 12.3 l1.7 1.7 L8.6 10.6"/><path d="M11.5 12.7 h9" stroke-width="1.2"/>
+          <path d="M3.5 18 l1.7 1.7 L8.6 16.3" opacity=".45"/><path d="M11.5 18.4 h6" stroke-width="1.2" opacity=".45"/>`,
+  flug:  `<path d="M11.2 2.6 a.9 .9 0 0 1 1.6 0 l1.1 6.2 6.9 4 a1 1 0 0 1 .5.9 v1.2 l-7.6-2.1-.7 4.6 2.4 1.9 v1.3 l-3.4-1.1-3.4 1.1 v-1.3 l2.4-1.9-.7-4.6-7.6 2.1 v-1.2 a1 1 0 0 1 .5-.9 l6.9-4 z"/>`
+};
+
+const SCHLOSS = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+  stroke-width="1.55" stroke-linejoin="round" aria-hidden="true">
+  <rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/>
+  <path d="M8 10.5 V7.8 a4 4 0 0 1 8 0 v2.7"/>
+  <circle cx="12" cy="15.2" r="1.25" fill="currentColor" stroke="none"/></svg>`;
+
+function symbol(k, groesse) {
+  return `<svg viewBox="0 0 24 24" width="${groesse}" height="${groesse}" fill="none"
+    stroke="currentColor" stroke-width="1.55" stroke-linejoin="round" aria-hidden="true">${SYM[k]}</svg>`;
+}
+
+const TUEREN = [
+  { tag: 10, sym: "route",  titel: "Die Route",       teaser: "Dreizehn Etappen, vom Vulkangipfel bis zum Gletscher." },
+  { tag: 11, sym: "quiz",   titel: "Das Quiz",        teaser: "Acht Fragen. Die Hälfte glaubst du mir nicht." },
+  { tag: 12, sym: "los",    titel: "Drei Rubbellose", teaser: "Freirubbeln. Einlösbar unterwegs." },
+  { tag: 13, sym: "koffer", titel: "Kofferchaos",     teaser: "Ein Spiel. Steigeisen ja, Weihnachtsbaum nein." },
+  { tag: 14, sym: "reden",  titel: "Notfall-Spanisch",teaser: "Die Sätze, die wirklich zählen." },
+  { tag: 15, sym: "liste",  titel: "Die letzte Liste",teaser: "Morgen früh. Also heute packen." },
+  { tag: 16, sym: "flug",   titel: "Boarding",        teaser: "Das war's mit Warten." }
+];
+
+function feldBauen() {
+  const f = $("#feld");
+  f.innerHTML = "";
+  TUEREN.forEach((t, i) => {
+    const frei = istFrei(t.tag);
+    const gesehen = speicher.get("gesehen:" + t.tag, false);
+    const b = el("button", "tuer t" + (i + 1) + (frei ? "" : " zu") + (istHeute(t.tag) ? " heute" : "") + (gesehen ? " gesehen" : ""));
+    b.type = "button";
+    b.disabled = !frei;
+    b.setAttribute("aria-label", frei
+      ? `Türchen ${t.tag}. August öffnen: ${t.titel}`
+      : `Türchen ${t.tag}. August — öffnet sich am ${t.tag}. August`);
+    b.innerHTML = `
+      <span class="datum">${t.tag}. August</span>
+      <span class="icon" aria-hidden="true">${symbol(t.sym, i === 0 ? 46 : 32)}</span>
+      <span>
+        <span class="titel">${t.titel}</span><br>
+        <span class="teaser">${t.teaser}</span>
+      </span>
+      <span class="schloss"><span class="s-icon" aria-hidden="true">${SCHLOSS}</span><span>ab ${t.tag}.8.</span></span>
+      ${gesehen ? '<span class="haken">✓</span>' : ""}`;
+    if (frei) b.addEventListener("click", () => oeffne(t.tag));
+    f.appendChild(b);
+  });
+}
+
+/* ============================================================
+   OVERLAY-STEUERUNG
+   ============================================================ */
+let letzterFokus = null;
+
+function oeffne(tag) {
+  const t = TUEREN.find(x => x.tag === tag);
+  letzterFokus = document.activeElement;
+  $("#oDatum").textContent = langesDatum(tag) + (istHeute(tag) ? " · heute" : "");
+  $("#oTitel").textContent = t.titel;
+  $("#oInhalt").innerHTML = "";
+  const bau = INHALTE[tag];
+  $("#oLead").textContent = bau.lead;
+  // Erst sichtbar machen, dann rendern — sonst messen Canvas-Inhalte eine Breite von 0
+  $("#overlay").classList.add("auf");
+  document.body.style.overflow = "hidden";
+  $("#overlay").scrollTop = 0;
+  bau.render($("#oInhalt"));
+  $("#schliessen").focus();
+  if (!speicher.get("gesehen:" + tag, false)) {
+    speicher.set("gesehen:" + tag, true);
+    setTimeout(() => konfetti(70), 250);
+  }
+}
+
+function schliesse() {
+  $("#overlay").classList.remove("auf");
+  document.body.style.overflow = "";
+  $("#oInhalt").innerHTML = "";
+  feldBauen();
+  if (letzterFokus && document.contains(letzterFokus)) letzterFokus.focus();
+}
+
+$("#schliessen").addEventListener("click", schliesse);
+addEventListener("keydown", (e) => { if (e.key === "Escape" && $("#overlay").classList.contains("auf")) schliesse(); });
+
+/* ============================================================
+   DIE ETAPPEN — Grundlage für Karte, Quiz und Packliste
+   ============================================================ */
+const ETAPPEN = [
+  { nr: 1,  ort: "Ciudad de México",  land: "mx", lon: -99.13, lat: 19.43, hoehe: "2.240 m", temp: "12–23 °C",
+    fakt: "Gebaut auf einem trockengelegten See — und sie sinkt bis heute, stellenweise 50 Zentimeter im Jahr. Im August ist Regenzeit: Die Vormittage sind klar, nachmittags schüttet es." },
+  { nr: 2,  ort: "Teotihuacán",       land: "mx", lon: -98.84, lat: 19.69, hoehe: "2.300 m", temp: "12–24 °C",
+    fakt: "Niemand weiß, wer diese Stadt gebaut hat. Als die Azteken sie fanden, lag sie schon Jahrhunderte verlassen da — sie gaben ihr den Namen „Ort, an dem die Götter geboren wurden“. Die Sonnenpyramide ist 65 Meter hoch." },
+  { nr: 3,  ort: "Iztaccíhuatl",      land: "mx", lon: -98.64, lat: 19.18, hoehe: "5.230 m", temp: "unter 0 °C",
+    fakt: "Der dritthöchste Berg Mexikos. Sein Name heißt auf Nahuatl „weiße Frau“, weil die Silhouette wie eine Liegende aussieht. Nebenan raucht der Popocatépetl." },
+  { nr: 4,  ort: "Puebla",            land: "mx", lon: -98.21, lat: 19.04, hoehe: "2.135 m", temp: "11–24 °C",
+    fakt: "Die Heimat der Talavera-Keramik, deren Blau-Weiß hier überall an den Fassaden klebt. Und ihr kommt zur richtigen Zeit: Chiles en Nogada gibt es nur von Juli bis September." },
+
+  { nr: 5,  ort: "Lima",              land: "pe", lon: -77.03, lat: -12.05, hoehe: "150 m",  temp: "15–19 °C",
+    fakt: "Eine der trockensten Hauptstädte der Welt — rund zehn Millimeter Regen im Jahr. Trotzdem selten sonnig: Von Juni bis November liegt der Küstennebel <i>garúa</i> über der Stadt." },
+
+  { nr: 6,  ort: "Buenos Aires",      land: "ar", lon: -58.38, lat: -34.60, hoehe: "25 m",   temp: "8–16 °C",
+    fakt: "Mehr Buchläden pro Kopf als jede andere Stadt der Welt. Der schönste, El Ateneo, steckt in einem umgebauten Theater von 1919 — die Logen sind Leseplätze geblieben." },
+  { nr: 7,  ort: "La Villa",          land: "ar", lon: -71.65, lat: -40.76, hoehe: "800 m",  temp: "−2–7 °C",
+    fakt: "Der ruhige Nachbar von Bariloche, zwischen Seen und Araukarienwäldern. Im August liegt hier Schnee." },
+  { nr: 8,  ort: "Bariloche",         land: "ar", lon: -71.31, lat: -41.13, hoehe: "893 m",  temp: "−2–7 °C",
+    fakt: "Die Schweiz Argentiniens, inklusive Holzchalets und einer absurden Dichte an Schokoladenläden. August ist Hochsaison — am Cerro Catedral wird Ski gefahren." },
+  { nr: 9,  ort: "El Calafate",       land: "ar", lon: -72.28, lat: -50.34, hoehe: "200 m",  temp: "−3–5 °C",
+    fakt: "Tor zum Perito Moreno, einem der wenigen Gletscher der Welt, der nicht schrumpft. Alle paar Stunden bricht eine Eiswand ab. Der Ort heißt nach einer Beere — wer sie isst, kehrt angeblich nach Patagonien zurück." },
+  { nr: 10, ort: "Salta",             land: "ar", lon: -65.41, lat: -24.79, hoehe: "1.187 m", temp: "5–23 °C",
+    fakt: "„Salta la linda“ — die Schöne. Koloniale Altstadt im Nordwesten, und der Ausgangspunkt in die Weinberge von Cafayate, wo der Torrontés wächst." },
+  { nr: 11, ort: "Tilcara",           land: "ar", lon: -65.39, lat: -23.58, hoehe: "2.465 m", temp: "2–22 °C",
+    fakt: "Mitten in der Quebrada de Humahuaca. Über dem Dorf liegt das Pucará, eine präkolumbische Festung. Tagsüber über 20 Grad, nachts nahe null — die Höhe macht den Unterschied." },
+  { nr: 12, ort: "Puerto Iguazú",     land: "ar", lon: -54.57, lat: -25.60, hoehe: "180 m",  temp: "14–25 °C",
+    fakt: "275 einzelne Wasserfälle, darunter der Teufelsschlund. Eleanor Roosevelt soll beim Anblick nur „Poor Niagara“ gesagt haben. Subtropisch — die einzige Etappe, auf der es richtig warm wird." },
+  { nr: 13, ort: "Buenos Aires",      land: "ar", lon: -58.38, lat: -34.60, hoehe: "25 m",   temp: "8–16 °C",
+    fakt: "Zurück zum Anfang, für den letzten Abend. Und für alles, was beim ersten Mal nicht geklappt hat." }
+];
+
+const LAENDER = {
+  mx: { name: "Mexiko",     zeit: "−8 Std.", farbe: "var(--carmin-hell)" },
+  pe: { name: "Peru",       zeit: "−7 Std.", farbe: "var(--jade)" },
+  ar: { name: "Argentinien", zeit: "−5 Std.", farbe: "var(--oro)" }
+};
+
+/* Kartenpunkte — Etappen, die auf dieser Zoomstufe zusammenfallen, teilen sich einen Punkt */
+const KARTENPUNKTE = [
+  { lon: -98.9, lat: 19.4,  kurz: "MEXIKO",     etappen: [1, 2, 3, 4], anker: "end",    dx: -13, dy: 4 },
+  { lon: -77.0, lat: -12.1, kurz: "LIMA",       etappen: [5],          anker: "end",    dx: -13, dy: 4 },
+  { lon: -65.4, lat: -24.2, kurz: "SALTA",      etappen: [10, 11],     anker: "end",    dx: -13, dy: 4 },
+  { lon: -54.6, lat: -25.6, kurz: "IGUAZÚ",     etappen: [12],         anker: "start",  dx: 13,  dy: 4 },
+  { lon: -58.4, lat: -34.6, kurz: "BUENOS AIRES", etappen: [6, 13],    anker: "end",    dx: -13, dy: 4 },
+  { lon: -71.5, lat: -41.0, kurz: "BARILOCHE",  etappen: [7, 8],       anker: "end",    dx: -13, dy: 4 },
+  { lon: -72.3, lat: -50.3, kurz: "EL CALAFATE", etappen: [9],         anker: "end",    dx: -13, dy: 4 }
+];
+
+/* Reihenfolge der Flug- und Fahrtwege über die Kartenpunkte */
+const WEGE = [[0, 1], [1, 4], [4, 5], [5, 6], [6, 2], [2, 3], [3, 4]];
+
+/* ============================================================
+   TAG 10 — DIE ROUTE
+   ============================================================ */
+const INHALTE = {};
+
+INHALTE[10] = {
+  lead: flach(`Drei Länder, dreizehn Etappen, vom Vulkangipfel bis zum Gletscher.
+               Tipp auf einen Punkt, dann siehst du, was dort wartet.`),
+  render(w) {
+    const n = el("div", "notiz");
+    n.innerHTML = `In sechs Tagen sitzen wir im Flieger.<br>
+      Bis dahin gibt es jeden Tag hier etwas — ein Spiel, ein Quiz, ein paar Versprechen zum Freirubbeln.
+      Immer nur eins, immer erst, wenn der Tag da ist.
+      ${SIG ? `<span class="sig">${SIG}</span>` : ""}`;
+    w.appendChild(n);
+
+    const p = el("div", "panel");
+    p.innerHTML = '<p class="panel-titel">Die Strecke</p>';
+    const halter = el("div");
+    p.appendChild(halter);
+    const info = el("div", "karten-info");
+    info.innerHTML = '<span class="ki-leer">Tipp einen Punkt auf der Karte an.</span>';
+    p.appendChild(info);
+    halter.appendChild(karteSvg(info));
+    w.appendChild(p);
+
+    const m = el("p", "mitte");
+    m.innerHTML = '<button class="btn geist" id="nochmal">Route nochmal zeichnen</button>';
+    w.appendChild(m);
+    $("#nochmal").addEventListener("click", () => {
+      halter.innerHTML = "";
+      halter.appendChild(karteSvg(info));
+    });
+
+    // Etappenliste, nach Ländern gruppiert
+    for (const [kuerzel, land] of Object.entries(LAENDER)) {
+      const etappen = ETAPPEN.filter(e => e.land === kuerzel);
+      const box = el("div", "panel");
+      box.innerHTML = `<p class="panel-titel">
+        <span style="color:${land.farbe}">■</span> ${land.name}
+        <span style="float:right;color:var(--schrift-2);letter-spacing:.1em">${land.zeit}</span></p>`;
+      etappen.forEach(e => {
+        const z = el("div", "etappe");
+        z.innerHTML = `
+          <div class="et-kopf">
+            <span class="et-nr">${String(e.nr).padStart(2, "0")}</span>
+            <b class="et-ort">${e.ort}</b>
+            <span class="et-daten">${e.hoehe} · ${e.temp}</span>
+          </div>
+          <p class="et-fakt">${e.fakt}</p>`;
+        box.appendChild(z);
+      });
+      w.appendChild(box);
+    }
+  }
+};
+
+function karteSvg(info) {
+  const NS = "http://www.w3.org/2000/svg";
+  // Ausschnitt reicht rechts über Iguazú hinaus, damit die Ortsnamen Platz haben
+  const B = 520, H = 560;
+  const LON0 = -120, LON_SPAN = 78, LAT0 = 33, LAT_SPAN = 89;
+  const px = (lon) => (lon - LON0) / LON_SPAN * B;
+  const py = (lat) => (LAT0 - lat) / LAT_SPAN * H;
+
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${B} ${H}`);
+  svg.setAttribute("class", "karte-svg");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label",
+    "Karte von Mexiko bis Patagonien mit den Stationen der Reise");
+
+  // Küstenlinien als Längen-/Breitengrad-Paare — grob, aber wiedererkennbar
+  const kuesten = [
+    // Mexiko mit Yucatán
+    [-117,33, -114,32, -111,31, -108,31.5, -106,31.8, -103,29, -101,29.5, -99,27, -97.5,25.9,
+     -97,22, -94.5,18.2, -92,18.6, -90,19.5, -87,21.5, -86.8,20.5, -88,18.5, -89,17, -91,15.8,
+     -94,16, -96,15.7, -99,16.5, -102,17.9, -104,18.9, -105.5,20.4, -105.7,22, -108,25,
+     -109.5,27, -112,29, -114,31, -117,33],
+    // Mittelamerika
+    [-92,15.5, -88.5,15.8, -87,13, -84,10.8, -82,9.5, -79,9.5, -77.5,8.6, -78,7.5, -81,8.5,
+     -83,9.5, -86,11.8, -89,14, -92,14.5],
+    // Südamerika
+    [-77.5,8.6, -75,10.5, -71,12, -66,10.6, -62,10.7, -60,8.5, -58,6.8, -52,5, -50,0, -44,-2.5,
+     -38,-5, -35,-8, -37,-11, -39,-13, -39,-18, -41,-22, -45,-24, -48,-25.5, -52,-32, -57,-34.5,
+     -57,-36, -62,-39, -62.5,-41, -65,-42.5, -65,-45, -67.5,-46, -67,-49, -69,-52, -68,-54.8,
+     -67,-55.5, -70,-55, -71,-53.5, -74,-52.5, -75,-50, -73.5,-47, -75,-45, -73.5,-42, -73,-38,
+     -72,-35, -71.5,-32, -70.5,-28, -70.5,-25, -70,-21, -71,-18, -74,-15.5, -76,-14, -79,-8,
+     -81,-6, -80.5,-4, -80,-2.5, -78.5,1, -77.5,4, -77.5,8.6]
+  ];
+
+  kuesten.forEach(paare => {
+    let d = "";
+    for (let i = 0; i < paare.length; i += 2)
+      d += (i ? "L" : "M") + px(paare[i]).toFixed(1) + " " + py(paare[i + 1]).toFixed(1) + " ";
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", d + "Z");
+    p.setAttribute("fill", "var(--verschlossen)");
+    p.setAttribute("stroke", "var(--linie)");
+    p.setAttribute("stroke-width", "1");
+    p.setAttribute("stroke-linejoin", "round");
+    svg.appendChild(p);
+  });
+
+  // Wendekreise als leise Orientierung
+  [[23.44, "Wendekreis des Krebses"], [-23.44, "Wendekreis des Steinbocks"]].forEach(([lat]) => {
+    const l = document.createElementNS(NS, "line");
+    l.setAttribute("x1", 0); l.setAttribute("x2", B);
+    l.setAttribute("y1", py(lat)); l.setAttribute("y2", py(lat));
+    l.setAttribute("stroke", "var(--linie)");
+    l.setAttribute("stroke-width", ".8");
+    l.setAttribute("stroke-dasharray", "3 7");
+    l.setAttribute("opacity", ".7");
+    svg.appendChild(l);
+  });
+
+  const pt = KARTENPUNKTE.map(k => ({ ...k, x: px(k.lon), y: py(k.lat) }));
+
+  // Wege — leicht gebogen, damit sie sich nicht überlagern
+  WEGE.forEach(([a, b], i) => {
+    const A = pt[a], Z = pt[b];
+    const mx = (A.x + Z.x) / 2, my = (A.y + Z.y) / 2;
+    const dx = Z.x - A.x, dy = Z.y - A.y;
+    const laenge = Math.hypot(dx, dy) || 1;
+    const bauch = Math.min(46, laenge * 0.17);
+    const d = `M${A.x.toFixed(1)} ${A.y.toFixed(1)} Q${(mx - dy / laenge * bauch).toFixed(1)} ${(my + dx / laenge * bauch).toFixed(1)} ${Z.x.toFixed(1)} ${Z.y.toFixed(1)}`;
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", d);
+    p.setAttribute("class", "route-linie");
+    svg.appendChild(p);
+    requestAnimationFrame(() => {
+      try {
+        const L = p.getTotalLength();
+        p.style.strokeDasharray = "6 8";
+        p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }],
+          { duration: reduziert ? 1 : 620, delay: reduziert ? 0 : i * 300, fill: "forwards", easing: "ease-out" });
+      } catch {}
+    });
+  });
+
+  // Stationen
+  pt.forEach((o, i) => {
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "station");
+    g.setAttribute("tabindex", "0");
+    g.setAttribute("role", "button");
+    const namen = o.etappen.map(nr => ETAPPEN[nr - 1].ort).join(", ");
+    g.setAttribute("aria-label", namen);
+
+    const treffer = document.createElementNS(NS, "circle");
+    treffer.setAttribute("cx", o.x); treffer.setAttribute("cy", o.y); treffer.setAttribute("r", 17);
+    treffer.setAttribute("fill", "transparent");
+    g.appendChild(treffer);
+
+    const ring = document.createElementNS(NS, "circle");
+    ring.setAttribute("cx", o.x); ring.setAttribute("cy", o.y); ring.setAttribute("r", 9);
+    ring.setAttribute("class", "stadt-ring");
+    ring.style.transformOrigin = `${o.x}px ${o.y}px`;
+    ring.style.animationDelay = (i * 0.3) + "s";
+    g.appendChild(ring);
+
+    const pkt = document.createElementNS(NS, "circle");
+    pkt.setAttribute("cx", o.x); pkt.setAttribute("cy", o.y);
+    pkt.setAttribute("r", o.etappen.length > 1 ? 5.6 : 4.4);
+    pkt.setAttribute("class", "stadt-punkt");
+    pkt.style.animationDelay = (i * 0.3) + "s";
+    g.appendChild(pkt);
+
+    const txt = document.createElementNS(NS, "text");
+    txt.setAttribute("x", o.x + o.dx); txt.setAttribute("y", o.y + o.dy);
+    txt.setAttribute("text-anchor", o.anker);
+    txt.setAttribute("class", "stadt-label");
+    txt.style.animationDelay = (i * 0.3 + 0.2) + "s";
+    txt.textContent = o.kurz + (o.etappen.length > 1 ? "  ·" + o.etappen.length : "");
+    g.appendChild(txt);
+
+    const zeigen = () => {
+      svg.querySelectorAll(".station").forEach(s => s.classList.remove("aktiv"));
+      g.classList.add("aktiv");
+      info.innerHTML = o.etappen.map(nr => {
+        const e = ETAPPEN[nr - 1];
+        return `<div class="ki-eintrag">
+          <div class="ki-kopf"><span class="ki-nr">Etappe ${String(e.nr).padStart(2, "0")}</span>
+          <b>${e.ort}</b><span class="ki-daten">${e.hoehe} · ${e.temp}</span></div>
+          <p>${e.fakt}</p></div>`;
+      }).join("");
+    };
+    g.addEventListener("click", zeigen);
+    g.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); zeigen(); }
+    });
+
+    svg.appendChild(g);
+  });
+
+  return svg;
+}
+
+/* ============================================================
+   TAG 11 — QUIZ
+   ============================================================ */
+const FRAGEN = [
+  {
+    f: "Mexiko-Stadt steht auf dem Grund eines trockengelegten Sees. Was macht die Stadt deshalb?",
+    o: ["Sie schwimmt bei Starkregen kurzzeitig auf", "Sie sinkt — stellenweise um bis zu 50 cm pro Jahr", "Sie wird jedes Jahr um 2 cm angehoben", "Nichts, das ist ein Mythos"],
+    r: 1,
+    e: "Stimmt wirklich. Weil Grundwasser abgepumpt wird, sackt der alte Seeboden ab. Manche Gebäude stehen sichtbar schief — die Kathedrale am Zócalo hat deswegen Jahrzehnte an Stützarbeiten hinter sich."
+  },
+  {
+    f: "Der Iztaccíhuatl, auf dem du stehen wirst, heißt auf Nahuatl „weiße Frau“. Warum?",
+    o: ["Weil nur Frauen ihn besteigen durften", "Weil seine Silhouette wie eine Liegende aussieht",
+        "Weil oben eine weiße Marienstatue steht", "Weil der Schnee dort nie schmilzt"],
+    r: 1,
+    e: "Vom Tal aus sieht der Bergrücken aus wie eine liegende Frau — Kopf, Brust, Knie, Füße heißen die Abschnitte bis heute. Der Legende nach war sie eine Prinzessin, und der rauchende Popocatépetl nebenan ist ihr Krieger, der bei ihr Wache hält."
+  },
+  {
+    f: "Teotihuacán ist eine der größten Ruinenstädte Amerikas. Wer hat sie gebaut?",
+    o: ["Die Azteken", "Die Maya", "Weiß bis heute niemand", "Die Tolteken, gesichert seit 1902"],
+    r: 2,
+    e: "Ungeklärt. Als die Azteken die Stadt fanden, lag sie schon Jahrhunderte verlassen da — sie waren so beeindruckt, dass sie ihr den Namen „Ort, an dem die Götter geboren wurden“ gaben. Auch der ursprüngliche Name ist verloren."
+  },
+  {
+    f: "In Puebla gibt es ein Gericht, das man nur wenige Wochen im Jahr bekommt — und ihr seid genau dann da. Welches?",
+    o: ["Chiles en Nogada", "Mole Poblano", "Cochinita Pibil", "Tacos al Pastor"],
+    r: 0,
+    e: "Von Juli bis September, wenn Granatapfel und Walnuss frisch sind: eine gefüllte Chili unter weißer Nusssauce mit roten Kernen und Petersilie — grün, weiß, rot, die Nationalfarben. Die anderen drei gibt es das ganze Jahr."
+  },
+  {
+    f: "In Lima regnet es im Jahr durchschnittlich etwa …",
+    o: ["800 Millimeter", "300 Millimeter", "10 Millimeter", "1.400 Millimeter"],
+    r: 2,
+    e: "Rund 10 mm. Zum Vergleich: In Deutschland sind es je nach Ecke 600 bis 900. Trotzdem wird Lima selten sonnig sein — im August hängt der Küstennebel <i>garúa</i> über der Stadt."
+  },
+  {
+    f: "Der Perito Moreno bei El Calafate ist unter den Gletschern weltweit eine Ausnahme. Warum?",
+    o: ["Er ist blau statt weiß", "Er schrumpft nicht", "Er bewegt sich rückwärts", "Er schwimmt auf dem Meer"],
+    r: 1,
+    e: "Während fast alle Gletscher zurückgehen, hält der Perito Moreno seit Jahrzehnten sein Volumen. Er schiebt sich bis zu zwei Meter am Tag vor — und alle paar Stunden kracht vorne eine Eiswand ins Wasser."
+  },
+  {
+    f: "August in Argentinien heißt für die Klamotten …",
+    o: ["Hochsommer, 35 Grad", "Übergangsjacke reicht überall",
+        "Winter — in Patagonien unter null, in Iguazú 25 Grad", "Regenzeit, aber durchgehend warm"],
+    r: 2,
+    e: "Südhalbkugel, also Winter. In Bariloche und El Calafate liegt Schnee, in Tilcara klettert es tagsüber auf 20 Grad und fällt nachts fast auf null — und Iguazú ist subtropisch. Ihr braucht praktisch zwei Garderoben."
+  },
+  {
+    f: "Was ist ein Colectivo?",
+    o: ["Ein Sammeltaxi oder Stadtbus", "Eine Genossenschaftsbäckerei", "Ein Straßenmusiker-Trio", "Ein argentinischer Grillabend"],
+    r: 0,
+    e: "In ganz Lateinamerika unterwegs, überall etwas anders. In Mexiko-Stadt heißen sie meist <i>peseros</i>, in Buenos Aires ist der Colectivo schlicht der Stadtbus."
+  },
+  {
+    f: "Über die Wasserfälle von Iguazú soll Eleanor Roosevelt beim ersten Anblick etwas gesagt haben. Was?",
+    o: ["„Nun bin ich still.“", "„Poor Niagara.“", "„Das ist zu laut.“", "„Ich bleibe hier.“"],
+    r: 1,
+    e: "Zwei Worte, überliefert seit ihrem Besuch 1944. Nachvollziehbar: Iguazú hat 275 einzelne Fälle auf fast drei Kilometern Breite — Niagara ist einer."
+  }
+];
+
+INHALTE[11] = {
+  lead: flach(`Acht Fragen zu den Orten, an denen du in den nächsten Wochen stehst.
+               Kein Druck — aber der Punktestand wird gespeichert.`),
+  render(w) {
+    let i = 0, punkte = 0, gesperrt = false;
+
+    const kopf = el("div");
+    kopf.innerHTML = `
+      <div class="q-fortschritt"><span id="qNr"></span><span id="qStand"></span></div>
+      <div class="q-balken"><i id="qBalken" style="width:0%"></i></div>`;
+    w.appendChild(kopf);
+
+    const buehne = el("div");
+    w.appendChild(buehne);
+
+    function frage() {
+      const q = FRAGEN[i];
+      $("#qNr").textContent = `Frage ${i + 1} von ${FRAGEN.length}`;
+      $("#qStand").textContent = `${punkte} richtig`;
+      $("#qBalken").style.width = (i / FRAGEN.length * 100) + "%";
+
+      buehne.innerHTML = "";
+      buehne.appendChild(el("h3", "q-frage", q.f));
+      const opts = el("div", "q-optionen");
+      q.o.forEach((text, k) => {
+        const b = el("button", "q-opt");
+        b.type = "button";
+        b.innerHTML = `<span class="marke">${"ABCD"[k]}</span><span>${text}</span>`;
+        b.addEventListener("click", () => antwort(k, opts, q));
+        opts.appendChild(b);
+      });
+      buehne.appendChild(opts);
+      gesperrt = false;
+    }
+
+    function antwort(k, opts, q) {
+      if (gesperrt) return;
+      gesperrt = true;
+      const knoepfe = [...opts.children];
+      knoepfe.forEach(b => b.disabled = true);
+      knoepfe[q.r].classList.add("richtig");
+      if (k === q.r) { punkte++; konfetti(35, .5, .3); }
+      else knoepfe[k].classList.add("falsch");
+
+      $("#qStand").textContent = `${punkte} richtig`;
+
+      const e = el("div", "q-erklaerung");
+      e.innerHTML = `<b>${k === q.r ? "Richtig." : "Knapp daneben."}</b> ${q.e}`;
+      buehne.appendChild(e);
+
+      const weiter = el("p");
+      weiter.style.marginTop = "18px";
+      weiter.innerHTML = `<button class="btn" id="qWeiter">${i + 1 < FRAGEN.length ? "Nächste Frage" : "Auswertung"}</button>`;
+      buehne.appendChild(weiter);
+      $("#qWeiter").focus();
+      $("#qWeiter").addEventListener("click", () => {
+        i++;
+        if (i < FRAGEN.length) frage(); else ergebnis();
+      });
+    }
+
+    function ergebnis() {
+      $("#qBalken").style.width = "100%";
+      $("#qNr").textContent = "Fertig";
+      const best = speicher.get("quizBest", 0);
+      if (punkte > best) speicher.set("quizBest", punkte);
+
+      const urteile = [
+        "Okay. Reiseführer wäre vielleicht nicht dein Beruf. Aber genau dafür fahren wir ja hin.",
+        "Ein Treffer. Der Rest wird vor Ort gelernt — dann bleibt es sowieso besser hängen.",
+        "Zwei. Reicht für den ersten Abend.",
+        "Solide Grundausstattung.",
+        "Die Hälfte. Genug, um beim Abendessen mitzureden.",
+        "Mehr als die Hälfte. Du hast offensichtlich schon gelesen.",
+        "Sechs von acht. Ich glaube, du freust dich genauso wie ich.",
+        "Sieben. Bei der letzten hättest du raten können — hast du vermutlich auch.",
+        "Alle acht. Ich frage jetzt lieber nicht, wie lange du dich schon damit beschäftigst."
+      ];
+
+      buehne.innerHTML = `
+        <div class="q-ergebnis">
+          <div class="q-punkte">${punkte}<small> / ${FRAGEN.length}</small></div>
+          <p style="max-width:44ch;margin:16px auto 0;color:var(--schrift-2);text-wrap:pretty">${urteile[punkte]}</p>
+          ${best > 0 && punkte <= best ? `<p style="font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;color:var(--jade);margin-top:14px">BESTER VERSUCH: ${Math.max(best, punkte)}</p>` : ""}
+          <p class="knopfreihe" style="margin-top:22px"><button class="btn geist" id="qNeu">Nochmal</button></p>
+        </div>`;
+      if (punkte >= 4) konfetti(120);
+      $("#qNeu").addEventListener("click", () => { i = 0; punkte = 0; frage(); });
+    }
+
+    frage();
+  }
+};
+
+/* ============================================================
+   TAG 12 — RUBBELLOSE
+   ============================================================ */
+const LOS_SYM = {
+  schlaf: `<path d="M20.4 14.6 A8.6 8.6 0 1 1 9.4 3.6 a6.8 6.8 0 0 0 11 11 z"/>
+           <path d="M4.6 6.2 h3.2 l-3.2 3.4 h3.2" stroke-width="1.2" opacity=".6"/>`,
+  glas:   `<path d="M4.5 4.5 h15 l-7.5 8 z"/><path d="M12 12.5 v6"/><path d="M8 19 h8"/>
+           <circle cx="15.6" cy="7.3" r="1.35" fill="currentColor" stroke="none" opacity=".7"/>`,
+  veto:   `<path d="M4 6 h16 l-6.2 6.6 v6.1 l-3.6 2.1 v-8.2 z"/>
+           <path d="M15.5 15.5 l5 5 M20.5 15.5 l-5 5" stroke-width="1.7" stroke-linecap="round"/>`
+};
+
+const LOSE = [
+  { sym: "schlaf", titel: "Einmal ausschlafen", text: "Ein Vormittag ohne Programm, ohne Wecker, ohne „wir müssten mal los“. Du sagst wann." },
+  { sym: "glas",   titel: "Der teure Cocktail", text: "Eine Bar deiner Wahl, ohne Blick auf die Preisspalte. Einmal pro Land einlösbar." },
+  { sym: "veto",   titel: "Veto-Recht",         text: "Ein Programmpunkt, den du streichen darfst. Ohne Begründung, ohne Diskussion." }
+];
+
+INHALTE[12] = {
+  lead: flach(`Drei Lose. Freirubbeln mit dem Finger oder der Maus.
+               Was drunter steht, gilt.`),
+  render(w) {
+    const hinweis = el("p");
+    hinweis.style.cssText = "font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--schrift-2)";
+    hinweis.textContent = "Rubbeln zum Aufdecken";
+    w.appendChild(hinweis);
+
+    const g = el("div", "lose");
+    w.appendChild(g);
+
+    LOSE.forEach((l, idx) => {
+      const schonFrei = speicher.get("los:" + idx, false);
+      const box = el("div", "los" + (schonFrei ? " frei" : ""));
+      box.innerHTML = `
+        <div class="los-inhalt">
+          <div class="l-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34"
+            fill="none" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round">${LOS_SYM[l.sym]}</svg></div>
+          <div class="l-titel">${l.titel}</div>
+          <div class="l-text">${l.text}</div>
+        </div>`;
+
+      if (!schonFrei) {
+        const cv = el("canvas");
+        cv.setAttribute("aria-label", "Rubbelfeld " + (idx + 1) + " — freirubbeln");
+        box.appendChild(cv);
+        g.appendChild(box);
+        rubbeln(cv, box, idx);
+      } else {
+        g.appendChild(box);
+      }
+    });
+
+    const reset = el("p", "mitte");
+    reset.style.marginTop = "20px";
+    reset.innerHTML = '<button class="btn geist" id="loseNeu">Lose zurücksetzen</button>';
+    w.appendChild(reset);
+    $("#loseNeu").addEventListener("click", () => {
+      LOSE.forEach((_, i) => speicher.set("los:" + i, false));
+      w.innerHTML = ""; INHALTE[12].render(w);
+    });
+  }
+};
+
+function rubbeln(cv, box, idx) {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const ctx = cv.getContext("2d", { willReadFrequently: true });
+  let bereit = false;
+
+  function initialisieren() {
+    const b = box.getBoundingClientRect();
+    if (b.width < 10) { requestAnimationFrame(initialisieren); return; }
+    cv.width = b.width * dpr;
+    cv.height = 128 * dpr;
+    cv.style.height = "128px";
+    ctx.scale(dpr, dpr);
+
+    const g = ctx.createLinearGradient(0, 0, b.width, 128);
+    g.addColorStop(0, "#B07F1E");
+    g.addColorStop(.45, "#E4AC38");
+    g.addColorStop(.55, "#F3D890");
+    g.addColorStop(1, "#B07F1E");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, b.width, 128);
+
+    // Feine Talavera-Rauten in die Rubbelschicht
+    ctx.strokeStyle = "rgba(16,26,46,.16)";
+    ctx.lineWidth = 1;
+    for (let x = -128; x < b.width + 128; x += 16) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 128, 128); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x + 128, 0); ctx.lineTo(x, 128); ctx.stroke();
+    }
+
+    ctx.fillStyle = "rgba(16,26,46,.62)";
+    ctx.font = "600 11px ui-monospace, monospace";
+    ctx.textAlign = "center";
+    ctx.letterSpacing = "3px";
+    ctx.fillText("HIER RUBBELN", b.width / 2, 68);
+
+    ctx.globalCompositeOperation = "destination-out";
+    bereit = true;
+  }
+  initialisieren();
+
+  let malt = false;
+
+  function punkt(e) {
+    const r = cv.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX - r.left, y: t.clientY - r.top };
+  }
+  function kratzen(e) {
+    if (!bereit) return;
+    e.preventDefault();
+    const p = punkt(e);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 21, 0, 7);
+    ctx.fill();
+  }
+  function pruefen() {
+    if (!bereit) return;
+    const d = ctx.getImageData(0, 0, cv.width, cv.height).data;
+    let leer = 0;
+    for (let i = 3; i < d.length; i += 40) if (d[i] < 30) leer++;
+    if (leer / (d.length / 40) > 0.52) {
+      box.classList.add("frei");
+      speicher.set("los:" + idx, true);
+      konfetti(60, .5, .4);
+    }
+  }
+
+  const start = (e) => { malt = true; kratzen(e); };
+  const zug   = (e) => { if (malt) kratzen(e); };
+  const ende  = () => { if (malt) { malt = false; pruefen(); } };
+
+  cv.addEventListener("mousedown", start);
+  cv.addEventListener("mousemove", zug);
+  addEventListener("mouseup", ende);
+  cv.addEventListener("touchstart", start, { passive: false });
+  cv.addEventListener("touchmove", zug, { passive: false });
+  cv.addEventListener("touchend", ende);
+}
+
+/* ============================================================
+   TAG 13 — KOFFERCHAOS
+   ============================================================ */
+const DINGE = [
+  { z: "🥾", gut: true,  w: "Bergschuhe" },
+  { z: "🧥", gut: true,  w: "Winterjacke" },
+  { z: "🧤", gut: true,  w: "Handschuhe" },
+  { z: "🕶️", gut: true,  w: "Sonnenbrille" },
+  { z: "🔦", gut: true,  w: "Stirnlampe" },
+  { z: "🧴", gut: true,  w: "Sonnencreme" },
+  { z: "📸", gut: true,  w: "Kamera" },
+  { z: "🔌", gut: true,  w: "Adapter" },
+  { z: "🧦", gut: true,  w: "Warme Socken" },
+  { z: "📖", gut: true,  w: "Buch" },
+  { z: "🎄", gut: false, w: "Weihnachtsbaum" },
+  { z: "🪑", gut: false, w: "Küchenstuhl" },
+  { z: "🐢", gut: false, w: "Schildkröte" },
+  { z: "🧯", gut: false, w: "Feuerlöscher" },
+  { z: "🎺", gut: false, w: "Tuba" },
+  { z: "🛷", gut: false, w: "Rodelschlitten" },
+  { z: "🌵", gut: false, w: "Zimmerkaktus" }
+];
+
+INHALTE[13] = {
+  lead: flach(`Sachen fallen vom Himmel. Fang die, die mitkommen.
+               Vorsicht: In Argentinien ist Winter — die Jacke muss rein.`),
+  render(w) {
+    const best = speicher.get("kofferBest", 0);
+
+    const huelle = el("div", "spiel-huelle");
+    huelle.innerHTML = `
+      <div class="spiel-hud">
+        <span>Punkte <b id="sPunkte">0</b></span>
+        <span>Leben <b id="sLeben">♥♥♥</b></span>
+        <span>Rekord <b id="sBest">${best}</b></span>
+      </div>
+      <div style="position:relative">
+        <canvas id="kofferSpiel"></canvas>
+        <div class="spiel-overlay" id="sOverlay">
+          <h4>Koffer bereit?</h4>
+          <p>Koffer mit Finger, Maus oder Pfeiltasten bewegen. Nur einpacken, was in den Urlaub gehört.</p>
+          <button class="btn" id="sStart">Los</button>
+        </div>
+      </div>`;
+    w.appendChild(huelle);
+
+    const legende = el("div", "panel");
+    legende.innerHTML = `<p class="panel-titel">Spielregeln</p>
+      <p style="margin:0;font-size:.88rem;color:var(--schrift-2);line-height:1.6">
+        Richtiges gefangen: <b style="color:var(--jade)">+10</b>.
+        Falsches gefangen: <b style="color:var(--carmin-hell)">ein Leben weg</b>.
+        Richtiges verpasst: auch ein Leben weg. Nach drei Fehlern ist Schluss.
+        Es wird mit der Zeit schneller.
+      </p>`;
+    w.appendChild(legende);
+
+    kofferSpiel();
+  }
+};
+
+function kofferSpiel() {
+  const cv = $("#kofferSpiel"), ctx = cv.getContext("2d");
+  const ov = $("#sOverlay");
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  let B = 0, H = 0;
+
+  function messen() {
+    const b = cv.parentElement.getBoundingClientRect();
+    if (b.width < 40) { requestAnimationFrame(messen); return; }   // Layout noch nicht da
+    const alt = B;
+    B = b.width;
+    H = Math.min(400, Math.max(280, B * 0.62));
+    cv.width = B * dpr; cv.height = H * dpr;
+    cv.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    koffer.x = alt ? koffer.x * (B / alt) : B / 2;
+    koffer.x = Math.max(koffer.b / 2, Math.min(B - koffer.b / 2, koffer.x));
+  }
+  const koffer = { x: 0, b: 74, h: 52, y: 0 };
+  messen();
+  addEventListener("resize", messen);
+
+  let objekte = [], punkte = 0, leben = 3, laeuft = false, tempo = 1, tick = 0, raf = 0;
+  let letzterStempel = 0, spawnZaehler = 0;
+  let links = false, rechts = false;
+  let blitze = [];
+
+  function spawn() {
+    const d = DINGE[(Math.random() * DINGE.length) | 0];
+    objekte.push({
+      x: 34 + Math.random() * (B - 68),
+      y: -30,
+      v: (1.7 + Math.random() * 1.1) * tempo,
+      d
+    });
+  }
+
+  function zeichneKoffer() {
+    const y = H - koffer.h - 12;
+    ctx.save();
+    ctx.translate(koffer.x, y);
+    // Korpus
+    ctx.fillStyle = "#B8353F";
+    ctx.strokeStyle = "#E4AC38";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(-koffer.b / 2, 0, koffer.b, koffer.h, 6);
+    ctx.fill(); ctx.stroke();
+    // Gurte
+    ctx.fillStyle = "rgba(228,172,56,.75)";
+    ctx.fillRect(-koffer.b / 2 + 14, 0, 6, koffer.h);
+    ctx.fillRect(koffer.b / 2 - 20, 0, 6, koffer.h);
+    // Griff
+    ctx.strokeStyle = "#E4AC38";
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, 15, Math.PI, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function schleife(jetzt) {
+    // Zeitbasiert statt framebasiert — sonst läuft das Spiel auf 120-Hz-Displays doppelt so schnell
+    if (jetzt == null) jetzt = performance.now();
+    let dt = (jetzt - letzterStempel) / 16.667;
+    if (!letzterStempel || !(dt > 0) || dt > 4) dt = 1;
+    letzterStempel = jetzt;
+
+    ctx.clearRect(0, 0, B, H);
+
+    // Boden
+    ctx.strokeStyle = "rgba(228,172,56,.2)";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, H - 10); ctx.lineTo(B, H - 10); ctx.stroke();
+
+    if (laeuft) {
+      tick += dt;
+      spawnZaehler += dt;
+      const rate = Math.max(28, 78 - tick / 26);
+      if (spawnZaehler >= rate) { spawn(); spawnZaehler = 0; }
+      tempo = 1 + tick / 3400;
+
+      if (links)  koffer.x -= 7.5 * dt;
+      if (rechts) koffer.x += 7.5 * dt;
+      koffer.x = Math.max(koffer.b / 2, Math.min(B - koffer.b / 2, koffer.x));
+
+      const kY = H - koffer.h - 12;
+      objekte = objekte.filter(o => {
+        o.y += o.v * dt;
+        const gefangen = o.y > kY - 6 && o.y < kY + koffer.h &&
+                         Math.abs(o.x - koffer.x) < koffer.b / 2 + 8;
+        if (gefangen) {
+          if (o.d.gut) { punkte += 10; blitz(o.x, kY, "+10", "#2E9E8F"); }
+          else { leben--; blitz(o.x, kY, o.d.w + "?!", "#D95560"); }
+          return false;
+        }
+        if (o.y > H + 20) {
+          if (o.d.gut) { leben--; blitz(o.x, H - 30, "verpasst", "#D95560"); }
+          return false;
+        }
+        return true;
+      });
+
+      if (leben <= 0) return schluss();
+      $("#sPunkte").textContent = punkte;
+      $("#sLeben").textContent = "♥".repeat(Math.max(0, leben)) + "♡".repeat(3 - Math.max(0, leben));
+    }
+
+    ctx.font = "26px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (const o of objekte) ctx.fillText(o.d.z, o.x, o.y);
+
+    zeichneKoffer();
+
+    blitze = blitze.filter(b => b.t > 0);
+    for (const b of blitze) {
+      b.t -= dt; b.y -= 1.1 * dt;
+      ctx.globalAlpha = Math.max(0, b.t / 45);
+      ctx.fillStyle = b.f;
+      ctx.font = "600 13px ui-monospace, monospace";
+      ctx.fillText(b.s, b.x, b.y);
+      ctx.globalAlpha = 1;
+    }
+
+    raf = requestAnimationFrame(schleife);
+  }
+
+  function blitz(x, y, s, f) { blitze.push({ x, y, s, f, t: 45 }); }
+
+  function start() {
+    objekte = []; punkte = 0; leben = 3; tick = 0; tempo = 1; blitze = [];
+    letzterStempel = 0; spawnZaehler = 45;   // kurzer Vorlauf, bevor das Erste fällt
+    laeuft = true;
+    ov.classList.add("weg");
+    cancelAnimationFrame(raf);
+    schleife();
+  }
+
+  function schluss() {
+    laeuft = false;
+    cancelAnimationFrame(raf);
+    const best = speicher.get("kofferBest", 0);
+    const neu = punkte > best;
+    if (neu) { speicher.set("kofferBest", punkte); konfetti(120); }
+    $("#sBest").textContent = Math.max(best, punkte);
+    ov.classList.remove("weg");
+    ov.innerHTML = `
+      <h4>${neu ? "Neuer Rekord" : "Koffer voll"}</h4>
+      <p style="font-family:var(--mono);font-size:1.9rem;color:var(--oro);font-weight:600">${punkte}</p>
+      <p>${punkte >= 150 ? "Beeindruckend. Du packst offenbar auch im echten Leben effizient."
+         : punkte >= 80 ? "Ordentlich. Der Weihnachtsbaum bleibt trotzdem zu Hause."
+         : "Naja. Wir packen den Koffer besser gemeinsam."}</p>
+      <button class="btn" id="sStart">Nochmal</button>`;
+    $("#sStart").addEventListener("click", start);
+    $("#sStart").focus();
+  }
+
+  $("#sStart").addEventListener("click", start);
+
+  cv.addEventListener("mousemove", e => {
+    const r = cv.getBoundingClientRect();
+    koffer.x = e.clientX - r.left;
+  });
+  cv.addEventListener("touchmove", e => {
+    e.preventDefault();
+    const r = cv.getBoundingClientRect();
+    koffer.x = e.touches[0].clientX - r.left;
+  }, { passive: false });
+
+  const runter = e => {
+    if (e.key === "ArrowLeft")  { links = true;  e.preventDefault(); }
+    if (e.key === "ArrowRight") { rechts = true; e.preventDefault(); }
+  };
+  const rauf = e => {
+    if (e.key === "ArrowLeft")  links = false;
+    if (e.key === "ArrowRight") rechts = false;
+  };
+  addEventListener("keydown", runter);
+  addEventListener("keyup", rauf);
+
+  // Aufräumen, wenn das Overlay geschlossen wird
+  const beobachter = new MutationObserver(() => {
+    if (!$("#overlay").classList.contains("auf")) {
+      laeuft = false;
+      cancelAnimationFrame(raf);
+      removeEventListener("keydown", runter);
+      removeEventListener("keyup", rauf);
+      beobachter.disconnect();
+    }
+  });
+  beobachter.observe($("#overlay"), { attributes: true, attributeFilter: ["class"] });
+
+  schleife();
+}
+
+/* ============================================================
+   TAG 14 — NOTFALL-SPANISCH
+   ============================================================ */
+const SAETZE = [
+  { de: "Einen Pisco Sour, bitte.",              es: "Un pisco sour, por favor.",            l: "un PIS-ko SAU-er, por fa-WOR",           wo: "Lima" },
+  { de: "Noch einen.",                            es: "Otro más.",                            l: "O-tro MAS",                              wo: "überall" },
+  { de: "Ist das scharf?",                        es: "¿Pica mucho?",                         l: "PI-ka MU-tscho",                         wo: "CDMX" },
+  { de: "Sehr scharf. Aber gut.",                 es: "Muy picante. Pero rico.",              l: "muy pi-KAN-te, PE-ro RI-ko",             wo: "CDMX" },
+  { de: "Wo ist die nächste Toilette?",           es: "¿Dónde está el baño?",                 l: "DON-de es-TA el BAN-jo",                 wo: "überall" },
+  { de: "Können wir das teilen?",                 es: "¿Lo podemos compartir?",               l: "lo po-DE-mos kom-par-TIR",               wo: "überall" },
+  { de: "Was empfehlen Sie?",                     es: "¿Qué me recomienda?",                  l: "ke me re-ko-MJEN-da",                    wo: "überall" },
+  { de: "Die Rechnung, bitte.",                   es: "La cuenta, por favor.",                l: "la KWEN-ta, por fa-WOR",                 wo: "überall" },
+  { de: "Ich bin nur müde, nicht sauer.",         es: "Solo estoy cansada, no enojada.",      l: "SO-lo es-TOY kan-SA-da, no e-no-CHA-da", wo: "überall" },
+  { de: "Das ist zu teuer.",                      es: "Está muy caro.",                       l: "es-TA muy KA-ro",                        wo: "Märkte" },
+  { de: "Wie hoch sind wir hier?",                es: "¿A qué altura estamos?",               l: "a ke al-TU-ra es-TA-mos",                wo: "Izta · Tilcara" },
+  { de: "Ich brauche eine Pause.",                es: "Necesito un descanso.",                l: "ne-se-SI-to un des-KAN-so",              wo: "am Berg" },
+  { de: "Gibt es Chiles en Nogada?",              es: "¿Hay chiles en nogada?",               l: "ai TSCHI-les en no-GA-da",               wo: "Puebla" },
+  { de: "Wie kalt wird es heute Nacht?",          es: "¿Qué tan frío hará esta noche?",       l: "ke tan FRI-o a-RA ES-ta NO-tsche",       wo: "Patagonien" }
+];
+
+INHALTE[14] = {
+  lead: flach(`Vierzehn Karten. Tippen zum Umdrehen — sie werden auch vorgelesen.
+               Der Rest kommt beim Bestellen von selbst.`),
+  render(w) {
+    const g = el("div", "karten-gitter");
+    SAETZE.forEach((s) => {
+      const k = el("button", "kk");
+      k.type = "button";
+      k.setAttribute("aria-label", "Karte umdrehen: " + s.de);
+      k.innerHTML = `
+        <span class="kk-inner">
+          <span class="kk-seite kk-vorn">
+            <span class="de">${s.de}</span>
+            <span class="hinweis">Tippen</span>
+          </span>
+          <span class="kk-seite kk-hinten">
+            <span class="es">${s.es}</span>
+            <span class="lautschrift">${s.l}</span>
+            <span class="wo">${s.wo}</span>
+          </span>
+        </span>`;
+      k.addEventListener("click", () => {
+        k.classList.toggle("um");
+        if (k.classList.contains("um")) sprich(s.es);
+      });
+      g.appendChild(k);
+    });
+    w.appendChild(g);
+
+    const p = el("div", "panel");
+    p.innerHTML = `<p class="panel-titel">Drei Länder, drei Zungenschläge</p>
+      <p style="margin:0 0 12px;font-size:.89rem;color:var(--schrift-2);line-height:1.6">
+        In <b style="color:var(--schrift)">Mexiko</b> wird sehr deutlich und höflich gesprochen — <i>usted</i> ist normal.
+      </p>
+      <p style="margin:0 0 12px;font-size:.89rem;color:var(--schrift-2);line-height:1.6">
+        In <b style="color:var(--schrift)">Peru</b> klingt es weicher, Endsilben verschlucken sich gern.
+      </p>
+      <p style="margin:0;font-size:.89rem;color:var(--schrift-2);line-height:1.6">
+        In <b style="color:var(--schrift)">Argentinien</b> wird alles anders: <i>ll</i> und <i>y</i> klingen wie „sch". Aus <i>calle</i> wird „KA-sche", aus <i>yo</i> wird „scho". Und statt <i>tú</i> sagt man <i>vos</i>.
+      </p>`;
+    w.appendChild(p);
+  }
+};
+
+function sprich(text) {
+  try {
+    if (!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "es-MX";
+    u.rate = 0.88;
+    const stimmen = speechSynthesis.getVoices();
+    const s = stimmen.find(v => /^es[-_]/i.test(v.lang));
+    if (s) u.voice = s;
+    speechSynthesis.speak(u);
+  } catch {}
+}
+if ("speechSynthesis" in window) speechSynthesis.getVoices();
+
+/* ============================================================
+   TAG 15 — DIE LETZTE LISTE
+   ============================================================ */
+const PACKEN = [
+  { g: "Ohne das geht gar nichts", punkte: [
+    ["Reisepass", "Sechs Monate gültig"],
+    ["Impfausweis", "Gelbfieber für Iguazú"],
+    ["Kreditkarte und Bargeld", "In Argentinien zählt Bargeld"],
+    ["Reiseadapter", "Typ A in Mexiko, Typ I in Argentinien"],
+    ["Offline-Karten geladen", "Vor dem Abflug, nicht danach"]
+  ]},
+  { g: "Für den Iztaccíhuatl — 5.230 Meter", punkte: [
+    ["Feste Bergschuhe", "Eingelaufen, nicht neu"],
+    ["Handschuhe und Mütze", "Am Gipfel unter null"],
+    ["Zwiebellook zum Ausziehen", "Aufstieg heiß, Gipfel eisig"],
+    ["Stirnlampe", "Ihr startet nachts"],
+    ["Kopfschmerztabletten", "Die Höhe kommt schneller als gedacht"]
+  ]},
+  { g: "Für Patagonien — Bariloche und der Gletscher", punkte: [
+    ["Richtig warme Jacke", "Nicht die Übergangsjacke"],
+    ["Thermounterwäsche", "El Calafate ist Winter"],
+    ["Wasserdichte Schuhe", "Auf dem Eis wird alles nass"],
+    ["Sonnenbrille", "Gletscher blendet mehr als Schnee"],
+    ["Lippenbalsam", "Kälte und Wind"]
+  ]},
+  { g: "Für den Norden und die Wasserfälle", punkte: [
+    ["Etwas Leichtes", "Iguazú hat 25 Grad"],
+    ["Regenjacke", "Am Teufelsschlund wirst du nass"],
+    ["Mückenschutz", "Subtropen"],
+    ["Sonnencreme, hoher Faktor", "Tilcara liegt auf 2.465 Metern"]
+  ]},
+  { g: "Was man vergisst", punkte: [
+    ["Powerbank", "Lange Tage, wenig Steckdosen"],
+    ["Ein Buch", "Frankfurt–Mexiko sind zwölf Stunden"],
+    ["Waschmittel für unterwegs", "Drei Wochen, ein Koffer"],
+    ["Platz für Rückmitbringsel", "Schokolade aus Bariloche, Talavera aus Puebla"]
+  ]}
+];
+
+INHALTE[15] = {
+  lead: flach(`Morgen früh geht es los. Heute ist der Tag,
+               an dem man merkt, was noch fehlt.`),
+  render(w) {
+    const alle = PACKEN.reduce((n, g) => n + g.punkte.length, 0);
+    let ab = 0;
+
+    PACKEN.forEach((grp, gi) => {
+      const box = el("div", "pl-gruppe");
+      box.appendChild(el("p", "pl-kopf", grp.g));
+      grp.punkte.forEach(([text, note], pi) => {
+        const key = `pack:${gi}:${pi}`;
+        const an = speicher.get(key, false);
+        if (an) ab++;
+        const z = el("button", "pl-zeile" + (an ? " ab" : ""));
+        z.type = "button";
+        z.setAttribute("aria-pressed", an ? "true" : "false");
+        z.innerHTML = `
+          <span class="pl-box" aria-hidden="true">✓</span>
+          <span class="pl-text">${text}</span>
+          <span class="pl-reaktion">${note}</span>`;
+        z.addEventListener("click", () => {
+          const jetzt = !z.classList.contains("ab");
+          z.classList.toggle("ab", jetzt);
+          z.setAttribute("aria-pressed", jetzt ? "true" : "false");
+          speicher.set(key, jetzt);
+          ab += jetzt ? 1 : -1;
+          standAktualisieren();
+        });
+        box.appendChild(z);
+      });
+      w.appendChild(box);
+    });
+
+    const stand = el("div", "pl-stand");
+    w.appendChild(stand);
+
+    const reset = el("p", "mitte");
+    reset.style.marginTop = "16px";
+    reset.innerHTML = '<button class="btn geist" id="plNeu">Liste leeren</button>';
+    w.appendChild(reset);
+    $("#plNeu").addEventListener("click", () => {
+      PACKEN.forEach((g, gi) => g.punkte.forEach((_, pi) => speicher.set(`pack:${gi}:${pi}`, false)));
+      w.innerHTML = ""; INHALTE[15].render(w);
+    });
+
+    function standAktualisieren() {
+      const prozent = Math.round(ab / alle * 100);
+      let text;
+      if (prozent === 100) text = "Fertig. Der Koffer kann zu.";
+      else if (prozent >= 75) text = "Fast. Der Rest passt noch rein.";
+      else if (prozent >= 40) text = "Guter Zwischenstand.";
+      else if (prozent > 0) text = "Angefangen ist die halbe Miete. Angeblich.";
+      else text = "Noch nichts. Es ist der letzte Abend.";
+      stand.innerHTML = `<b>${ab} / ${alle}</b>${text}`;
+      if (prozent === 100) konfetti(140);
+    }
+    standAktualisieren();
+  }
+};
+
+/* ============================================================
+   TAG 16 — BOARDING
+   ============================================================ */
+INHALTE[16] = {
+  lead: "Kein Türchen mehr. Nur noch Gate, Sitzplatz und ungefähr fünfzehn Stunden Flug.",
+  render(w) {
+    const bp = el("div", "bp");
+    bp.innerHTML = `
+      <div class="bp-kopf">
+        <span>Boarding Pass</span>
+        <span>${CFG.flugnr}</span>
+      </div>
+      <div class="bp-koerper">
+        <div class="bp-strecke">
+          <div class="bp-ort">
+            <div class="code">${CFG.vonCode}</div>
+            <div class="stadt">${CFG.vonStadt}</div>
+          </div>
+          <div class="bp-pfeil"><span aria-hidden="true">${symbol("flug", 19)}</span></div>
+          <div class="bp-ort" style="text-align:right">
+            <div class="code">MEX</div>
+            <div class="stadt">Ciudad de México</div>
+          </div>
+        </div>
+        <div class="bp-gitter">
+          <div class="bp-feld"><div class="k">Passagier</div><div class="v">${CFG.name ? CFG.name.toUpperCase() : "DU"}</div></div>
+          <div class="bp-feld"><div class="k">Datum</div><div class="v">16 AUG</div></div>
+          <div class="bp-feld"><div class="k">Weiter</div><div class="v">LIM · EZE</div></div>
+          <div class="bp-feld"><div class="k">Gepäck</div><div class="v">GEPACKT</div></div>
+          <div class="bp-feld"><div class="k">Sitz</div><div class="v">NEBENAN</div></div>
+          <div class="bp-feld"><div class="k">Status</div><div class="v" style="color:var(--jade)">BEREIT</div></div>
+        </div>
+      </div>
+      <div class="bp-fuss" id="bpCode"></div>`;
+    w.appendChild(bp);
+
+    // Barcode
+    const bc = bp.querySelector("#bpCode");
+    let s = "";
+    for (let i = 0; i < 68; i++) {
+      const br = 1 + ((i * 7919) % 4);
+      s += `<i style="width:${br}px;opacity:${.35 + ((i * 13) % 6) / 10}"></i>`;
+    }
+    bc.innerHTML = s;
+
+    const uhr = el("div", "final-uhr");
+    uhr.innerHTML = `
+      <div><div class="z" id="fH">–</div><div class="l">Stunden</div></div>
+      <div><div class="z" id="fM">–</div><div class="l">Minuten</div></div>
+      <div><div class="z" id="fS">–</div><div class="l">Sekunden</div></div>`;
+    w.appendChild(uhr);
+
+    const n = el("div", "notiz");
+    n.innerHTML = `Sechs Tage lang war hier jeden Tag eine Kleinigkeit.
+      Ab jetzt passiert das Echte — und zwar draußen, in echt, ohne Bildschirm.
+      <br><br>Vámonos.
+      ${SIG ? `<span class="sig">${SIG}</span>` : ""}`;
+    w.appendChild(n);
+
+    const knopf = el("p", "mitte");
+    knopf.innerHTML = '<button class="btn" id="gate">Gate öffnen</button>';
+    w.appendChild(knopf);
+    $("#gate").addEventListener("click", () => {
+      konfetti(200, .5, .45);
+      setTimeout(() => konfetti(160, .25, .5), 280);
+      setTimeout(() => konfetti(160, .75, .5), 520);
+      $("#gate").textContent = "¡Buen viaje!";
+      $("#gate").disabled = true;
+    });
+
+    let id = setInterval(fTick, 1000);
+    fTick();
+    function fTick() {
+      if (!document.contains(uhr)) { clearInterval(id); return; }
+      const rest = ABFLUG - new Date();
+      const p = (n) => String(Math.max(0, n)).padStart(2, "0");
+      const s = Math.max(0, Math.floor(rest / 1000));
+      $("#fH").textContent = p(Math.floor(s / 3600));
+      $("#fM").textContent = p(Math.floor(s / 60) % 60);
+      $("#fS").textContent = p(s % 60);
+    }
+  }
+};
+
+/* ============================================================
+   START
+   ============================================================ */
+feldBauen();
+
+// Um Mitternacht das Feld neu bauen, falls die Seite offen bleibt
+setInterval(() => {
+  const marker = TUEREN.map(t => istFrei(t.tag) ? "1" : "0").join("");
+  if (marker !== feldBauen.marker) {
+    feldBauen.marker = marker;
+    if (!$("#overlay").classList.contains("auf")) feldBauen();
+  }
+}, 30000);
+feldBauen.marker = TUEREN.map(t => istFrei(t.tag) ? "1" : "0").join("");
+
+if (VORSCHAU) {
+  $("#untertitel").innerHTML = 'Vorschaumodus — alle Türchen sind offen. Ohne <code>?vorschau=1</code> gilt das Datum.';
+}
+
+// Beim ersten Besuch: kleiner Empfang
+if (!speicher.get("begruesst", false)) {
+  speicher.set("begruesst", true);
+  setTimeout(() => konfetti(90, .5, .3), 700);
+}
+})();
+</script>
