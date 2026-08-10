@@ -3251,17 +3251,21 @@ function galoppSpiel() {
      nicht mehr klobig im Bild — und man sieht weiter voraus, was das
      Springen dort überhaupt erst fair macht. */
   let M = 1;
+  /* Höhe der Spielwelt: Reiter (90) plus höchster Sprung (121) plus Luft.
+     Die Anzeigehöhe folgt daraus, sonst steht der Reiter in einem
+     halbleeren Feld. */
+  const WELT_HOEHE = 268;
 
   function messen() {
     const b = cv.parentElement.getBoundingClientRect();
     if (b.width < 40) { requestAnimationFrame(messen); return; }
     const breiteCss = b.width;
-    const hoeheCss = Math.min(300, Math.max(200, breiteCss * 0.40));
     M = Math.max(0.58, Math.min(0.92, breiteCss / 700));
 
     B = breiteCss / M;                 // Weltbreite
-    H = hoeheCss / M;                  // Welthöhe
-    BODEN = H - 30;
+    H = WELT_HOEHE;
+    BODEN = H - 28;
+    const hoeheCss = Math.round(H * M);
 
     cv.width = breiteCss * dpr;
     cv.height = hoeheCss * dpr;
