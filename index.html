@@ -1456,7 +1456,7 @@ function symbol(k, groesse) {
 
 const TUEREN = [
   { tag: 10, sym: "route",  titel: "Die Route",       teaser: "Dreizehn Etappen, vom Vulkangipfel bis zum Gletscher." },
-  { tag: 11, sym: "quiz",   titel: "Das Quiz",        teaser: "Acht Fragen. Die Hälfte glaubst du mir nicht." },
+  { tag: 11, sym: "quiz",   titel: "Das Quiz",        teaser: "Neun Fragen. Die Hälfte glaubst du mir nicht." },
   { tag: 12, sym: "los",    titel: "Drei Rubbellose", teaser: "Freirubbeln. Einlösbar unterwegs." },
   { tag: 13, sym: "koffer", titel: "Kofferchaos",     teaser: "Ein Spiel. Steigeisen ja, Weihnachtsbaum nein." },
   { tag: 14, sym: "reden",  titel: "Notfall-Spanisch",teaser: "Die Sätze, die wirklich zählen." },
@@ -2426,7 +2426,7 @@ const FRAGEN = [
 ];
 
 INHALTE[11] = {
-  lead: flach(`Acht Fragen zu den Orten, an denen du in den nächsten Wochen stehst.
+  lead: flach(`Neun Fragen zu den Orten, an denen du in den nächsten Wochen stehst.
                Kein Druck — aber der Punktestand wird gespeichert.`),
   render(w) {
     let i = 0, punkte = 0, gesperrt = false;
@@ -2492,16 +2492,18 @@ INHALTE[11] = {
       const best = speicher.get("quizBest", 0);
       if (punkte > best) speicher.set("quizBest", punkte);
 
+      // Ein Urteil je möglichem Punktestand, also von null bis zur Fragenzahl
       const urteile = [
-        "Okay. Reiseführer wäre vielleicht nicht dein Beruf. Aber genau dafür fahren wir ja hin.",
-        "Ein Treffer. Der Rest wird vor Ort gelernt — dann bleibt es sowieso besser hängen.",
+        "Keine einzige. Aber genau deswegen fahren wir ja hin.",
+        "Einer. Der Rest wird vor Ort gelernt — dann bleibt es sowieso besser hängen.",
         "Zwei. Reicht für den ersten Abend.",
-        "Solide Grundausstattung.",
-        "Die Hälfte. Genug, um beim Abendessen mitzureden.",
-        "Mehr als die Hälfte. Du hast offensichtlich schon gelesen.",
-        "Sechs von acht. Ich glaube, du freust dich genauso wie ich.",
-        "Sieben. Bei der letzten hättest du raten können — hast du vermutlich auch.",
-        "Alle acht. Ich frage jetzt lieber nicht, wie lange du dich schon damit beschäftigst."
+        "Drei. Solide Grundausstattung.",
+        "Vier von neun. Knapp unter der Hälfte.",
+        "Fünf. Genug, um beim Abendessen mitzureden.",
+        "Sechs von neun. Du hast offensichtlich schon gelesen.",
+        "Sieben. Ich glaube, du freust dich genauso wie ich.",
+        "Acht von neun. Bei der letzten hättest du raten können — hast du vermutlich auch.",
+        "Alle neun. Ich frage jetzt lieber nicht, wie lange du dich schon damit beschäftigst."
       ];
 
       buehne.innerHTML = `
@@ -2511,7 +2513,7 @@ INHALTE[11] = {
           ${best > 0 && punkte <= best ? `<p style="font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;color:var(--jade);margin-top:14px">BESTER VERSUCH: ${Math.max(best, punkte)}</p>` : ""}
           <p class="knopfreihe" style="margin-top:22px"><button class="btn geist" id="qNeu">Nochmal</button></p>
         </div>`;
-      if (punkte >= 4) konfetti(120);
+      if (punkte > FRAGEN.length / 2) konfetti(120);
       $("#qNeu").addEventListener("click", () => { i = 0; punkte = 0; frage(); });
     }
 
