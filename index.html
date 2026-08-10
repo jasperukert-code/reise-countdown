@@ -47,6 +47,14 @@ button { font: inherit; }
   --karte-2:    #1E2E4C;
   --verschlossen: rgba(255,255,255,.045);
 
+  /* Kartenflächen */
+  --wasser:       #0C1526;
+  --wasser-linie: #2C4E7A;
+  --land:         #23334F;
+  --kueste-linie: #4A6285;
+  --relief:       #2E415F;
+  --relief-hoch:  #6E7F98;
+
   /* Typo */
   --display: "Bodoni MT", "Didot", "Playfair Display", "Hoefler Text", Georgia, serif;
   --body: "Avenir Next", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -71,6 +79,12 @@ button { font: inherit; }
     --karte:    #FBF7EC;
     --karte-2:  #F4EFDF;
     --verschlossen: rgba(27,31,46,.05);
+    --wasser:       #CFDDE8;
+    --wasser-linie: #6E93B4;
+    --land:         #F1EADA;
+    --kueste-linie: #9AA6A0;
+    --relief:       #E2D9C2;
+    --relief-hoch:  #A99C7E;
   }
 }
 
@@ -88,6 +102,12 @@ button { font: inherit; }
   --karte:    #FBF7EC;
   --karte-2:  #F4EFDF;
   --verschlossen: rgba(27,31,46,.05);
+  --wasser:       #CFDDE8;
+  --wasser-linie: #6E93B4;
+  --land:         #F1EADA;
+  --kueste-linie: #9AA6A0;
+  --relief:       #E2D9C2;
+  --relief-hoch:  #A99C7E;
 }
 
 :root[data-theme="dark"] {
@@ -104,6 +124,12 @@ button { font: inherit; }
   --karte:    #18253E;
   --karte-2:  #1E2E4C;
   --verschlossen: rgba(255,255,255,.045);
+  --wasser:       #0C1526;
+  --wasser-linie: #2C4E7A;
+  --land:         #23334F;
+  --kueste-linie: #4A6285;
+  --relief:       #2E415F;
+  --relief-hoch:  #6E7F98;
 }
 
 * { box-sizing: border-box; }
@@ -585,6 +611,33 @@ footer {
   opacity: 0;
   animation: einfaden .6s ease-out forwards;
 }
+
+/* Kartenflächen: Wasser dunkel und kühl, Land heller und wärmer —
+   damit auf einen Blick klar ist, was Küste ist und was Ozean. */
+.karte-svg .ozean { fill: var(--wasser); }
+.karte-svg .kueste { fill: var(--land); stroke: var(--kueste-linie); }
+.karte-svg .gebirge {
+  fill: var(--relief);
+  stroke: none;
+}
+.karte-svg .gewaesser {
+  fill: var(--wasser);
+  stroke: var(--kueste-linie);
+  stroke-width: calc(.7px * var(--k, 1));
+}
+.karte-svg .fluss {
+  fill: none;
+  stroke: var(--wasser-linie);
+  stroke-width: calc(1.4px * var(--k, 1));
+}
+.karte-svg .gipfel {
+  fill: var(--relief-hoch);
+  stroke: var(--land);
+  stroke-width: .5px;
+  transform: scale(1.5);
+}
+.gipfel-schicht { opacity: 0; transition: opacity .35s; pointer-events: none; }
+.karte-svg.gezoomt .gipfel-schicht { opacity: 1; }
 
 /* Beim Zoom skaliert die viewBox — Punkte, Linien und Schrift werden
    über --k gegengerechnet, damit sie optisch gleich groß bleiben. */
@@ -1541,7 +1594,7 @@ const ETAPPEN = [
     ]},
 
   { o: "sla", land: "ar", von: "14. Sep", bis: "15. Sep", naechte: 1, hoehe: "1.187 m", temp: "5–23 °C",
-    fakt: "„Salta la linda“ — die Schöne. Koloniale Altstadt im Nordwesten, Ausgangspunkt für alles Weitere. Ein Tag Aufenthalt, dann geht es mit dem Auto weiter." },
+    fakt: "„Salta la linda“ — die Schöne. Koloniale Altstadt im Nordwesten. Von Patagonien aus dauert der Weg sieben Stunden, weil es keinen Direktflug gibt: erst zurück nach Buenos Aires, dann quer nach Norden. Eine Nacht, dann weiter mit dem Auto." },
 
   { o: "til", land: "ar", von: "15. Sep", bis: "18. Sep", naechte: 3, hoehe: "2.465 m", temp: "2–22 °C",
     fakt: "Mitten in der Quebrada de Humahuaca. Über dem Dorf liegt das Pucará, eine präkolumbische Festung. Tagsüber über 20 Grad, nachts nahe null — das macht die Höhe." },
@@ -1556,7 +1609,7 @@ const ETAPPEN = [
     fakt: "Sieben Nächte zum Schluss, zurück am Anfang. Inzwischen ist Frühling — und ihr habt Zeit für alles, was beim ersten Mal nicht geklappt hat." },
 
   { o: "muc", land: "de", von: "30. Sep", art: "ziel", hoehe: "519 m", temp: "9–18 °C",
-    fakt: "16:35 ab Buenos Aires, Ankunft am nächsten Tag in München. 46 Tage, drei Länder — und diesmal geht die Zeitverschiebung in die unangenehme Richtung." }
+    fakt: "16:35 ab Buenos Aires, über Frankfurt zurück und am nächsten Tag in München. 46 Tage, drei Länder, gut 36.000 Kilometer allein in der Luft — und diesmal geht die Zeitverschiebung in die unangenehme Richtung." }
 ];
 
 const LAENDER = {
@@ -1578,10 +1631,12 @@ const REGIONEN = [
   { id: "cal", kurz: "EL CALAFATE",  titel: "El Calafate",         orte: ["cal"],                       anker: "end",   dx: -13, dy: 4 }
 ];
 
-/* Die Flüge in Reihenfolge — das ist die Linie, die das Flugzeug abfliegt. */
+/* Die Flüge in Reihenfolge — das ist die Linie, die das Flugzeug abfliegt.
+   El Calafate–Salta und der Rückweg gehen über Zwischenstopps, weil es
+   auf beiden Strecken keine Direktverbindung gibt. */
 const FLUEGE = [
   ["fra", "cdmx"], ["cdmx", "lim"], ["lim", "bue"], ["bue", "bar"], ["bar", "cal"],
-  ["cal", "sla"], ["sla", "igu"], ["igu", "bue"], ["bue", "muc"]
+  ["cal", "bue"], ["bue", "sla"], ["sla", "igu"], ["igu", "bue"], ["bue", "fra"], ["fra", "muc"]
 ];
 
 /* Landwege, nur im Zoom sichtbar */
@@ -1700,53 +1755,160 @@ function karteBauen() {
     <span class="k-zaehler" id="kZaehler">0 km</span>`;
   panel.appendChild(steuerung);
 
-  /* --- Landmassen ------------------------------------------------ */
-  const kuesten = [
-    // Mexiko mit Yucatán
-    [-117,33, -114,32, -111,31, -108,31.5, -106,31.8, -103,29, -101,29.5, -99,27, -97.5,25.9,
-     -97,22, -94.5,18.2, -92,18.6, -90,19.5, -87,21.5, -86.8,20.5, -88,18.5, -89,17, -91,15.8,
-     -94,16, -96,15.7, -99,16.5, -102,17.9, -104,18.9, -105.5,20.4, -105.7,22, -108,25,
-     -109.5,27, -112,29, -114,31, -117,33],
-    // Nordamerika, am oberen Rand angeschnitten
-    [-124,56, -110,56, -95,56, -80,56, -68,52, -60,47, -67,45, -70,43, -74,40, -76,37,
-     -78,34, -81,31, -80,25, -84,29, -88,30, -94,29.5, -97,26, -99,27, -101,29.5, -103,29,
-     -106,31.8, -111,31, -117,33, -124,40, -125,48, -124,56],
-    // Mittelamerika
-    [-92,15.5, -88.5,15.8, -87,13, -84,10.8, -82,9.5, -79,9.5, -77.5,8.6, -78,7.5, -81,8.5,
-     -83,9.5, -86,11.8, -89,14, -92,14.5],
-    // Südamerika
-    [-77.5,8.6, -75,10.5, -71,12, -66,10.6, -62,10.7, -60,8.5, -58,6.8, -52,5, -50,0, -44,-2.5,
-     -38,-5, -35,-8, -37,-11, -39,-13, -39,-18, -41,-22, -45,-24, -48,-25.5, -52,-32, -57,-34.5,
-     -57,-36, -62,-39, -62.5,-41, -65,-42.5, -65,-45, -67.5,-46, -67,-49, -69,-52, -68,-54.8,
-     -67,-55.5, -70,-55, -71,-53.5, -74,-52.5, -75,-50, -73.5,-47, -75,-45, -73.5,-42, -73,-38,
-     -72,-35, -71.5,-32, -70.5,-28, -70.5,-25, -70,-21, -71,-18, -74,-15.5, -76,-14, -79,-8,
-     -81,-6, -80.5,-4, -80,-2.5, -78.5,1, -77.5,4, -77.5,8.6],
-    // Europa, am oberen Rand angeschnitten
-    [-10,43, -9,39, -6,37, -2,36, 3,42, 7,43, 12,44, 16,42, 19,40, 15,38, 13,46, 17,48,
-     20,50, 21,54, 19,56, 12,56, 12,54, 8,54, 5,53, 4,51, 0,50, -2,49, -5,48, -1,46, -1,44, -10,43],
-    // Britische Inseln
-    [-5,50, -3,51, 1,51, 2,53, -1,55, -2,58, -5,58, -6,56, -5,53, -5,50],
-    // Nordwestafrika, angeschnitten
-    [-17,21, -16,28, -10,31, -6,35, 0,35, 10,34, 15,32, 20,32, 20,20, 10,20, 0,20, -8,21, -17,21]
-  ];
+  /* --- Ozean als Grundfläche ------------------------------------- */
+  const meer = document.createElementNS(NS, "rect");
+  meer.setAttribute("x", -B); meer.setAttribute("y", -H);
+  meer.setAttribute("width", B * 3); meer.setAttribute("height", H * 3);
+  meer.setAttribute("class", "ozean");
+  svg.appendChild(meer);
 
-  kuesten.forEach(paare => {
+  /* Marker werden über transform gegenskaliert statt über die Schriftgröße:
+     bei starkem Zoom fiele font-size sonst unter ein Pixel und verschwände. */
+  const marker = [];
+  function markerSetzen(g, x, y, k) {
+    g.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${k})`);
+  }
+
+  /* Hilfsfunktion: Längen-/Breitengrad-Paare zu einem Pfad */
+  const zuPfad = (paare, offen) => {
     let d = "";
     for (let i = 0; i < paare.length; i += 2)
       d += (i ? "L" : "M") + px(paare[i]).toFixed(1) + " " + py(paare[i + 1]).toFixed(1) + " ";
+    return d + (offen ? "" : "Z");
+  };
+
+  function flaeche(paare, klasse, offen) {
     const p = document.createElementNS(NS, "path");
-    p.setAttribute("d", d + "Z");
-    p.setAttribute("fill", "var(--verschlossen)");
-    p.setAttribute("stroke", "var(--linie)");
-    p.setAttribute("class", "kueste");
+    p.setAttribute("d", zuPfad(paare, offen));
+    p.setAttribute("class", klasse);
     p.setAttribute("stroke-linejoin", "round");
+    p.setAttribute("stroke-linecap", "round");
     svg.appendChild(p);
+    return p;
+  }
+
+  /* --- Landmassen ------------------------------------------------ */
+  const kuesten = [
+    // Nordamerika, am oberen Rand angeschnitten
+    [-124,56, -110,56, -95,56, -80,56, -68,52, -60,47, -66,45, -70,43, -74,40, -75.5,37,
+     -76,35, -78,33.5, -81,31, -80.5,27, -80,25, -82,26, -83,29, -85,30, -88,30, -90,29,
+     -94,29.5, -97,26, -97.5,25.9, -99,27, -101,29.5, -103,29, -106,31.8, -111,31, -117,33,
+     -120,34.5, -122,37, -124,40, -124,44, -125,48, -124,56],
+    // Mexiko mit Yucatán und Baja
+    [-117,33, -114,32, -111,31, -108,31.5, -106,31.8, -103,29, -101,29.5, -99,27, -97.5,25.9,
+     -97,22, -95.5,18.7, -94.5,18.2, -92,18.6, -90.5,19.6, -90,21, -88,21.6, -86.8,21.4,
+     -86.7,20.2, -87.5,19, -88.3,18.5, -89,17.9, -90.5,16, -92,15, -94,16, -96,15.7,
+     -98,16.3, -99.5,16.7, -101.5,17.6, -103.5,18.5, -105.2,20.2, -105.7,22, -106.5,23.5,
+     -108,25, -109.5,27, -112,29, -114,31, -117,33],
+    // Baja California
+    [-117,32.5, -114.5,31.5, -113,29.5, -112,27.5, -110.5,24.5, -109.5,23, -110.5,24,
+     -112,25.5, -114,27.5, -115,29.5, -116.5,31.5, -117,32.5],
+    // Mittelamerika
+    [-92,15.5, -89,16, -88.2,15.9, -87,13, -84,10.8, -82.5,9.7, -80,9.2, -78.5,9.4, -77.5,8.6,
+     -78,7.5, -80,8, -81.5,8.5, -83,9.5, -85,11, -87,12.5, -89,14, -92,14.5],
+    // Südamerika, mit ausgeformtem Río de la Plata
+    [-77.5,8.6, -76,9.5, -75,10.5, -73,11.5, -71,12, -68,11.2, -66,10.6, -63,10.8, -62,10.7,
+     -60,8.5, -58,6.8, -55,5.8, -52,5, -51,3, -50,0, -47.5,-1, -44,-2.5, -41,-3, -38,-5,
+     -35.5,-6.5, -35,-8, -36,-10, -37,-11, -38.5,-12.8, -39,-15, -39.5,-18, -41,-22,
+     -43,-23, -45,-24, -46.5,-24.5, -48,-25.5, -50,-28, -52,-32, -53.5,-33.5, -55,-34.5,
+     -56.3,-34.9, -57.8,-34.5, -58.5,-34.0, -58.7,-34.5, -57.3,-35.3, -57.0,-36.4,
+     -56.7,-36.9, -57.5,-38.2, -60,-38.9, -62,-39, -62.5,-41, -64,-42.3, -65,-42.5, -65,-45,
+     -67.5,-46, -67,-49, -68,-50.5, -69,-52, -68,-54.8, -67,-55.5, -70,-55, -71,-53.5,
+     -74,-52.5, -75,-50, -73.5,-47, -75,-45, -74,-43.5, -73.5,-42, -73.5,-40, -73,-38,
+     -72.5,-36, -71.5,-33, -71,-30, -70.5,-28, -70.5,-25, -70.4,-23, -70,-21, -70.3,-19,
+     -71,-18, -73,-16.5, -74,-15.5, -76,-14, -76.3,-13.5, -77.2,-12.3, -77.1,-11.7,
+     -78.3,-10, -79,-8, -81,-6, -80.5,-4, -80,-2.5, -79.5,-1, -78.5,1, -77.5,4, -77.5,8.6],
+    // Europa
+    [-9.5,43, -9,39, -7,37, -6,36, -2,36.5, 0,39, 3,42, 4,43.5, 7,43.5, 9,44, 12,44,
+     14,42, 16,41.5, 18,40, 16,38.5, 15,38, 13,45.5, 14,45, 17,46, 19,48, 20,50, 21,54,
+     19,56, 14,56, 12,54.5, 10,54.5, 8,54, 6,53.5, 4,52, 4,51, 2,51, 0,50, -2,49, -4.5,48.5,
+     -2,47, -1,46, -1.5,44, -9.5,43],
+    // Britische Inseln
+    [-5,50, -3,50.7, -1,50.7, 1,51, 1.7,52.8, -0.5,54, -1.5,55.5, -2,57.5, -3.5,58.6,
+     -5,58.5, -5.5,57, -4.5,55.5, -5,53.5, -4,52.5, -5,51.5, -5,50],
+    // Irland
+    [-10,51.5, -8,51.6, -6,52.2, -6,54.2, -7,55.3, -9.5,54.3, -10,53, -10,51.5],
+    // Nordwestafrika, angeschnitten
+    [-17,21, -16.5,24, -15,27.7, -13,28.5, -10,31, -8,33, -6,35.2, -2,35.5, 2,36.8,
+     8,37, 10,37.2, 11,33.5, 15,32, 20,32, 20,20, 10,20, 0,20, -8,21, -17,21]
+  ];
+  kuesten.forEach(k => flaeche(k, "kueste"));
+
+  /* --- Gebirge, damit die Karte Relief bekommt -------------------- */
+  const gebirge = [
+    // Anden — schmales Band entlang der Westküste
+    [-72,-16, -69,-18, -67.5,-21, -67,-24, -67.5,-27, -68.5,-30, -69.5,-33, -70.5,-36,
+     -71.3,-39, -71.8,-42, -72.3,-45, -72.8,-48, -73.2,-51, -73.8,-52.5,
+     -74.6,-52, -74,-48.5, -73.6,-45, -73.2,-42, -72.7,-39, -71.8,-36, -71,-33, -70.3,-30,
+     -69.5,-27, -69,-24, -69.5,-21, -71,-18, -73,-16],
+    // Sierra Madre Occidental
+    [-108,29, -106,25, -105,22, -104.5,20.5, -103,20, -104,22, -105,25, -106.5,29, -108,29],
+    // Transmexikanischer Vulkangürtel — hier liegt der Iztaccíhuatl
+    [-103,19.6, -100,19.4, -98,19.2, -97,19.5, -98.5,19.8, -100.5,19.9, -103,20.1, -103,19.6],
+    // Alpen
+    [6,46, 9,46.5, 12,47, 14,47.3, 13,46.5, 10,45.8, 7,45.5, 6,46]
+  ];
+  gebirge.forEach(g => flaeche(g, "gebirge"));
+
+  /* --- Gewässer, die erst im Zoom Sinn ergeben -------------------- */
+  const gewaesser = [
+    // Nahuel Huapi bei Bariloche
+    [-71.9,-40.78, -71.6,-40.8, -71.35,-40.9, -71.1,-40.95, -71.05,-41.05, -71.4,-41.05,
+     -71.65,-40.97, -71.88,-40.9, -71.95,-40.83],
+    // Lago Correntoso / Villa La Angostura
+    [-71.72,-40.68, -71.6,-40.7, -71.55,-40.75, -71.65,-40.76, -71.75,-40.72],
+    // Lago Argentino bei El Calafate
+    [-73.4,-50.12, -72.9,-50.05, -72.5,-50.15, -72.1,-50.28, -71.95,-50.35, -72.2,-50.45,
+     -72.7,-50.5, -73.2,-50.42, -73.45,-50.28],
+    // Lago Viedma, nördlich davon
+    [-73.2,-49.5, -72.6,-49.45, -72.2,-49.55, -72.5,-49.68, -73.0,-49.65],
+    // Titicacasee, als Orientierung im Norden
+    [-69.8,-15.2, -69.2,-15.6, -68.7,-16.2, -69.2,-16.5, -69.9,-16.0]
+  ];
+  gewaesser.forEach(g => flaeche(g, "gewaesser"));
+
+  // Flüsse als Linien
+  const fluesse = [
+    // Paraná bei Iguazú, dann südwärts
+    [-54.62,-24.0, -54.6,-25.0, -54.58,-25.58, -54.75,-26.4, -55.5,-27.4, -56.5,-27.5,
+     -58,-27.3, -58.6,-29.5, -59.5,-31.5, -60.3,-33.2, -58.5,-34.2],
+    // Iguazú-Fluss von Osten zu den Fällen
+    [-53.2,-25.55, -54.0,-25.6, -54.35,-25.68, -54.58,-25.58],
+    // Uruguay
+    [-56.0,-27.4, -57.6,-30.2, -58.2,-32.5, -58.4,-34.0],
+    // Amazonas, grob
+    [-73,-4.5, -68,-3.8, -60,-3.2, -55,-2.2, -50,-1]
+  ];
+  fluesse.forEach(f => flaeche(f, "fluss", true));
+
+  /* --- Gipfel, die auf der Reise vorkommen ----------------------- */
+  const GIPFEL = [
+    { lon: -98.64, lat: 19.18, n: "Iztaccíhuatl" },
+    { lon: -98.62, lat: 19.02, n: "Popocatépetl" },
+    { lon: -71.88, lat: -41.16, n: "Tronador" },
+    { lon: -71.44, lat: -41.17, n: "Catedral" },
+    { lon: -73.04, lat: -49.27, n: "Fitz Roy" },
+    { lon: -65.20, lat: -23.15, n: "Hornocal" }
+  ];
+  const gipfelGruppe = document.createElementNS(NS, "g");
+  gipfelGruppe.setAttribute("class", "gipfel-schicht");
+  GIPFEL.forEach(g => {
+    const x = px(g.lon), y = py(g.lat);
+    const halter = document.createElementNS(NS, "g");
+    const s = document.createElementNS(NS, "path");
+    s.setAttribute("d", "M0 0 L-5 4.5 L5 4.5 Z M0 0 L-2 1.8 L-1 2.4 L0 1.9 L1 2.4 L2 1.8 Z");
+    s.setAttribute("class", "gipfel");
+    halter.appendChild(s);
+    gipfelGruppe.appendChild(halter);
+    marker.push({ g: halter, x, y });
+    markerSetzen(halter, x, y, 1);
   });
+  svg.appendChild(gipfelGruppe);
 
   // Äquator und Wendekreise
   [0, 23.44, -23.44].forEach(lat => {
     const l = document.createElementNS(NS, "line");
-    l.setAttribute("x1", 0); l.setAttribute("x2", B);
+    l.setAttribute("x1", -B); l.setAttribute("x2", B * 2);
     l.setAttribute("y1", py(lat)); l.setAttribute("y2", py(lat));
     l.setAttribute("class", "breitengrad");
     svg.appendChild(l);
@@ -1786,13 +1948,6 @@ function karteBauen() {
     return p;
   });
 
-  /* Marker werden über transform gegenskaliert statt über die Schriftgröße:
-     bei starkem Zoom fiele font-size sonst unter ein Pixel und verschwände. */
-  const marker = [];
-  function markerSetzen(g, x, y, k) {
-    g.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${k})`);
-  }
-
   /* --- Einzelorte, nur im Zoom sichtbar -------------------------- */
   const ortGruppen = {};
   for (const [id, o] of Object.entries(ORTE)) {
@@ -1820,6 +1975,7 @@ function karteBauen() {
 
   /* --- Regionen als antippbare Punkte ---------------------------- */
   const regionGruppen = {};
+  const regionLabels = [];
   REGIONEN.forEach((r, i) => {
     const mittel = r.orte.reduce((a, id) => ({
       lon: a.lon + ORTE[id].lon / r.orte.length,
@@ -1867,7 +2023,28 @@ function karteBauen() {
     regionGruppen[r.id] = g;
     marker.push({ g, x, y });
     markerSetzen(g, x, y, 1);
+    regionLabels.push({ txt, x, dx: Math.abs(r.dx), anker: r.anker });
   });
+
+  /* Ortsnamen kippen auf die freie Seite, wenn sie sonst aus dem
+     Kartenrand laufen — das hängt von der Anzeigebreite ab. */
+  function labelsAusrichten(box, k) {
+    const links = box[0], rechts = box[0] + box[2];
+    regionLabels.forEach(L => {
+      L.txt.setAttribute("text-anchor", L.anker);
+      L.txt.setAttribute("x", L.anker === "end" ? -L.dx : L.dx);
+      let bb;
+      try { bb = L.txt.getBBox(); } catch { return; }
+      const l = L.x + bb.x * k, r = l + bb.width * k;
+      if (l < links + 3) {
+        L.txt.setAttribute("text-anchor", "start");
+        L.txt.setAttribute("x", L.dx);
+      } else if (r > rechts - 3) {
+        L.txt.setAttribute("text-anchor", "end");
+        L.txt.setAttribute("x", -L.dx);
+      }
+    });
+  }
 
   /* --- Maßstab, nur im Zoom ------------------------------------- */
   const massstab = document.createElementNS(NS, "g");
@@ -1906,10 +2083,11 @@ function karteBauen() {
   const flieger = document.createElementNS(NS, "g");
   flieger.setAttribute("class", "flieger-marke");
   flieger.setAttribute("hidden", "");
-  const fSym = document.createElementNS(NS, "path");
-  // Kleines Flugzeug, Nase nach rechts
-  fSym.setAttribute("d", "M13 0 L-3 -6 L-6 -6 L-2.5 0 L-6 6 L-3 6 Z M-2 -1 L-9 -4 L-11 -3 L-8 0 L-11 3 L-9 4 L-2 1 Z");
+  const fSym = document.createElementNS(NS, "text");
   fSym.setAttribute("class", "flieger-form");
+  fSym.setAttribute("text-anchor", "middle");
+  fSym.setAttribute("dominant-baseline", "central");
+  fSym.textContent = "✈️";
   flieger.appendChild(fSym);
   svg.appendChild(flieger);
 
@@ -1947,6 +2125,7 @@ function karteBauen() {
     svg.style.setProperty("--k", k.toFixed(4));
     marker.forEach(m => markerSetzen(m.g, m.x, m.y, k));
     massstabSetzen(box, k);
+    labelsAusrichten(box, k);
   }
 
   // Bei Größenänderung neu ausrechnen
@@ -2022,7 +2201,7 @@ function karteBauen() {
 
     const laengen = flugPfade.map(p => { try { return p.getTotalLength(); } catch { return 0; } });
     const gesamtL = laengen.reduce((s, l) => s + l, 0) || 1;
-    const dauer = reduziert ? 1 : 7000;
+    const dauer = reduziert ? 1 : 17000;
     flieger.removeAttribute("hidden");
 
     const t0 = performance.now();
@@ -2036,7 +2215,8 @@ function karteBauen() {
         const pfad = flugPfade[idx];
         const pos = pfad.getPointAtLength(rest);
         const vor = pfad.getPointAtLength(Math.min(laengen[idx], rest + 2));
-        const winkel = Math.atan2(vor.y - pos.y, vor.x - pos.x) * 180 / Math.PI;
+        // Das Emoji zeigt von Haus aus nach rechts oben, daher die 45 Grad Ausgleich
+        const winkel = Math.atan2(vor.y - pos.y, vor.x - pos.x) * 180 / Math.PI + 45;
         flieger.setAttribute("transform",
           `translate(${pos.x.toFixed(2)} ${pos.y.toFixed(2)}) rotate(${winkel.toFixed(1)}) scale(${faktor(aktuelleBox).toFixed(4)})`);
       } catch {}
