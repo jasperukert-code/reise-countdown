@@ -1082,8 +1082,7 @@ const CFG = {
   vonStadt:  "Frankfurt",
 };
 
-const ANREDE = CFG.anrede || CFG.name || "du";
-const SIG    = CFG.absender ? "— " + CFG.absender : "";
+const SIG = CFG.absender ? "— " + CFG.absender : "";
 
 /* ============================================================
    BASIS
@@ -1109,6 +1108,22 @@ const istHeute = (tag) => heuteMitternacht().getTime() === tagDatum(tag).getTime
 
 const WOCHENTAG = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
 const langesDatum = (tag) => WOCHENTAG[tagDatum(tag).getDay()] + ", " + tag + ". August " + JAHR;
+
+/* Texte, die eine Frist nennen, müssen mitwandern — ein Türchen bleibt
+   ja offen und wird womöglich Tage später noch einmal gelesen. */
+const tageBisAbflug = () => {
+  const ab = new Date(ABFLUG); ab.setHours(0, 0, 0, 0);
+  return Math.max(0, Math.round((ab - heuteMitternacht()) / 86400000));
+};
+const ZAHLWORT = ["null","ein","zwei","drei","vier","fünf","sechs","sieben","acht","neun","zehn"];
+const inTagen = () => {
+  const n = tageBisAbflug();
+  if (n === 0) return "heute";
+  if (n === 1) return "morgen";
+  if (n === 2) return "übermorgen";
+  return "in " + (ZAHLWORT[n] || n) + " Tagen";
+};
+const gross = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const reduziert = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -1267,7 +1282,7 @@ const TUEREN = [
   { tag: 12, sym: "los",    titel: "Drei Rubbellose", teaser: "Freirubbeln. Einlösbar unterwegs." },
   { tag: 13, sym: "koffer", titel: "Kofferchaos",     teaser: "Ein Spiel. Steigeisen ja, Weihnachtsbaum nein." },
   { tag: 14, sym: "reden",  titel: "Notfall-Spanisch",teaser: "Die Sätze, die wirklich zählen." },
-  { tag: 15, sym: "liste",  titel: "Die letzte Liste",teaser: "Morgen früh. Also heute packen." },
+  { tag: 15, sym: "liste",  titel: "Die letzte Liste",teaser: "Morgen Mittag geht der Flieger. Also heute packen." },
   { tag: 16, sym: "flug",   titel: "Boarding",        teaser: "Das war's mit Warten." }
 ];
 
@@ -1397,7 +1412,7 @@ INHALTE[10] = {
                Tipp auf einen Punkt, dann siehst du, was dort wartet.`),
   render(w) {
     const n = el("div", "notiz");
-    n.innerHTML = `In sechs Tagen sitzen wir im Flieger.<br>
+    n.innerHTML = `${gross(inTagen())} sitzen wir im Flieger.<br>
       Bis dahin gibt es jeden Tag hier etwas — ein Spiel, ein Quiz, ein paar Versprechen zum Freirubbeln.
       Immer nur eins, immer erst, wenn der Tag da ist.
       ${SIG ? `<span class="sig">${SIG}</span>` : ""}`;
@@ -2258,7 +2273,7 @@ const PACKEN = [
 ];
 
 INHALTE[15] = {
-  lead: flach(`Morgen früh geht es los. Heute ist der Tag,
+  lead: flach(`Morgen um halb zwei geht der Flieger. Heute ist der Tag,
                an dem man merkt, was noch fehlt.`),
   render(w) {
     const alle = PACKEN.reduce((n, g) => n + g.punkte.length, 0);
@@ -2322,7 +2337,7 @@ INHALTE[15] = {
    TAG 16 — BOARDING
    ============================================================ */
 INHALTE[16] = {
-  lead: "Kein Türchen mehr. Nur noch Gate, Sitzplatz und ungefähr fünfzehn Stunden Flug.",
+  lead: "Kein Türchen mehr. Nur noch Gate, Sitzplatz und zwölf Stunden über den Atlantik.",
   render(w) {
     const bp = el("div", "bp");
     bp.innerHTML = `
