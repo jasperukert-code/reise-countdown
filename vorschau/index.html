@@ -3810,8 +3810,8 @@ function tagAus(text) {
   return new Date(JAHR, MONATSKUERZEL[m[2]], +m[1]);
 }
 
-/* Wo steckt die Reise gerade? Gibt null zurück, solange sie noch nicht
-   losgegangen oder schon vorbei ist. */
+/* Wo steckt die Reise gerade? null, solange sie noch bevorsteht;
+   danach entweder der laufende Tag oder die Rückschau. */
 function reiseStand() {
   const heute = heuteMitternacht();
   const start = tagAus(ETAPPEN[0].von);
@@ -3819,7 +3819,8 @@ function reiseStand() {
   if (!start || !schluss) return null;
   const tag = Math.round((heute - start) / 86400000) + 1;
   const gesamt = Math.round((schluss - start) / 86400000) + 1;
-  if (tag < 1 || tag > gesamt) return null;
+  if (tag < 1) return null;
+  if (tag > gesamt) return { vorbei: true, gesamt };
 
   let aktuell = null;
   ETAPPEN.forEach(e => { const v = tagAus(e.von); if (v && v <= heute) aktuell = e; });
@@ -3831,9 +3832,10 @@ function reiseStand() {
    ============================================================ */
 INHALTE[16] = {
   get lead() {
-    return reiseStand()
-      ? "Der Countdown ist abgelaufen, die Reise nicht. Hier steht, wie weit ihr seid."
-      : "Kein Türchen mehr. Nur noch Gate, Sitzplatz und zwölf Stunden über den Atlantik.";
+    const s = reiseStand();
+    if (!s) return "Kein Türchen mehr. Nur noch Gate, Sitzplatz und zwölf Stunden über den Atlantik.";
+    if (s.vorbei) return "Wieder da. Der Boarding Pass bleibt trotzdem liegen.";
+    return "Der Countdown ist abgelaufen, die Reise nicht. Hier steht, wie weit ihr seid.";
   },
   render(w) {
     const bp = el("div", "bp");
@@ -3885,6 +3887,11 @@ INHALTE[16] = {
         <div><div class="z" id="fH">–</div><div class="l">Stunden</div></div>
         <div><div class="z" id="fM">–</div><div class="l">Minuten</div></div>
         <div><div class="z" id="fS">–</div><div class="l">Sekunden</div></div>`;
+    } else if (stand.vorbei) {
+      uhr.innerHTML = `
+        <div><div class="z">${stand.gesamt}</div><div class="l">Tage unterwegs</div></div>
+        <div><div class="z">3</div><div class="l">Länder</div></div>
+        <div><div class="z">${Math.round(GESAMT_KM).toLocaleString("de-DE")}</div><div class="l">Kilometer</div></div>`;
     } else {
       uhr.innerHTML = `
         <div><div class="z">${stand.tag}</div><div class="l">Tag von ${stand.gesamt}</div></div>
@@ -3913,15 +3920,21 @@ INHALTE[16] = {
     }
 
     const n = el("div", "notiz");
-    n.innerHTML = stand
-      ? `Sechs Tage lang stand hier jeden Tag eine Kleinigkeit.
-         Inzwischen passiert das Echte — draußen, ohne Bildschirm.
-         <br><br>Der Boarding Pass bleibt trotzdem hier liegen.
-         ${SIG ? `<span class="sig">${SIG}</span>` : ""}`
-      : `Sechs Tage lang war hier jeden Tag eine Kleinigkeit.
+    const signatur = SIG ? `<span class="sig">${SIG}</span>` : "";
+    if (!stand) {
+      n.innerHTML = `Sechs Tage lang war hier jeden Tag eine Kleinigkeit.
          Ab jetzt passiert das Echte — und zwar draußen, in echt, ohne Bildschirm.
-         <br><br>Vámonos.
-         ${SIG ? `<span class="sig">${SIG}</span>` : ""}`;
+         <br><br>Vámonos.${signatur}`;
+    } else if (stand.vorbei) {
+      n.innerHTML = `Sechs Tage Warten, ${stand.gesamt} Tage unterwegs.
+         Vom Gipfel des Iztaccíhuatl bis zum Teufelsschlund, und zwischendurch
+         einmal Tango.
+         <br><br>Beim nächsten Mal fangen wir wieder mit sieben Türchen an.${signatur}`;
+    } else {
+      n.innerHTML = `Sechs Tage lang stand hier jeden Tag eine Kleinigkeit.
+         Inzwischen passiert das Echte — draußen, ohne Bildschirm.
+         <br><br>Der Boarding Pass bleibt trotzdem hier liegen.${signatur}`;
+    }
     w.appendChild(n);
 
     const knopf = el("p", "mitte");
