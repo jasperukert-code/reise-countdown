@@ -510,6 +510,29 @@ footer {
 .schliessen:hover { background: var(--akzent); color: var(--auf-akzent); transform: rotate(90deg); }
 .schliessen:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
 
+/* Blättern zwischen den offenen Türchen, gegenüber dem Schließkreuz */
+.o-blaettern {
+  position: sticky;
+  top: calc(26px + env(safe-area-inset-top, 0px));
+  z-index: 5;
+  float: left;
+  display: flex; gap: 8px;
+}
+.o-blaettern button {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--karte);
+  border: 1px solid var(--linie-satt);
+  color: var(--schrift);
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s, color .2s, opacity .2s;
+}
+.o-blaettern button:hover:not(:disabled) { background: var(--akzent); color: var(--auf-akzent); }
+.o-blaettern button:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+.o-blaettern button:disabled { opacity: .25; cursor: default; }
+
 .o-kopf { padding-top: 22px; margin-bottom: 26px; clear: both; }
 .o-datum {
   font-family: var(--mono);
@@ -791,6 +814,31 @@ footer {
 .et-dazu p { margin: 0; font-size: .84rem; line-height: 1.5; color: var(--schrift-2); }
 @keyframes einfaden { to { opacity: 1; } }
 .flieger { offset-path: var(--pfad); animation: fliegen 3.4s ease-out forwards; font-size: 15px; }
+
+/* Bereits geflogene Abschnitte treten zurück */
+.karte-svg .route-linie.geflogen {
+  stroke-dasharray: none;
+  stroke: var(--jade);
+  opacity: .5;
+}
+
+/* Wo die Reise gerade steht */
+.station.hier .stadt-punkt { fill: var(--jade); }
+.station.hier .stadt-ring {
+  stroke: var(--jade);
+  animation: pulsring 2s ease-out infinite;
+}
+.station.hier .stadt-label { fill: var(--jade); }
+
+.karte-hier {
+  margin: 0 0 12px;
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--jade);
+}
+.karte-hier b { color: var(--schrift); font-size: .78rem; }
 
 /* Antippbare Stationen */
 .station { cursor: pointer; }
@@ -1277,6 +1325,10 @@ footer {
 <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="oTitel">
   <div class="overlay-inner">
     <button class="schliessen" id="schliessen" aria-label="Türchen schließen">✕</button>
+    <div class="o-blaettern">
+      <button id="oFrueher" type="button" aria-label="Vorheriges Türchen">←</button>
+      <button id="oSpaeter" type="button" aria-label="Nächstes Türchen">→</button>
+    </div>
     <div class="o-kopf">
       <p class="o-datum" id="oDatum"></p>
       <h2 class="o-titel" id="oTitel"></h2>
@@ -1583,12 +1635,35 @@ function oeffne(tag) {
   document.body.style.overflow = "hidden";
   $("#overlay").scrollTop = 0;
   bau.render($("#oInhalt"));
+  blaetternSetzen(tag);
   $("#schliessen").focus();
   if (!speicher.get("gesehen:" + tag, false)) {
     speicher.set("gesehen:" + tag, true);
     setTimeout(() => konfetti(70), 250);
   }
 }
+
+/* Blättern führt nur durch die bereits offenen Türchen — an den Enden
+   werden die Pfeile abgeschaltet statt zu springen. */
+let offenesTuerchen = null;
+
+function blaetternSetzen(tag) {
+  offenesTuerchen = tag;
+  const frei = TUEREN.filter(t => istFrei(t.tag)).map(t => t.tag);
+  const i = frei.indexOf(tag);
+  const frueher = $("#oFrueher"), spaeter = $("#oSpaeter");
+  frueher.disabled = i <= 0;
+  spaeter.disabled = i < 0 || i >= frei.length - 1;
+  frueher.dataset.ziel = i > 0 ? frei[i - 1] : "";
+  spaeter.dataset.ziel = (i >= 0 && i < frei.length - 1) ? frei[i + 1] : "";
+}
+
+["oFrueher", "oSpaeter"].forEach(id => {
+  document.getElementById(id).addEventListener("click", (e) => {
+    const ziel = +e.currentTarget.dataset.ziel;
+    if (ziel) oeffne(ziel);
+  });
+});
 
 function schliesse() {
   $("#overlay").classList.remove("auf");
@@ -1710,8 +1785,10 @@ const REGIONEN = [
    El Calafate–Salta und der Rückweg gehen über Zwischenstopps, weil es
    auf beiden Strecken keine Direktverbindung gibt. */
 const FLUEGE = [
-  ["fra", "cdmx"], ["cdmx", "lim"], ["lim", "bue"], ["bue", "bar"], ["bar", "cal"],
-  ["cal", "bue"], ["bue", "sla"], ["sla", "igu"], ["igu", "bue"], ["bue", "fra"], ["fra", "muc"]
+  ["fra", "cdmx", "16. Aug"], ["cdmx", "lim", "31. Aug"], ["lim", "bue", "3. Sep"],
+  ["bue", "bar", "6. Sep"],   ["bar", "cal", "11. Sep"],  ["cal", "bue", "14. Sep"],
+  ["bue", "sla", "14. Sep"],  ["sla", "igu", "20. Sep"],  ["igu", "bue", "23. Sep"],
+  ["bue", "fra", "30. Sep"],  ["fra", "muc", "1. Okt"]
 ];
 
 /* Landwege, nur im Zoom sichtbar */
@@ -1823,6 +1900,14 @@ function karteBauen() {
   const info = el("div", "karten-info");
   info.innerHTML = '<span class="ki-leer">Tipp eine Region an</span>';
   panel.appendChild(info);
+
+  // Während der Reise sagt die Karte, wo ihr steht
+  const standJetzt = reiseStand();
+  if (standJetzt && !standJetzt.vorbei && standJetzt.ort) {
+    const hinweis = el("p", "karte-hier");
+    hinweis.innerHTML = `Gerade in <b>${standJetzt.ort}</b> — Tag ${standJetzt.tag} von ${standJetzt.gesamt}`;
+    panel.insertBefore(hinweis, svg);
+  }
 
   const steuerung = el("div", "k-steuerung");
   steuerung.innerHTML = `
@@ -2007,19 +2092,27 @@ function karteBauen() {
     svg.appendChild(p);
   });
 
-  const flugPfade = FLUEGE.map(([a, b], i) => {
+  /* Läuft die Reise schon, wird sichtbar, was hinter euch liegt:
+     geflogene Abschnitte durchgezogen und zurückgenommen, kommende
+     weiter gestrichelt. */
+  const heuteTag = heuteMitternacht();
+  const flugPfade = FLUEGE.map(([a, b, wann], i) => {
+    const datum = tagAus(wann);
+    const schonGeflogen = datum && datum <= heuteTag;
     const p = document.createElementNS(NS, "path");
     p.setAttribute("d", bogenPfad(ORTE[a], ORTE[b], 0.15));
-    p.setAttribute("class", "route-linie");
+    p.setAttribute("class", "route-linie" + (schonGeflogen ? " geflogen" : ""));
     svg.appendChild(p);
-    requestAnimationFrame(() => {
-      try {
-        const L = p.getTotalLength();
-        p.style.strokeDasharray = "6 8";
-        p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }],
-          { duration: reduziert ? 1 : 520, delay: reduziert ? 0 : i * 210, fill: "forwards", easing: "ease-out" });
-      } catch {}
-    });
+    if (!schonGeflogen) {
+      requestAnimationFrame(() => {
+        try {
+          const L = p.getTotalLength();
+          p.style.strokeDasharray = "6 8";
+          p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }],
+            { duration: reduziert ? 1 : 520, delay: reduziert ? 0 : i * 210, fill: "forwards", easing: "ease-out" });
+        } catch {}
+      });
+    }
     return p;
   });
 
@@ -2051,6 +2144,8 @@ function karteBauen() {
   /* --- Regionen als antippbare Punkte ---------------------------- */
   const regionGruppen = {};
   const regionLabels = [];
+  const unterwegs = reiseStand();
+  const jetztHier = unterwegs && !unterwegs.vorbei ? unterwegs.ortKuerzel : null;
   REGIONEN.forEach((r, i) => {
     const mittel = r.orte.reduce((a, id) => ({
       lon: a.lon + ORTE[id].lon / r.orte.length,
@@ -2089,6 +2184,9 @@ function karteBauen() {
     txt.style.animationDelay = (i * 0.28 + 0.2) + "s";
     txt.textContent = r.kurz + (r.orte.length > 1 ? "  ·" + r.orte.length : "");
     g.appendChild(txt);
+
+    // Wo die Reise gerade steht, leuchtet die Region auf
+    if (jetztHier && r.orte.includes(jetztHier)) g.classList.add("hier");
 
     g.addEventListener("click", () => hinein(r));
     g.addEventListener("keydown", (e) => {
@@ -3822,7 +3920,11 @@ function reiseStand() {
 
   let aktuell = null;
   ETAPPEN.forEach(e => { const v = tagAus(e.von); if (v && v <= heute) aktuell = e; });
-  return { tag, gesamt, ort: aktuell ? ORTE[aktuell.o].name : null };
+  return {
+    tag, gesamt,
+    ort: aktuell ? ORTE[aktuell.o].name : null,
+    ortKuerzel: aktuell ? aktuell.o : null
+  };
 }
 
 /* ============================================================
