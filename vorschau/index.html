@@ -1004,6 +1004,24 @@ footer {
    TAG 5 — Sprachkarten
    ============================================================ */
 .karten-gitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 11px; }
+.sprach-gruppe {
+  font-family: var(--mono);
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--akzent);
+  margin: 26px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--linie);
+}
+.o-inhalt > .sprach-gruppe:first-child { margin-top: 0; }
+.sprach-hinweis {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  color: var(--jade);
+  text-align: center;
+}
 .kk { perspective: 900px; background: none; border: 0; padding: 0; cursor: pointer; height: 132px; font-family: inherit; }
 .kk:focus-visible { outline: 2px solid var(--akzent); outline-offset: 3px; border-radius: var(--r); }
 .kk-inner {
@@ -1529,7 +1547,7 @@ const TUEREN = [
   { tag: 11, sym: "quiz",   titel: "Das Quiz",        teaser: "Zwölf Fragen. Die Hälfte glaubst du mir nicht." },
   { tag: 12, sym: "los",    titel: "Drei Rubbellose", teaser: "Eines pro Land. Freirubbeln, dann gilt es." },
   { tag: 13, sym: "koffer", titel: "Kofferchaos",     teaser: "Ein Spiel. Steigeisen ja, Weihnachtsbaum nein." },
-  { tag: 14, sym: "reden",  titel: "Notfall-Spanisch",teaser: "Die Sätze, die wirklich zählen." },
+  { tag: 14, sym: "reden",  titel: "Notfall-Spanisch",teaser: "Die Sätze, die wirklich zählen — mit Lautschrift." },
   { tag: 15, sym: "liste",  titel: "Die letzte Liste",teaser: "Morgen Mittag geht der Flieger. Also heute packen." },
   { tag: 16, sym: "flug",   titel: "Boarding",        teaser: "Das war's mit Warten." }
 ];
@@ -3085,51 +3103,81 @@ function kofferSpiel() {
 /* ============================================================
    TAG 14 — NOTFALL-SPANISCH
    ============================================================ */
-const SAETZE = [
-  { de: "Einen Pisco Sour, bitte.",              es: "Un pisco sour, por favor.",            l: "un PIS-ko SAU-er, por fa-WOR",           wo: "Lima" },
-  { de: "Noch einen.",                            es: "Otro más.",                            l: "O-tro MAS",                              wo: "überall" },
-  { de: "Ist das scharf?",                        es: "¿Pica mucho?",                         l: "PI-ka MU-tscho",                         wo: "CDMX" },
-  { de: "Sehr scharf. Aber gut.",                 es: "Muy picante. Pero rico.",              l: "muy pi-KAN-te, PE-ro RI-ko",             wo: "CDMX" },
-  { de: "Wo ist die nächste Toilette?",           es: "¿Dónde está el baño?",                 l: "DON-de es-TA el BAN-jo",                 wo: "überall" },
-  { de: "Können wir das teilen?",                 es: "¿Lo podemos compartir?",               l: "lo po-DE-mos kom-par-TIR",               wo: "überall" },
-  { de: "Was empfehlen Sie?",                     es: "¿Qué me recomienda?",                  l: "ke me re-ko-MJEN-da",                    wo: "überall" },
-  { de: "Die Rechnung, bitte.",                   es: "La cuenta, por favor.",                l: "la KWEN-ta, por fa-WOR",                 wo: "überall" },
-  { de: "Ich bin nur müde, nicht sauer.",         es: "Solo estoy cansada, no enojada.",      l: "SO-lo es-TOY kan-SA-da, no e-no-CHA-da", wo: "überall" },
-  { de: "Das ist zu teuer.",                      es: "Está muy caro.",                       l: "es-TA muy KA-ro",                        wo: "Märkte" },
-  { de: "Wie hoch sind wir hier?",                es: "¿A qué altura estamos?",               l: "a ke al-TU-ra es-TA-mos",                wo: "Izta · Tilcara" },
-  { de: "Ich brauche eine Pause.",                es: "Necesito un descanso.",                l: "ne-se-SI-to un des-KAN-so",              wo: "am Berg" },
-  { de: "Gibt es Chiles en Nogada?",              es: "¿Hay chiles en nogada?",               l: "ai TSCHI-les en no-GA-da",               wo: "Puebla" },
-  { de: "Wie kalt wird es heute Nacht?",          es: "¿Qué tan frío hará esta noche?",       l: "ke tan FRI-o a-RA ES-ta NO-tsche",       wo: "Patagonien" }
+const SPRACHGRUPPEN = [
+  { titel: "Bestellen", saetze: [
+    { de: "Was empfehlen Sie?",             es: "¿Qué me recomienda?",             l: "ke me re-ko-MJEN-da",              wo: "überall" },
+    { de: "Ein großes Bier, bitte.",        es: "Una cerveza grande, por favor.",  l: "U-na ser-WE-sa GRAN-de, por fa-WOR", wo: "überall" },
+    { de: "Einen Pisco Sour, bitte.",       es: "Un pisco sour, por favor.",       l: "un PIS-ko SAU-er, por fa-WOR",     wo: "Lima" },
+    { de: "Noch einen.",                    es: "Otro más.",                       l: "O-tro MAS",                        wo: "überall" },
+    { de: "Können wir das teilen?",         es: "¿Lo podemos compartir?",          l: "lo po-DE-mos kom-par-TIR",         wo: "überall" },
+    { de: "Die Rechnung, bitte.",           es: "La cuenta, por favor.",           l: "la KWEN-ta, por fa-WOR",           wo: "überall" }
+  ]},
+  { titel: "Wenn es genau werden muss", saetze: [
+    { de: "Für mich ohne Zwiebeln, bitte.", es: "Para mí sin cebolla, por favor.", l: "PA-ra MI sin se-BO-ja, por fa-WOR", wo: "überall" },
+    { de: "Ohne Koriander, bitte.",         es: "Sin cilantro, por favor.",        l: "sin si-LAN-tro, por fa-WOR",       wo: "Mexiko" },
+    { de: "Ist das scharf?",                es: "¿Pica mucho?",                    l: "PI-ka MU-tscho",                   wo: "Mexiko" },
+    { de: "Gibt es Chiles en Nogada?",      es: "¿Hay chiles en nogada?",          l: "ai TSCHI-les en no-GA-da",         wo: "Puebla" }
+  ]},
+  { titel: "Unterwegs", saetze: [
+    { de: "Wo ist die nächste Toilette?",   es: "¿Dónde está el baño?",            l: "DON-de es-TA el BAN-jo",           wo: "überall" },
+    { de: "Nur schauen, danke.",            es: "Solo estoy mirando, gracias.",    l: "SO-lo es-TOY mi-RAN-do, GRA-sjas", wo: "Märkte" },
+    { de: "Das ist zu teuer.",              es: "Está muy caro.",                  l: "es-TA muy KA-ro",                  wo: "Märkte" },
+    { de: "Wo kann ich Geld wechseln?",     es: "¿Dónde puedo cambiar dinero?",    l: "DON-de PWE-do kam-BJAR di-NE-ro",  wo: "Argentinien" },
+    { de: "Ich verstehe nicht.",            es: "No entiendo.",                    l: "no en-TJEN-do",                    wo: "überall" },
+    { de: "Können Sie langsamer sprechen?", es: "¿Puede hablar más despacio?",     l: "PWE-de a-BLAR mas des-PA-sjo",     wo: "überall" },
+    { de: "Ich bin noch nie geritten.",     es: "Nunca he montado a caballo.",     l: "NUN-ka e mon-TA-do a ka-BA-jo",    wo: "Estancia" }
+  ]},
+  { titel: "In der Höhe und in der Kälte", saetze: [
+    { de: "Wie hoch sind wir hier?",        es: "¿A qué altura estamos?",          l: "a ke al-TU-ra es-TA-mos",          wo: "Izta · Tilcara" },
+    { de: "Mir ist schwindelig.",           es: "Estoy mareada.",                  l: "es-TOY ma-re-A-da",                wo: "über 3.000 m" },
+    { de: "Ich brauche eine Pause.",        es: "Necesito un descanso.",           l: "ne-se-SI-to un des-KAN-so",        wo: "am Berg" },
+    { de: "Wie kalt wird es heute Nacht?",  es: "¿Qué tan frío hará esta noche?",  l: "ke tan FRI-o a-RA ES-ta NO-tsche", wo: "Patagonien" }
+  ]},
+  { titel: "Abends", saetze: [
+    { de: "Auf uns!",                       es: "¡Por nosotros!",                  l: "por no-SO-tros",                   wo: "überall" },
+    { de: "Das war ein guter Tag.",         es: "Fue un buen día.",                l: "fwe un bwen DI-a",                 wo: "überall" }
+  ]}
 ];
+const SAETZE = SPRACHGRUPPEN.flatMap(g => g.saetze);
 
 INHALTE[14] = {
-  lead: flach(`Vierzehn Karten. Tippen zum Umdrehen — sie werden auch vorgelesen.
-               Der Rest kommt beim Bestellen von selbst.`),
+  lead: flach(`${SAETZE.length} Karten, nach Situation sortiert. Tippen dreht sie um —
+               vorne steht, was du sagen willst, hinten wie es klingt.`),
   render(w) {
-    const g = el("div", "karten-gitter");
-    SAETZE.forEach((s) => {
-      const k = el("button", "kk");
-      k.type = "button";
-      k.setAttribute("aria-label", "Karte umdrehen: " + s.de);
-      k.innerHTML = `
-        <span class="kk-inner">
-          <span class="kk-seite kk-vorn">
-            <span class="de">${s.de}</span>
-            <span class="hinweis">Tippen</span>
-          </span>
-          <span class="kk-seite kk-hinten">
-            <span class="es">${s.es}</span>
-            <span class="lautschrift">${s.l}</span>
-            <span class="wo">${s.wo}</span>
-          </span>
-        </span>`;
-      k.addEventListener("click", () => {
-        k.classList.toggle("um");
-        if (k.classList.contains("um")) sprich(s.es);
+    SPRACHGRUPPEN.forEach(gruppe => {
+      w.appendChild(el("p", "sprach-gruppe", gruppe.titel));
+      const g = el("div", "karten-gitter");
+      gruppe.saetze.forEach((s) => {
+        const k = el("button", "kk");
+        k.type = "button";
+        k.setAttribute("aria-label", "Karte umdrehen: " + s.de);
+        k.innerHTML = `
+          <span class="kk-inner">
+            <span class="kk-seite kk-vorn">
+              <span class="de">${s.de}</span>
+              <span class="hinweis">Tippen</span>
+            </span>
+            <span class="kk-seite kk-hinten">
+              <span class="es">${s.es}</span>
+              <span class="lautschrift">${s.l}</span>
+              <span class="wo">${s.wo}</span>
+            </span>
+          </span>`;
+        k.addEventListener("click", () => {
+          k.classList.toggle("um");
+          if (k.classList.contains("um")) sprich(s.es);
+        });
+        g.appendChild(k);
       });
-      g.appendChild(k);
+      w.appendChild(g);
     });
-    w.appendChild(g);
+
+    // Nur erwähnen, wenn das Gerät tatsächlich eine spanische Stimme hat
+    if (kannSprechen()) {
+      const hoerbar = el("p", "sprach-hinweis",
+        "Beim Umdrehen wird der Satz auch vorgelesen.");
+      w.appendChild(hoerbar);
+    }
 
     const p = el("div", "panel");
     p.innerHTML = `<p class="panel-titel">Drei Länder, drei Zungenschläge</p>
@@ -3146,20 +3194,40 @@ INHALTE[14] = {
   }
 };
 
-function sprich(text) {
+/* Vorgelesen wird nur, wenn das Gerät wirklich eine spanische Stimme hat.
+   Sonst spräche die deutsche Standardstimme den spanischen Satz — das
+   klingt nicht nach Spanisch und führt beim Üben in die Irre. Die
+   Lautschrift auf der Karte funktioniert dagegen immer. */
+let spanischeStimme = null;
+
+function stimmeSuchen() {
   try {
-    if (!("speechSynthesis" in window)) return;
+    const alle = speechSynthesis.getVoices();
+    spanischeStimme =
+      alle.find(v => /^es[-_](MX|419|AR|PE|US)/i.test(v.lang)) ||
+      alle.find(v => /^es\b|^es[-_]/i.test(v.lang)) || null;
+  } catch { spanischeStimme = null; }
+}
+
+if ("speechSynthesis" in window) {
+  stimmeSuchen();
+  speechSynthesis.addEventListener("voiceschanged", stimmeSuchen);
+}
+
+function kannSprechen() { return !!spanischeStimme; }
+
+function sprich(text) {
+  if (!spanischeStimme) return false;
+  try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "es-MX";
-    u.rate = 0.88;
-    const stimmen = speechSynthesis.getVoices();
-    const s = stimmen.find(v => /^es[-_]/i.test(v.lang));
-    if (s) u.voice = s;
+    u.voice = spanischeStimme;
+    u.lang = spanischeStimme.lang;
+    u.rate = 0.85;
     speechSynthesis.speak(u);
-  } catch {}
+    return true;
+  } catch { return false; }
 }
-if ("speechSynthesis" in window) speechSynthesis.getVoices();
 
 /* ============================================================
    TAG 15 — DIE LETZTE LISTE
