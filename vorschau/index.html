@@ -3227,7 +3227,7 @@ const musik = (() => {
   const KLICK = [2, 5, 8, 11, 14, 17, 20, 23];
 
   let ac = null, summe = null, laeuft = false;
-  let naechster = 0, schritt = 0, uhr = null, faktor = 1;
+  let naechster = 0, schritt = 0, uhr = null, faktor = 1, lauf = 0;
   let an = speicher.get("musikAn", true);
 
   const hz = (halb) => 220 * Math.pow(2, halb / 12);
@@ -3271,7 +3271,12 @@ const musik = (() => {
     o.start(start); o.stop(start + 0.08);
   }
 
-  function planen() {
+  /* Jeder Start bekommt eine eigene Nummer. Nur die aktuelle Schleife
+     darf weiterplanen — sonst setzt eine gerade laufende Runde nach dem
+     Stoppen noch einen neuen Zeitgeber, und beim Fortsetzen liefen am
+     Ende mehrere Schleifen nebeneinander. */
+  function planen(meine) {
+    if (!laeuft || meine !== lauf) return;
     const achtel = ACHTEL_GRUND / faktor;
     while (naechster < ac.currentTime + 0.15) {
       const pos = schritt % TAKTLAENGE;
@@ -3286,7 +3291,7 @@ const musik = (() => {
       naechster += achtel;
       schritt++;
     }
-    uhr = setTimeout(planen, 30);
+    uhr = setTimeout(() => planen(meine), 30);
   }
 
   const api = {
@@ -3296,25 +3301,28 @@ const musik = (() => {
         if (!ac) {
           ac = new (window.AudioContext || window.webkitAudioContext)();
           summe = ac.createGain();
-          summe.gain.value = 0.5;
           summe.connect(ac.destination);
         }
         if (ac.state === "suspended") ac.resume();
+        // Lautstärke hier setzen statt nach dem Ausblenden zurückzudrehen
+        summe.gain.cancelScheduledValues(ac.currentTime);
+        summe.gain.setValueAtTime(0.5, ac.currentTime);
         laeuft = true;
         schritt = 0;
         naechster = ac.currentTime + 0.08;
-        planen();
+        planen(++lauf);
       } catch { laeuft = false; }
     },
     stopp() {
       laeuft = false;
+      lauf++;                       // macht jede noch laufende Schleife ungültig
       clearTimeout(uhr);
+      uhr = null;
       if (summe && ac) {
         try {
           summe.gain.cancelScheduledValues(ac.currentTime);
           summe.gain.setValueAtTime(summe.gain.value, ac.currentTime);
-          summe.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.35);
-          setTimeout(() => { if (!laeuft && summe) summe.gain.value = 0.5; }, 500);
+          summe.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.3);
         } catch {}
       }
     },
