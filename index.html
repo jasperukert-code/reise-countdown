@@ -3391,6 +3391,23 @@ if (VORSCHAU) {
 })();
 
 // Beim ersten Besuch: kleiner Empfang
+/* Kommt die Seite nach längerer Pause zurück, einmal frisch holen.
+   Ein Startbildschirm-Symbol kann tagelang im Speicher liegen und
+   würde sonst alte Inhalte und einen stehengebliebenen Countdown
+   zeigen. Der Fortschritt bleibt dabei erhalten, er liegt im
+   Speicher des Geräts und nicht in der Seite. */
+(() => {
+  let weg = 0;
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { weg = Date.now(); return; }
+    const pause = weg ? Date.now() - weg : 0;
+    weg = 0;
+    if (pause > 20 * 60 * 1000 && !$("#overlay").classList.contains("auf")) {
+      location.reload();
+    }
+  });
+})();
+
 if (!speicher.get("begruesst", false)) {
   speicher.set("begruesst", true);
   setTimeout(() => konfetti(90, .5, .3), 700);
