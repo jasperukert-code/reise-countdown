@@ -481,16 +481,20 @@ footer {
 .overlay.auf { display: block; animation: einblenden .3s ease; }
 @keyframes einblenden { from { opacity: 0; } to { opacity: 1; } }
 
+/* Das Overlay liegt außerhalb von .wrap, muss die Statusleiste also
+   selbst aussparen — im Standalone-Modus klebte das Schließkreuz sonst
+   am oberen Bildschirmrand. */
 .overlay-inner {
   width: min(720px, 92vw);
   margin: 0 auto;
-  padding: 22px 0 90px;
+  padding: calc(30px + env(safe-area-inset-top, 0px)) 0 90px;
   position: relative;
   z-index: 1;
 }
 
 .schliessen {
-  position: sticky; top: 14px;
+  position: sticky;
+  top: calc(26px + env(safe-area-inset-top, 0px));
   float: right;
   z-index: 5;
   background: var(--karte);
@@ -506,7 +510,7 @@ footer {
 .schliessen:hover { background: var(--akzent); color: var(--auf-akzent); transform: rotate(90deg); }
 .schliessen:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
 
-.o-kopf { padding-top: 34px; margin-bottom: 26px; clear: both; }
+.o-kopf { padding-top: 22px; margin-bottom: 26px; clear: both; }
 .o-datum {
   font-family: var(--mono);
   font-size: .66rem;
