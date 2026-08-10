@@ -1082,6 +1082,22 @@ footer {
 }
 .hoeren:hover { border-color: var(--akzent); color: var(--akzent); }
 
+/* Rückblick auf die Woche im letzten Türchen */
+.bilanz-zeile {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 14px;
+  padding: 11px 0;
+  border-top: 1px solid var(--linie);
+  font-size: .9rem;
+  color: var(--schrift-2);
+}
+.bilanz-zeile b {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--akzent);
+  white-space: nowrap;
+}
+
 /* Musikschalter unter dem Spiel */
 .ton-zeile {
   display: flex; align-items: center; justify-content: space-between;
@@ -3774,11 +3790,42 @@ function galoppSpiel() {
   schleife();
 }
 
+/* Die Etappendaten stehen als Text da ("16. Aug"). Für den Reisestand
+   werden sie in echte Tage übersetzt. */
+const MONATSKUERZEL = { Jan: 0, Feb: 1, "Mär": 2, Apr: 3, Mai: 4, Jun: 5,
+                        Jul: 6, Aug: 7, Sep: 8, Okt: 9, Nov: 10, Dez: 11 };
+
+function tagAus(text) {
+  const m = /(\d+)\.\s*([A-Za-zÄÖÜäöü]+)/.exec(text || "");
+  if (!m || !(m[2] in MONATSKUERZEL)) return null;
+  return new Date(JAHR, MONATSKUERZEL[m[2]], +m[1]);
+}
+
+/* Wo steckt die Reise gerade? Gibt null zurück, solange sie noch nicht
+   losgegangen oder schon vorbei ist. */
+function reiseStand() {
+  const heute = heuteMitternacht();
+  const start = tagAus(ETAPPEN[0].von);
+  const schluss = tagAus(ETAPPEN[ETAPPEN.length - 1].von);
+  if (!start || !schluss) return null;
+  const tag = Math.round((heute - start) / 86400000) + 1;
+  const gesamt = Math.round((schluss - start) / 86400000) + 1;
+  if (tag < 1 || tag > gesamt) return null;
+
+  let aktuell = null;
+  ETAPPEN.forEach(e => { const v = tagAus(e.von); if (v && v <= heute) aktuell = e; });
+  return { tag, gesamt, ort: aktuell ? ORTE[aktuell.o].name : null };
+}
+
 /* ============================================================
    TAG 16 — BOARDING
    ============================================================ */
 INHALTE[16] = {
-  lead: "Kein Türchen mehr. Nur noch Gate, Sitzplatz und zwölf Stunden über den Atlantik.",
+  get lead() {
+    return reiseStand()
+      ? "Der Countdown ist abgelaufen, die Reise nicht. Hier steht, wie weit ihr seid."
+      : "Kein Türchen mehr. Nur noch Gate, Sitzplatz und zwölf Stunden über den Atlantik.";
+  },
   render(w) {
     const bp = el("div", "bp");
     bp.innerHTML = `
@@ -3819,22 +3866,57 @@ INHALTE[16] = {
     }
     bc.innerHTML = s;
 
+    /* Vor dem Abflug zählt die Uhr herunter. Danach hat sie ausgedient —
+       die Seite bleibt aber 46 Tage lang erreichbar, also zeigt sie ab
+       dann, wo die Reise gerade steht. */
+    const stand = reiseStand();
     const uhr = el("div", "final-uhr");
-    uhr.innerHTML = `
-      <div><div class="z" id="fH">–</div><div class="l">Stunden</div></div>
-      <div><div class="z" id="fM">–</div><div class="l">Minuten</div></div>
-      <div><div class="z" id="fS">–</div><div class="l">Sekunden</div></div>`;
+    if (!stand) {
+      uhr.innerHTML = `
+        <div><div class="z" id="fH">–</div><div class="l">Stunden</div></div>
+        <div><div class="z" id="fM">–</div><div class="l">Minuten</div></div>
+        <div><div class="z" id="fS">–</div><div class="l">Sekunden</div></div>`;
+    } else {
+      uhr.innerHTML = `
+        <div><div class="z">${stand.tag}</div><div class="l">Tag von ${stand.gesamt}</div></div>
+        ${stand.ort ? `<div><div class="z" style="font-size:1.1rem;font-family:var(--display)">${stand.ort}</div><div class="l">gerade hier</div></div>` : ""}
+        <div><div class="z">${stand.gesamt - stand.tag}</div><div class="l">noch übrig</div></div>`;
+    }
     w.appendChild(uhr);
 
+    // Was die Woche über zusammengekommen ist
+    const bilanz = [];
+    const quiz = speicher.get("quizBest", 0);
+    if (quiz) bilanz.push(["Quiz", `${quiz} von ${FRAGEN.length} richtig`]);
+    const koffer = speicher.get("kofferBest", 0);
+    if (koffer) bilanz.push(["Kofferchaos", `${koffer} Punkte`]);
+    const galopp = speicher.get("galoppBest", 0);
+    if (galopp) bilanz.push(["Galopp", `${galopp} Meter`]);
+    const lose = LOSE.filter((_, i) => speicher.get("los:" + i, false)).length;
+    if (lose) bilanz.push(["Rubbellose", `${lose} von ${LOSE.length} freigerubbelt`]);
+
+    if (bilanz.length) {
+      const b = el("div", "panel");
+      b.innerHTML = `<p class="panel-titel">Die Woche in Zahlen</p>` +
+        bilanz.map(([was, wert]) =>
+          `<div class="bilanz-zeile"><span>${was}</span><b>${wert}</b></div>`).join("");
+      w.appendChild(b);
+    }
+
     const n = el("div", "notiz");
-    n.innerHTML = `Sechs Tage lang war hier jeden Tag eine Kleinigkeit.
-      Ab jetzt passiert das Echte — und zwar draußen, in echt, ohne Bildschirm.
-      <br><br>Vámonos.
-      ${SIG ? `<span class="sig">${SIG}</span>` : ""}`;
+    n.innerHTML = stand
+      ? `Sechs Tage lang stand hier jeden Tag eine Kleinigkeit.
+         Inzwischen passiert das Echte — draußen, ohne Bildschirm.
+         <br><br>Der Boarding Pass bleibt trotzdem hier liegen.
+         ${SIG ? `<span class="sig">${SIG}</span>` : ""}`
+      : `Sechs Tage lang war hier jeden Tag eine Kleinigkeit.
+         Ab jetzt passiert das Echte — und zwar draußen, in echt, ohne Bildschirm.
+         <br><br>Vámonos.
+         ${SIG ? `<span class="sig">${SIG}</span>` : ""}`;
     w.appendChild(n);
 
     const knopf = el("p", "mitte");
-    knopf.innerHTML = '<button class="btn" id="gate">Gate öffnen</button>';
+    knopf.innerHTML = `<button class="btn" id="gate">${stand ? "Nochmal Konfetti" : "Gate öffnen"}</button>`;
     w.appendChild(knopf);
     $("#gate").addEventListener("click", () => {
       konfetti(200, .5, .45);
@@ -3844,16 +3926,19 @@ INHALTE[16] = {
       $("#gate").disabled = true;
     });
 
-    let id = setInterval(fTick, 1000);
-    fTick();
-    function fTick() {
-      if (!document.contains(uhr)) { clearInterval(id); return; }
-      const rest = ABFLUG - new Date();
-      const p = (n) => String(Math.max(0, n)).padStart(2, "0");
-      const s = Math.max(0, Math.floor(rest / 1000));
-      $("#fH").textContent = p(Math.floor(s / 3600));
-      $("#fM").textContent = p(Math.floor(s / 60) % 60);
-      $("#fS").textContent = p(s % 60);
+    // Die Sekundenuhr braucht es nur, solange der Abflug noch bevorsteht
+    if (!stand) {
+      const id = setInterval(fTick, 1000);
+      fTick();
+      function fTick() {
+        if (!document.contains(uhr)) { clearInterval(id); return; }
+        const rest = ABFLUG - new Date();
+        const p = (n) => String(Math.max(0, n)).padStart(2, "0");
+        const s = Math.max(0, Math.floor(rest / 1000));
+        $("#fH").textContent = p(Math.floor(s / 3600));
+        $("#fM").textContent = p(Math.floor(s / 60) % 60);
+        $("#fS").textContent = p(s % 60);
+      }
     }
   }
 };
