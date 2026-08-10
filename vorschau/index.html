@@ -1144,10 +1144,10 @@ footer {
 .vorspann.weg { opacity: 0; pointer-events: none; }
 .vs-bild { position: absolute; inset: 0; width: 100%; height: 100%; }
 .vs-wort {
-  /* Sitzt unter dem Horizont bei 45 %; die Querposition steuert das
-     Skript, weil der Name erst durchs Bild gezogen wird. */
+  /* Position steuert komplett das Skript: Der Name wird auf Reiterhöhe
+     hereingezogen und sinkt erst danach auf seinen Platz. */
   position: absolute;
-  top: 56%;
+  top: 0;
   left: 0;
   white-space: nowrap;
   letter-spacing: .1em;
@@ -4227,6 +4227,8 @@ function vorspann() {
   // Farbe des Vorhangs, der beim Schlusszoom durchstoßen wird
   const GRUND = getComputedStyle(document.documentElement)
     .getPropertyValue("--grund").trim() || "#101A2E";
+  const SONNE_ANTEIL = 0.36;
+  const sonnenRadius = () => Math.min(B, H) * SONNE_ANTEIL;
 
   /* Andenkette in Bruchteilen der Breite und der Kulissenhöhe.
      Zwei Ebenen: die hintere höher und heller, die vordere spitzer. */
@@ -4274,7 +4276,7 @@ function vorspann() {
     /* Abendsonne: nur die obere Hälfte, sie steht im Horizont.
        Der Reiter zieht später davor vorbei. */
     const sonne = weich(t / 1200);
-    const r = Math.min(B, H) * 0.32 * sonne;
+    const r = sonnenRadius() * sonne;
     if (r > 1) {
       const schein = ctx.createRadialGradient(B / 2, BODEN, r * 0.1, B / 2, BODEN, r * 1.5);
       schein.addColorStop(0, "rgba(228,172,56,.22)");
@@ -4301,7 +4303,7 @@ function vorspann() {
        Sonnenradius, damit die Scheibe immer darüber stehen bleibt. */
     const berg = weich((t - T_BERGE) / T_BERGE_DAUER);
     if (berg > 0) {
-      const hoehe = Math.min(Math.min(B, H) * 0.32 * 0.66, H * 0.15);
+      const hoehe = Math.min(sonnenRadius() * 0.58, H * 0.15);
       kette(KETTE_HINTEN, hoehe, (1 - berg) * hoehe * 0.9, "#152340");
       kette(KETTE_VORNE, hoehe * 0.72, (1 - berg) * hoehe * 0.5, "#0B1220");
     }
@@ -4348,9 +4350,22 @@ function vorspann() {
     } else if (t > T_WORT) {
       wx = links + weich((t - T_WORT) / (T_RAND - T_WORT)) * (rechts - links);
     }
+    // Höhe: auf Augenhöhe des Reiters, und dort bleibt er auch
+    const wh = wort.offsetHeight || 60;
+    const wy = BODEN - 90 * groesse * 0.55 - wh / 2;
+
+    /* Auf seiner Höhe ist die Sonnenscheibe nur so breit — der Name wird
+       zurückgenommen, bis er samt Abstand hineinpasst. Sonst schnitte das
+       V durch die Kontur. */
+    const abstandHorizont = BODEN - (wy + wh / 2);
+    const rVoll = sonnenRadius();
+    const platz = 2 * Math.sqrt(Math.max(1, rVoll * rVoll - abstandHorizont * abstandHorizont)) - 52;
+    const passt = Math.min(1, platz / Math.max(1, wb));
+
     const auf = weich((t - T_WORT) / 420);
     wort.style.opacity = t < T_ZOOM ? auf : 0;
-    wort.style.transform = `translate(${wx.toFixed(1)}px, 0) translateX(-50%)`;
+    wort.style.transform =
+      `translate(${wx.toFixed(1)}px, ${wy.toFixed(1)}px) translateX(-50%) scale(${passt.toFixed(3)})`;
 
     /* Schlusszoom: Die Leinwand wird zum Vorhang, aus dem der Name
        ausgestanzt ist. Er wächst auf das erste o zu, bis dessen Innenraum
@@ -4365,7 +4380,8 @@ function vorspann() {
       ctx.fillRect(0, 0, B, H);
 
       const stil = getComputedStyle(wort);
-      const basis = parseFloat(stil.fontSize);
+      // passt: dieselbe Verkleinerung wie eben noch beim Schriftzug
+      const basis = parseFloat(stil.fontSize) * passt;
       ctx.save();
       ctx.globalCompositeOperation = "destination-out";
       ctx.font = `italic 700 ${basis * skala}px ${stil.fontFamily}`;
@@ -4375,8 +4391,8 @@ function vorspann() {
       // Das erste o mittig halten: Abstand bis zu seiner Mitte messen
       const bisO = ctx.measureText("Vám").width;
       const mitO = ctx.measureText("Vámo").width;
-      // Anfangs dort stehen, wo eben noch der Schriftzug saß, dann zur Mitte
-      const yStart = H * 0.56 + basis * 0.34;
+      // Anfangs genau dort stehen, wo eben noch der Schriftzug saß
+      const yStart = wy + wh / 2;
       const y = yStart + (H / 2 - yStart) * Math.min(1, z * 3);
       ctx.fillText("Vámonos", B / 2 - (bisO + mitO) / 2, y);
       ctx.restore();
